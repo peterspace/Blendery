@@ -1,0 +1,27 @@
+/* 
+.tablet {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--gap-262xl);
+  background-image: url(/Hero.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: top;
+  text-align: left;
+  font-size: var(--text-20-bd-size);
+  color: var(--text-1-d);
+  font-family: var(--text-16-bd);
+} */
+
+.hero {
+  /* background-image: url(/public/tablet@3x.png); */
+  background-image: url(/Hero.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: top;
+}

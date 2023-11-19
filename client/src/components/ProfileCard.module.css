@@ -1,0 +1,33 @@
+.maxwell {
+  position: absolute;
+  width: 100%;
+  top: 69.23%;
+  left: 0;
+  letter-spacing: 0.02em;
+  line-height: 20px;
+  font-weight: 500;
+  display: inline-block;
+}
+.userAvatarIcon {
+  position: absolute;
+  height: 61.54%;
+  width: 72.73%;
+  top: 0;
+  right: 12.73%;
+  bottom: 38.46%;
+  left: 14.55%;
+  border-radius: 360px;
+  max-width: 100%;
+  overflow: hidden;
+  max-height: 100%;
+  object-fit: cover;
+}
+.profileCard {
+  position: relative;
+  width: 55px;
+  height: 65px;
+  text-align: left;
+  font-size: 14px;
+  color: '#9d9da3';
+  font-family: 14px var(--text-14-md);
+}

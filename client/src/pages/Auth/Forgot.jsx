@@ -1,0 +1,136 @@
+import React, { useState, useEffect } from 'react';
+import { Link, Navigate } from 'react-router-dom';
+import { FcGoogle } from 'react-icons/fc';
+import { FaFacebookSquare } from 'react-icons/fa';
+import { AiFillApple, AiOutlineClose } from 'react-icons/ai';
+import {
+  loginUser,
+  validateEmail,
+  forgotPassword,
+  resetPassword,
+} from '../../services/apiService';
+
+import { toast } from 'react-toastify';
+
+import { useDispatch } from 'react-redux';
+
+export const Forgot = (props) => {
+  const { setIsLogin, setIsRegister, setIsForgot } = props;
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+
+  const [redirectHome, setRedirectHome] = useState(false);
+
+  const dispatch = useDispatch();
+
+  // async function LoginSubmit() {
+  async function forgot(ev) {
+    ev.preventDefault();
+    if (!email) {
+      return toast.error('Please enter an email');
+    }
+
+    if (!validateEmail(email)) {
+      return toast.error('Please enter a valid email');
+    }
+
+    const userData = {
+      email,
+    };
+
+    try {
+      const data = forgotPassword(userData);
+      console.log({ userData: data });
+      setEmail('');
+      if (data) {
+        setMessage('Request sent');
+        setTimeout(() => {
+          setMessage('');
+          setIsLogin(true);
+          setIsRegister(false);
+          setIsForgot(false);
+        }, 10000); // 10 secs
+
+        // window.location.reload(); // relaod to update changes m,ade by localStoarge
+      }
+    } catch (e) {
+      alert('Password reset failed');
+    }
+  }
+
+  if (redirectHome) {
+    // return <Navigate to={'/landingPage'} />;
+    return <Navigate to={'/'} />;
+  }
+
+  const login = (
+    <div className="flex justify-center rounded-lg bg-white shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[375px] md:w-[500px] p-4">
+      <div className="flex flex-col gap-[24px]">
+        <div className="flex flex-col gap-[8px] md:gap-[12px]">
+          <div className="flex flex-row justify-between mt-[24px]">
+            <div className="text-[18px] md:text-[24px] font-extrabold leading-[32px] inline-block">
+              Forgot Password
+            </div>
+
+            <div className="transition-transform duration-300 hover:scale-125 cursor-pointer flex flex-row justify-center items-center p-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="#130D1A"
+                className="w-5 h-5"
+                onClick={() => setRedirectHome(true)}
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+          </div>
+
+          <div className="flex bg-lightslategray-300 md:w-[452px] w-[370px] h-px" />
+        </div>
+        <div className="flex flex-col gap-[8px]">
+          <div className="flex flex-row h-[48px] bg-whitesmoke-100 rounded outline outline-lightslategray-300 outline-[1px]">
+            <input
+              type="email"
+              className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 placeholder-darkgray-100 inline-block w-full outline-none bg-gray-100"
+              placeholder="your@email.com"
+              value={email}
+              onChange={(ev) => setEmail(ev.target.value)}
+            />
+          </div>
+          <div className="flex flex-row justify-center items-center">
+            <div
+              className="cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full"
+              onClick={forgot}
+            >
+              {message ? <>{message}</> : <>{'Get Reset Email'}</>}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-row gap-2 justify-end">
+          <div className="text-smi leading-[22px] text-gray-300 inline-block">
+            {'Remember your email and password?'}
+          </div>
+          <div
+            className="cursor-pointer text-smi leading-[22px] text-mediumspringgreen hover:text-opacity-80 inline-block"
+            onClick={() => {
+              setIsLogin(true);
+              setIsRegister(false);
+              setIsForgot(false);
+            }}
+          >
+            Login!
+          </div>
+        </div>
+
+        <div className="flex flex-row w-full" />
+      </div>
+    </div>
+  );
+  return <>{login}</>;
+};

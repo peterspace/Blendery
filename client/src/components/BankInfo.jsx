@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
-import { MdQrCodeScanner } from 'react-icons/md';
+import { MdQrCodeScanner } from "react-icons/md";
 
 export const BankInfo = (props) => {
   const {
@@ -21,7 +21,14 @@ export const BankInfo = (props) => {
     setPhone,
   } = props;
 
-  const [isNextStep, setIsNextStep] = useState(false);
+  const [isTermsChecked, setIsTermsChecked] = useState(false);
+
+  const handleSubmit = () => {
+    if (!isTermsChecked) {
+      return;
+    }
+    setPercentageProgress(3);
+  };
 
   const bankInfo = (
     <div className="flex justify-center rounded-lg bg-white shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[320px] xs:w-[340px] md:w-[500px] p-4">
@@ -36,7 +43,7 @@ export const BankInfo = (props) => {
           </div>
           <div className="flex bg-lightslategray-300 md:w-[452px] w-[320px] xs:w-[340px] h-px" />
         </div>
-        {provider?.name === 'Phone' && (
+        {provider?.name === "Phone" && (
           <>
             <div className="flex flex-col w-[320px] xs:w-[340px] md:w-[452px] gap-[8px]">
               <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between">
@@ -111,6 +118,10 @@ export const BankInfo = (props) => {
                 <div className="flex flex-row gap-2">
                   <input
                     type="checkbox"
+                    value={isTermsChecked}
+                    onChange={(event) => {
+                      setIsTermsChecked(event.target.checked);
+                    }}
                     className="outline-none bg-whitesmoke-100 accent-mediumspringgreen focus:accent-mediumspringgreen/30"
                   />
 
@@ -124,7 +135,7 @@ export const BankInfo = (props) => {
             </div>
           </>
         )}
-        {provider?.name === 'Card' && (
+        {provider?.name === "Card" && (
           <>
             <div className="flex flex-col w-[320px] xs:w-[340px] md:w-[452px] gap-[8px]">
               <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between">
@@ -182,6 +193,10 @@ export const BankInfo = (props) => {
                 <div className="flex flex-row gap-2">
                   <input
                     type="checkbox"
+                    value={isTermsChecked}
+                    onChange={(event) => {
+                      setIsTermsChecked(event.target.checked);
+                    }}
                     className="outline-none bg-whitesmoke-100 accent-mediumspringgreen focus:accent-mediumspringgreen/30"
                   />
 
@@ -196,25 +211,14 @@ export const BankInfo = (props) => {
           </>
         )}
 
-        {isNextStep ? (
-          <div
-            className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded"
-            onClick={() => {
-              setPercentageProgress(3);
-            }}
-          >
-            Next step
-          </div>
-        ) : (
-          <div
-            className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded"
-            onClick={() => {
-              setIsNextStep(true);
-            }}
-          >
-            {service} {fValue} {fToken?.symbol}
-          </div>
-        )}
+        <div
+          className={`mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded transition ease-in-out delay-150 ${
+            !isTermsChecked ? `bg-[#F3F5F8] text-[#586268]` : ""
+          }`}
+          onClick={handleSubmit}
+        >
+          {service} {fValue} {fToken?.symbol}
+        </div>
       </div>
     </div>
   );

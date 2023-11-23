@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
 
-import { MdQrCodeScanner } from 'react-icons/md';
+import { MdQrCodeScanner } from "react-icons/md";
 
 export const WalletInfo = (props) => {
   const {
@@ -12,7 +12,14 @@ export const WalletInfo = (props) => {
     fToken,
   } = props;
 
-  const [isNextStep, setIsNextStep] = useState(false);
+  const [isTermsChecked, setIsTermsChecked] = useState(false);
+
+  const handleSubmit = () => {
+    if (!isTermsChecked) {
+      return;
+    }
+    setPercentageProgress(3);
+  };
 
   const walletInfo = (
     <div className="flex justify-center rounded-lg bg-white shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[320px] xs:w-[340px] md:w-[500px] p-4">
@@ -70,6 +77,10 @@ export const WalletInfo = (props) => {
             <div className="flex flex-row gap-2">
               <input
                 type="checkbox"
+                value={isTermsChecked}
+                onChange={(event) => {
+                  setIsTermsChecked(event.target.checked);
+                }}
                 className="outline-none bg-whitesmoke-100 accent-mediumspringgreen focus:accent-mediumspringgreen/30"
               />
 
@@ -81,25 +92,15 @@ export const WalletInfo = (props) => {
             </div>
           </div>
         </div>
-        {isNextStep ? (
-          <div
-            className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded"
-            onClick={() => {
-              setPercentageProgress(3);
-            }}
-          >
-            Next step
-          </div>
-        ) : (
-          <div
-            className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded"
-            onClick={() => {
-              setIsNextStep(true);
-            }}
-          >
-            {service} {fValue} {fToken?.symbol}
-          </div>
-        )}
+
+        <div
+          className={`mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded transition ease-in-out delay-150 ${
+            !isTermsChecked ? `bg-[#F3F5F8] text-[#586268]` : ""
+          }`}
+          onClick={handleSubmit}
+        >
+          {service} {fValue} {fToken?.symbol}
+        </div>
       </div>
     </div>
   );

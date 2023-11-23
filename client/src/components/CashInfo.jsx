@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import { MdQrCodeScanner } from 'react-icons/md';
-
+import React, { useState } from "react";
+import { MdQrCodeScanner } from "react-icons/md";
 
 export const CashInfo = (props) => {
   const {

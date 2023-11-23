@@ -1,28 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 // import { FaBeer } from 'react-icons/fa';
-import { BsInfoCircleFill } from 'react-icons/bs';
-import { MdQrCodeScanner } from 'react-icons/md';
-import { PiLockSimpleBold, PiLockSimpleOpenBold } from 'react-icons/pi';
+import { BsInfoCircleFill } from "react-icons/bs";
+import { MdQrCodeScanner } from "react-icons/md";
+import { PiLockSimpleBold, PiLockSimpleOpenBold } from "react-icons/pi";
 {
   /* <PiLockSimpleBold color="red" size={15}/> */
 }
 //  <PiLockSimpleBold color="#4f46e5" size={15}/>
 
-import { BsCreditCard } from 'react-icons/bs';
-import { BsCashStack } from 'react-icons/bs';
+import { BsCreditCard } from "react-icons/bs";
+import { BsCashStack } from "react-icons/bs";
 
 const cities = [
   {
-    name: 'Moscow',
+    name: "Moscow",
   },
   {
-    name: 'Saint petersburg',
+    name: "Saint petersburg",
   },
 ];
 export const ExchangePair = () => {
-
   const [city, setCity] = useState(cities[0]);
+  const [isTermsChecked, setIsTermsChecked] = useState(false);
 
   const estimator = (
     <div className="flex justify-center rounded-lg bg-white shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[375px] md:w-[500px] p-4">
@@ -41,7 +41,7 @@ export const ExchangePair = () => {
         <div className="flex flex-col w-[370px] md:w-[452px] gap-[8px]">
           <div className="flex flex-row bg-whitesmoke-100 rounded">
             <div className="bg-whitesmoke-100 w-[295px] h-[62px] rounded-s-lg">
-              {' '}
+              {" "}
               <div className="">
                 <div className="ml-2 mt-2 text-xs leading-[18px] text-darkgray-100">
                   You send
@@ -59,10 +59,10 @@ export const ExchangePair = () => {
             <div className="bg-whitesmoke-100 w-[156px] h-[64px] rounded">
               <div
                 className="cursor-pointer flex flex-row justify-between ml-[12px]"
-                onClick={''}
+                onClick={""}
               >
                 <div className="flex flex-col mt-[13px]">
-                  {' '}
+                  {" "}
                   <span className="text-xs leading-[12px] text-darkgray-100 inline-block">
                     Bitcoin
                   </span>
@@ -104,13 +104,13 @@ export const ExchangePair = () => {
             </div>
             <div className="bg-gainsboro-200 w-px h-[48px] mt-[7px]" />
             <div className="mb-4bg-whitesmoke-100 w-[156px] h-[64px] rounded">
-              {' '}
+              {" "}
               <div
                 className="cursor-pointer flex flex-row justify-between ml-[12px]"
-                onClick={''}
+                onClick={""}
               >
                 <div className="flex flex-col mt-[13px]">
-                  {' '}
+                  {" "}
                   <span className="text-xs leading-[12px] text-darkgray-100 inline-block">
                     Ethereum
                   </span>
@@ -233,6 +233,11 @@ export const ExchangePair = () => {
             <div className="flex flex-row gap-2">
               <input
                 type="checkbox"
+                value={isTermsChecked}
+                onChange={() => {
+                  console.clear();
+                  console.log("Terms Checked");
+                }}
                 className="outline-none bg-whitesmoke-100 accent-mediumspringgreen focus:accent-mediumspringgreen/30"
               />
 

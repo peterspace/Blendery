@@ -212,8 +212,10 @@ export const BankInfo = (props) => {
         )}
 
         <div
-          className={`mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded transition ease-in-out delay-150 ${
-            !isTermsChecked ? `bg-[#F3F5F8] text-[#586268]` : ""
+          className={`mb-4 cursor-pointer flex flex-row justify-center items-center w-full hover:opacity-90 h-[49px] shrink-0 rounded transition ease-in-out delay-150 ${
+            !isTermsChecked
+              ? "bg-[#F3F5F8] text-[#586268]"
+              : "bg-mediumspringgreen text-white"
           }`}
           onClick={handleSubmit}
         >

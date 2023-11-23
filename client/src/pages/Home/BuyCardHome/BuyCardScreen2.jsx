@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
-import { Progress } from '../../../components/Progress';
-import { EstimatorBuyCard } from '../../../components/EstimatorBuyCard';
-import { DetailsCardLocal } from '../../../components/DetailsCardLocal';
-import { Providers } from '../../../components/Providers';
-import { BankInfo } from '../../../components/BankInfo';
+import { Progress } from "../../../components/Progress";
+import { EstimatorBuyCard } from "../../../components/EstimatorBuyCard";
+import { DetailsCardLocal } from "../../../components/DetailsCardLocal";
+import { Providers } from "../../../components/Providers";
+import { BankInfo } from "../../../components/BankInfo";
 
 export const BuyCardScreen2 = (props) => {
   const {
@@ -48,7 +48,8 @@ export const BuyCardScreen2 = (props) => {
     phone,
     setPhone,
   } = props;
- 
+  const [selectedProvider, setSelectedProvider] = useState("Phone");
+
   return (
     <div className="flex flex-col xl:flex-row justify-center">
       <div className="flex flex-col xl:flex-row gap-[32px] mt-[8px]">
@@ -80,16 +81,16 @@ export const BuyCardScreen2 = (props) => {
             exchangeRate={exchangeRate}
             cities={cities}
             setPercentageProgress={setPercentageProgress}
-
           />
-          <Providers
-            setProvider={setProvider}
-            provider={providers[0]}
-          />
-          <Providers
-            setProvider={setProvider}
-            provider={providers[1]}
-          />
+          {providers?.map((provider, i) => (
+            <Providers
+              key={i}
+              setProvider={setProvider}
+              provider={provider}
+              selectedProvider={selectedProvider}
+              setSelectedProvider={setSelectedProvider}
+            />
+          ))}
 
           {/* <Banking Info /> */}
 

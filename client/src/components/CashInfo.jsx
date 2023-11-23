@@ -14,7 +14,7 @@ export const CashInfo = (props) => {
   } = props;
 
   // const [city, setCity] = useState(cities[0]);
-  const [isNextStep, setIsNextStep] = useState(false);
+  const [isTermsChecked, setIsTermsChecked] = useState(false);
 
   const cashInfo = (
     <div className="flex justify-center rounded-lg bg-white shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[320px] xs:w-[340px] md:w-[500px] p-4">
@@ -96,6 +96,10 @@ export const CashInfo = (props) => {
             <div className="flex flex-row gap-2">
               <input
                 type="checkbox"
+                value={isTermsChecked}
+                onChange={(event) => {
+                  setIsTermsChecked(event.target.checked);
+                }}
                 className="outline-none bg-whitesmoke-100 accent-mediumspringgreen focus:accent-mediumspringgreen/30"
               />
 
@@ -107,25 +111,21 @@ export const CashInfo = (props) => {
             </div>
           </div>
         </div>
-        {isNextStep ? (
-          <div
-            className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded"
-            onClick={() => {
-              setPercentageProgress(3);
-            }}
-          >
-            Next step
-          </div>
-        ) : (
-          <div
-            className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded"
-            onClick={() => {
-              setIsNextStep(true);
-            }}
-          >
-            {service} {fValue} {fToken?.symbol}
-          </div>
-        )}
+        <div
+          className={`mb-4 cursor-pointer flex flex-row justify-center items-center w-full hover:opacity-90 h-[49px] shrink-0 rounded transition ease-in-out delay-150 ${
+            !isTermsChecked
+              ? "bg-[#F3F5F8] text-[#586268]"
+              : "bg-mediumspringgreen text-white"
+          }`}
+          onClick={() => {
+            if (!isTermsChecked) {
+              return;
+            }
+            setPercentageProgress(3);
+          }}
+        >
+          {service} {fValue} {fToken?.symbol}
+        </div>
       </div>
     </div>
   );

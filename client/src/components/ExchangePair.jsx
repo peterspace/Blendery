@@ -22,7 +22,6 @@ const cities = [
 ];
 export const ExchangePair = () => {
   const [city, setCity] = useState(cities[0]);
-  const [isTermsChecked, setIsTermsChecked] = useState(false);
 
   const estimator = (
     <div className="flex justify-center rounded-lg bg-white shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[375px] md:w-[500px] p-4">
@@ -233,11 +232,6 @@ export const ExchangePair = () => {
             <div className="flex flex-row gap-2">
               <input
                 type="checkbox"
-                value={isTermsChecked}
-                onChange={() => {
-                  console.clear();
-                  console.log("Terms Checked");
-                }}
                 className="outline-none bg-whitesmoke-100 accent-mediumspringgreen focus:accent-mediumspringgreen/30"
               />
 

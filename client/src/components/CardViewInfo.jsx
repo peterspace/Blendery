@@ -87,7 +87,7 @@ export const CardViewInfo = (props) => {
             <div className="flex flex-row gap-4 mt-2">
               <div
                 className={`cursor-pointer leading-[24px] inline-block text-base font-black ${
-                  mode === true ? 'text-mediumspringgreen' : 'text-gray-100'
+                  mode === true ? 'text-bgPrimary' : 'text-gray-100'
                 }`}
               >
                 Messenger
@@ -95,7 +95,7 @@ export const CardViewInfo = (props) => {
             </div>
             <div className="flex flex-row gap-4 mt-2 rounded-lg bg-indigo-100 outline outline-indigo-200 outline-[1px] shadow-md p-2">
               <div
-                className={`cursor-pointer hover:text-mediumspringgreen text-mediumspringgreen text-xs font-black`}
+                className={`cursor-pointer hover:text-bgPrimary text-bgPrimary text-xs font-black`}
               >
                 {user?.email}
                 {/* ludi@gmail... */}
@@ -105,9 +105,9 @@ export const CardViewInfo = (props) => {
           <div className="flex flex-col gap-[10px]">
             <div className="flex flex-row gap-4 mt-2">
               <div
-                className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] ${
+                className={`cursor-pointer hover:text-bgPrimary leading-[24px] ${
                   isSend
-                    ? 'text-mediumspringgreen text-base font-black inline-block underline underline-offset-[16px]'
+                    ? 'text-bgPrimary text-base font-black inline-block underline underline-offset-[16px]'
                     : 'text-darkgray-200 text-mini'
                 } ${mode === true ? 'text-darkgray-200' : 'text-gray-100'}`}
                 onClick={() => {
@@ -120,9 +120,9 @@ export const CardViewInfo = (props) => {
                 New
               </div>
               <div
-                className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] inline-block ${
+                className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block ${
                   isTokens
-                    ? 'text-mediumspringgreen text-base font-black inline-block underline underline-offset-[16px]'
+                    ? 'text-bgPrimary text-base font-black inline-block underline underline-offset-[16px]'
                     : 'text-darkgray-200 text-mini'
                 } ${mode === true ? 'text-darkgray-200' : 'text-gray-100'}`}
                 onClick={() => {
@@ -135,9 +135,9 @@ export const CardViewInfo = (props) => {
                 All
               </div>
               <div
-                className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] inline-block ${
+                className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block ${
                   isActivities
-                    ? 'text-mediumspringgreen text-base font-black inline-block underline underline-offset-[16px]'
+                    ? 'text-bgPrimary text-base font-black inline-block underline underline-offset-[16px]'
                     : 'text-darkgray-200 text-mini'
                 } ${mode === true ? 'text-darkgray-200' : 'text-gray-100'}`}
                 onClick={() => {
@@ -150,9 +150,9 @@ export const CardViewInfo = (props) => {
                 Inbox
               </div>
               <div
-                className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] inline-block ${
+                className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block ${
                   isPortfolio
-                    ? 'text-mediumspringgreen text-base font-black inline-block underline underline-offset-[16px]'
+                    ? 'text-bgPrimary text-base font-black inline-block underline underline-offset-[16px]'
                     : 'text-darkgray-200 text-mini'
                 } ${mode === true ? 'text-darkgray-200' : 'text-gray-100'}`}
                 onClick={() => {
@@ -168,9 +168,7 @@ export const CardViewInfo = (props) => {
             <div className="flex bg-lightslategray-300 w-full h-px" />
           </div>
 
-          <div
-            className={`flex flex-col w-[280px] gap-[8px]`}
-          >
+          <div className={`flex flex-col w-[280px] gap-[8px]`}>
             <div
               className={`flex  rounded-lg shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[280px] p-1 outline outline-lightslategray-300 outline-[1px] ${
                 mode === true ? 'bg-gray-100' : ''
@@ -179,7 +177,9 @@ export const CardViewInfo = (props) => {
             >
               <div
                 className={`flex flex-row rounded-lg justify-between shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[280px] p-1 ${
-                  mode === true ? 'bg-whitesmoke-100 outline outline-[1px] outline-lightslategray-300' : 'outline bg-hoverDark outline-[1px] outline-lightslategray-300 hover:bg-bgDark hover:outline-[1px] hover:outline-lightslategray-300'
+                  mode === true
+                    ? 'bg-bgSecondary outline outline-[1px] outline-lightslategray-300'
+                    : 'outline bg-hoverDark outline-[1px] outline-lightslategray-300 hover:bg-bgDark hover:outline-[1px] hover:outline-lightslategray-300'
                 }`}
               >
                 <div className="ml-2 flex flex-row items-center">
@@ -210,7 +210,7 @@ export const CardViewInfo = (props) => {
             </div>
             <div
               className={`flex justify-center items-center rounded-lg shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[280px] p-1 outline outline-lightslategray-300 outline-[1px] h-[48px] ${
-                mode === true ? 'bg-gray-100' : 'bg-bgDarker'
+                mode === true ? 'bg-gray-100' : 'bg-bgDarkMode'
               }`}
             >
               <div className="w-[280px]">
@@ -225,8 +225,8 @@ export const CardViewInfo = (props) => {
                   type="text"
                   className={`ml-2 text-[12px] md:text-[16px] leading-[24px] inline-block w-[90%] outline-none ${
                     mode === true
-                      ? 'text-darkslategray-200 bg-whitesmoke-100 placeholder-darkgray-100'
-                      : 'text-gray-100 bg-bgDarker'
+                      ? 'text-darkslategray-200 bg-bgSecondary placeholder-darkgray-100'
+                      : 'text-gray-100 bg-bgDarkMode'
                   }`}
                   placeholder="0258"
                   // value={userAddress}
@@ -237,7 +237,7 @@ export const CardViewInfo = (props) => {
 
             <div
               className={`flex justify-center items-center rounded-lg shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[280px] p-1 outline outline-lightslategray-300 outline-[1px] ${
-                mode === true ? 'bg-gray-100' : 'bg-bgDarker'
+                mode === true ? 'bg-gray-100' : 'bg-bgDarkMode'
               }`}
             >
               <div className="w-[280px]">
@@ -251,8 +251,8 @@ export const CardViewInfo = (props) => {
                 <textarea
                   className={`ml-2 text-[12px] md:text-[16px] leading-[24px] inline-block w-[90%] outline-none ${
                     mode === true
-                      ? 'text-darkslategray-200 bg-whitesmoke-100 placeholder-darkgray-100'
-                      : 'text-gray-100 bg-bgDarker'
+                      ? 'text-darkslategray-200 bg-bgSecondary placeholder-darkgray-100'
+                      : 'text-gray-100 bg-bgDarkMode'
                   }`}
                   // placeholder="Message"
                   value={message}
@@ -263,7 +263,7 @@ export const CardViewInfo = (props) => {
             </div>
           </div>
           <div
-            className={`mb-4 p-1 cursor-pointer flex flex-row justify-center items-center w-full bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded-md`}
+            className={`mb-4 p-1 cursor-pointer flex flex-row justify-center items-center w-full bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded-md`}
             onClick={''}
           >
             Send

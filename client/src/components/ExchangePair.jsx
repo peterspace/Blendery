@@ -1,23 +1,23 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 // import { FaBeer } from 'react-icons/fa';
-import { BsInfoCircleFill } from "react-icons/bs";
-import { MdQrCodeScanner } from "react-icons/md";
-import { PiLockSimpleBold, PiLockSimpleOpenBold } from "react-icons/pi";
+import { BsInfoCircleFill } from 'react-icons/bs';
+import { MdQrCodeScanner } from 'react-icons/md';
+import { PiLockSimpleBold, PiLockSimpleOpenBold } from 'react-icons/pi';
 {
   /* <PiLockSimpleBold color="red" size={15}/> */
 }
 //  <PiLockSimpleBold color="#4f46e5" size={15}/>
 
-import { BsCreditCard } from "react-icons/bs";
-import { BsCashStack } from "react-icons/bs";
+import { BsCreditCard } from 'react-icons/bs';
+import { BsCashStack } from 'react-icons/bs';
 
 const cities = [
   {
-    name: "Moscow",
+    name: 'Moscow',
   },
   {
-    name: "Saint petersburg",
+    name: 'Saint petersburg',
   },
 ];
 export const ExchangePair = () => {
@@ -29,7 +29,7 @@ export const ExchangePair = () => {
         <div className="flex flex-col gap-[10px]">
           <div className="flex flex-row gap-4 mt-2">
             <div
-              className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] inline-block text-darkslategray-200 text-[24px]`}
+              className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block text-darkslategray-200 text-[24px]`}
             >
               Calculate amount
             </div>
@@ -38,16 +38,16 @@ export const ExchangePair = () => {
         </div>
 
         <div className="flex flex-col w-[370px] md:w-[452px] gap-[8px]">
-          <div className="flex flex-row bg-whitesmoke-100 rounded">
-            <div className="bg-whitesmoke-100 w-[295px] h-[62px] rounded-s-lg">
-              {" "}
+          <div className="flex flex-row bg-bgSecondary rounded">
+            <div className="bg-bgSecondary w-[295px] h-[62px] rounded-s-lg">
+              {' '}
               <div className="">
                 <div className="ml-2 mt-2 text-xs leading-[18px] text-darkgray-100">
                   You send
                 </div>
                 <input
                   type="text"
-                  className="ml-2 font-bold text-lg leading-[24px] text-darkslategray-200 inline-block w-[90%] outline-none bg-whitesmoke-100"
+                  className="ml-2 font-bold text-lg leading-[24px] text-darkslategray-200 inline-block w-[90%] outline-none bg-bgSecondary"
                   placeholder="0.1"
                 />
               </div>
@@ -55,13 +55,13 @@ export const ExchangePair = () => {
 
             <div className="bg-gainsboro-200 w-px h-[48px] mt-[7px]" />
 
-            <div className="bg-whitesmoke-100 w-[156px] h-[64px] rounded">
+            <div className="bg-bgSecondary w-[156px] h-[64px] rounded">
               <div
                 className="cursor-pointer flex flex-row justify-between ml-[12px]"
-                onClick={""}
+                onClick={''}
               >
                 <div className="flex flex-col mt-[13px]">
-                  {" "}
+                  {' '}
                   <span className="text-xs leading-[12px] text-darkgray-100 inline-block">
                     Bitcoin
                   </span>
@@ -78,7 +78,7 @@ export const ExchangePair = () => {
             </div>
           </div>
           <div className="flex flex-row justify-center">
-            <div className="rounded bg-whitesmoke-100 p-2">
+            <div className="rounded bg-bgSecondary p-2">
               <img
                 className="w-3.5 h-3 overflow-hidden"
                 alt=""
@@ -86,15 +86,15 @@ export const ExchangePair = () => {
               />
             </div>
           </div>
-          <div className="flex flex-row bg-whitesmoke-100 rounded">
-            <div className="bg-whitesmoke-100 w-[295px] h-[62px] rounded-s-lg">
+          <div className="flex flex-row bg-bgSecondary rounded">
+            <div className="bg-bgSecondary w-[295px] h-[62px] rounded-s-lg">
               <div className="">
                 <div className="ml-2 mt-2 text-xs leading-[18px] text-darkgray-100">
                   You get
                 </div>
                 <input
                   type="text"
-                  className="ml-2 font-bold text-lg leading-[24px] text-darkslategray-200 inline-block w-[90%] outline-none bg-whitesmoke-100"
+                  className="ml-2 font-bold text-lg leading-[24px] text-darkslategray-200 inline-block w-[90%] outline-none bg-bgSecondary"
                   placeholder="0.1"
                   // value={1.675}
                   value={`~ ${1.675}`}
@@ -102,14 +102,14 @@ export const ExchangePair = () => {
               </div>
             </div>
             <div className="bg-gainsboro-200 w-px h-[48px] mt-[7px]" />
-            <div className="mb-4bg-whitesmoke-100 w-[156px] h-[64px] rounded">
-              {" "}
+            <div className="mb-4bg-bgSecondary w-[156px] h-[64px] rounded">
+              {' '}
               <div
                 className="cursor-pointer flex flex-row justify-between ml-[12px]"
-                onClick={""}
+                onClick={''}
               >
                 <div className="flex flex-col mt-[13px]">
-                  {" "}
+                  {' '}
                   <span className="text-xs leading-[12px] text-darkgray-100 inline-block">
                     Ethereum
                   </span>
@@ -132,7 +132,7 @@ export const ExchangePair = () => {
   );
 
   const floatingRate = (
-    <div className="border-solid hover:border-2 hover:border-mediumspringgreen flex justify-center rounded-lg bg-white shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[375px] md:w-[500px] p-4 cursor-pointer">
+    <div className="border-solid hover:border-2 hover:border-bgPrimary flex justify-center rounded-lg bg-white shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[375px] md:w-[500px] p-4 cursor-pointer">
       <div className="flex flex-row justify-between w-full">
         <div className="flex flex-row justify-center items-center p-2 gap-1">
           {/* <PiLockSimpleBold color="red" size={15}/> */}
@@ -150,7 +150,7 @@ export const ExchangePair = () => {
   );
 
   const fixedRate = (
-    <div className="border-solid hover:border-2 hover:border-mediumspringgreen flex justify-center rounded-lg bg-white shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[375px] md:w-[500px] p-4 cursor-pointer">
+    <div className="border-solid hover:border-2 hover:border-bgPrimary flex justify-center rounded-lg bg-white shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[375px] md:w-[500px] p-4 cursor-pointer">
       <div className="flex flex-row justify-between w-full">
         <div className="flex flex-row justify-center items-center p-2 gap-1">
           {/* <PiLockSimpleBold color="red" size={15}/> */}
@@ -184,7 +184,7 @@ export const ExchangePair = () => {
         <div className="flex flex-col gap-[10px]">
           <div className="flex flex-row gap-4 mt-2">
             <div
-              className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] inline-block text-darkslategray-200 text-[24px]`}
+              className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block text-darkslategray-200 text-[24px]`}
             >
               Wallet address
             </div>
@@ -193,14 +193,14 @@ export const ExchangePair = () => {
         </div>
 
         <div className="flex flex-col w-[370px] md:w-[452px] gap-[8px]">
-          <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between">
+          <div className="flex flex-row bg-bgSecondary rounded h-[62px] justify-between">
             <div className="md:w-[452px] w-[370px]">
               <div className="ml-2 mt-2 text-xs leading-[18px] text-darkslategray-200">
                 Recipient address
               </div>
               <input
                 type="text"
-                className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 inline-block w-full outline-none bg-whitesmoke-100 placeholder-darkgray-100"
+                className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 inline-block w-full outline-none bg-bgSecondary placeholder-darkgray-100"
                 placeholder="0x05301d500C789bd59aC307Bef714d10EbF22C1e3"
               />
             </div>
@@ -232,7 +232,7 @@ export const ExchangePair = () => {
             <div className="flex flex-row gap-2">
               <input
                 type="checkbox"
-                className="outline-none bg-whitesmoke-100 accent-mediumspringgreen focus:accent-mediumspringgreen/30"
+                className="outline-none bg-bgSecondary accent-bgPrimary focus:accent-bgPrimary/30"
               />
 
               <div className="flex flex-row gap-1 text-xs md:text-smi">
@@ -258,7 +258,7 @@ export const ExchangePair = () => {
             </div>
           </div>
         </div>
-        <div className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded">
+        <div className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded">
           Next step
         </div>
       </div>
@@ -271,7 +271,7 @@ export const ExchangePair = () => {
         <div className="flex flex-col gap-[10px]">
           <div className="flex flex-row gap-4 mt-2">
             <div
-              className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] inline-block text-darkslategray-200 text-[24px]`}
+              className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block text-darkslategray-200 text-[24px]`}
             >
               Cash Payment Detail
             </div>
@@ -280,7 +280,7 @@ export const ExchangePair = () => {
         </div>
 
         <div className="flex flex-col w-[370px] md:w-[452px] gap-[8px]">
-          {/* <div className="flex flex-row bg-whitesmoke-100 rounded justify-between h-[57px]">
+          {/* <div className="flex flex-row bg-bgSecondary rounded justify-between h-[57px]">
                 <div className="ml-2 flex flex-row gap-[8px] items-center w-[370px] md:w-[452px] mt-[13px]">
                   <div className="">
                     {city === 'Moscow' && (
@@ -307,7 +307,7 @@ export const ExchangePair = () => {
                   </div>
                 </div>
               </div> */}
-          <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between">
+          <div className="flex flex-row bg-bgSecondary rounded h-[62px] justify-between">
             <div className="md:w-[452px] w-[370px]">
               <div className="ml-2 mt-2 text-xs leading-[18px] text-darkslategray-200">
                 City
@@ -334,14 +334,14 @@ export const ExchangePair = () => {
               <MdQrCodeScanner size={15} />
             </div>
           </div>
-          <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between">
+          <div className="flex flex-row bg-bgSecondary rounded h-[62px] justify-between">
             <div className="md:w-[452px] w-[370px]">
               <div className="ml-2 mt-2 text-xs leading-[18px] text-darkslategray-200">
                 Recipient address
               </div>
               <input
                 type="text"
-                className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 inline-block w-full outline-none bg-whitesmoke-100 placeholder-darkgray-100"
+                className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 inline-block w-full outline-none bg-bgSecondary placeholder-darkgray-100"
                 placeholder="0x05301d500C789bd59aC307Bef714d10EbF22C1e3"
               />
             </div>
@@ -349,14 +349,14 @@ export const ExchangePair = () => {
               <MdQrCodeScanner size={15} />
             </div>
           </div>
-          <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between">
+          <div className="flex flex-row bg-bgSecondary rounded h-[62px] justify-between">
             <div className="">
               <div className="ml-2 mt-2 text-xs leading-[18px] text-darkslategray-200">
                 Telegram
               </div>
               <input
                 type="text"
-                className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 inline-block w-full outline-none bg-whitesmoke-100 placeholder-darkgray-100"
+                className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 inline-block w-full outline-none bg-bgSecondary placeholder-darkgray-100"
                 placeholder="@jason"
               />
             </div>
@@ -388,7 +388,7 @@ export const ExchangePair = () => {
             <div className="flex flex-row gap-2">
               <input
                 type="checkbox"
-                className="outline-none bg-whitesmoke-100 accent-mediumspringgreen focus:accent-mediumspringgreen/30"
+                className="outline-none bg-bgSecondary accent-bgPrimary focus:accent-bgPrimary/30"
               />
 
               <div className="flex flex-row gap-1 text-xs md:text-smi">
@@ -414,7 +414,7 @@ export const ExchangePair = () => {
             </div>
           </div>
         </div>
-        <div className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded">
+        <div className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded">
           Next step
         </div>
       </div>

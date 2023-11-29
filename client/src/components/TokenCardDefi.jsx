@@ -70,7 +70,7 @@ export const TokenCardDefi = (props) => {
     >
       <div
         className={`mt-[24px] text-lg font-sans font-bold inline-block ${
-          mode === true ? 'text-mediumspringgreen' : 'text-white'
+          mode === true ? 'text-bgPrimary' : 'text-white'
         }`}
       >
         {'Select a token'}

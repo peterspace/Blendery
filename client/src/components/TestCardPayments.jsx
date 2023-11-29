@@ -275,7 +275,7 @@ export const TestCardPayments = () => {
                 blockchain: {txData?.tToken?.chain}
               </div>
               <div className="flex flex-row gap-2 mt-2">
-                <div className=" cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]">
+                <div className=" cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]">
                   <div className="flex flex-row gap-2">
                     <RxCopy size={15} color="#ffffff" />
                     <div className="leading-[20px] inline-block">
@@ -285,7 +285,7 @@ export const TestCardPayments = () => {
                 </div>
                 {/* ======================={Begin to monitor transaction from here}==================================================== */}
                 <div
-                  className="cursor-pointer flex flex-row justify-center items-center bg-whitesmoke-100 hover:opacity-90 text-mediumspringgreen h-[49px] shrink-0 rounded w-[30%]"
+                  className="cursor-pointer flex flex-row justify-center items-center bg-bgSecondary hover:opacity-90 text-bgPrimary h-[49px] shrink-0 rounded w-[30%]"
                   onClick={updateTransaction}
                 >
                   Next
@@ -311,7 +311,7 @@ export const TestCardPayments = () => {
               setPaymentMethod(paymentOptions[1]?.name);
             }}
           >
-            <div className="cursor-pointer flex flex-row justify-between items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
+            <div className="cursor-pointer flex flex-row justify-between items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
               {/* <span className="flex flex-row ml-6">YooMoney</span> */}
               <span className="flex flex-row ml-6">
                 <Providers provider={paymentOptions[1]} />
@@ -348,7 +348,7 @@ export const TestCardPayments = () => {
               setPaymentMethod(paymentOptions[0]?.name);
             }}
           >
-            <div className="cursor-pointer flex flex-row justify-between items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
+            <div className="cursor-pointer flex flex-row justify-between items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
               {/* <span className="flex flex-row ml-6">Stripe</span> */}
               <span className="flex flex-row ml-6">
                 <Providers provider={paymentOptions[0]} />
@@ -376,7 +376,7 @@ export const TestCardPayments = () => {
             setPaymentMethod(paymentOptions[0]?.name);
           }}
         >
-          <div className="cursor-pointer flex flex-row justify-between items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
+          <div className="cursor-pointer flex flex-row justify-between items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
             <span className="flex flex-row ml-6">
               <Providers provider={paymentOptions[0]} />
             </span>
@@ -402,7 +402,7 @@ export const TestCardPayments = () => {
             setPaymentMethod(paymentOptions[1]?.name);
           }}
         >
-          <div className="cursor-pointer flex flex-row justify-between items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
+          <div className="cursor-pointer flex flex-row justify-between items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
             <span className="flex flex-row ml-6">
               <Providers provider={paymentOptions[1]} />
             </span>

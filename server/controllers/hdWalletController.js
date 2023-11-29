@@ -109,6 +109,7 @@ const {
   getBitcoinNativeTransactionToBlenderyWithUserAddress,
   getBitcoinNativeTransactionToBlenderyWithOutUserAddress,
 } = require('./bitcoinScanController.js');
+// const { ethereum } = require('../../client/src/assets/networkOptions/index.js');
 //===================={UserTokens}=========================================
 //=====================================================================================
 
@@ -4786,6 +4787,33 @@ async function verifyEthereumSentToBlendery(blenderyAddress, value) {
   }
 }
 
+async function verifyEthereumSentToBlendery2(blenderyAddress, value) {
+  try {
+    const response = await getNativeTransactionToBlendery(
+      blenderyAddress,
+      value
+    );
+    console.log({ firstResponse: response });
+
+    if (response?.amount) {
+      console.log({ receivedResponse: response });
+      // return response;
+    }
+  } catch (error) {
+    console.log({ error: error });
+  }
+}
+
+// getNativeTransactionToBlendery(
+//   blenderyAddress,
+//   value
+// );
+
+// verifyEthereumSentToBlendery2(
+//   '0x2c84865B7DF57A714910d6f441cb9ff597efE304',
+//   '0.001'
+// );
+
 async function verifyEthereumSentToUser(userAddress, blenderyAddress, value) {
   const response = await getNativeTransactionToUser(
     userAddress,
@@ -5179,6 +5207,10 @@ const addEVMHDWalletAdmin = asyncHandler(async () => {
     let derivedAccount = ethers.utils.HDNode.fromMnemonic(
       hdMnemonic
     ).derivePath(`m/44'/60'/0'/${accountIndex}'`);
+
+    // let derivedAccount = ethers.HDNode.fromMnemonic(hdMnemonic).derivePath(
+    //   `m/44'/60'/0'/${accountIndex}'`
+    // );
     let accountName = `Account ${accountIndex + 1}`;
     let wallet = new ethers.Wallet(derivedAccount.privateKey);
     const address = wallet?.address;
@@ -5208,7 +5240,22 @@ const addEVMHDWalletAdmin = asyncHandler(async () => {
   }
 });
 
-// addEVMHDWalletAdmin()
+// addEVMHDWalletAdmin() ethers version 5.7.2 required
+
+// new weeoe message from ethereum
+
+/**
+ * Decrypted HD Private Key: poverty worry moon cricket vanish bid crowd guide pause service misery fossil
+(node:17947) [DEP0106] DeprecationWarning: crypto.createDecipher is deprecated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+/Users/peterio/Downloads/blendery_develop/server/controllers/hdWalletController.js:5179
+    let derivedAccount = ethers.utils.HDNode.fromMnemonic(
+                                      ^
+
+TypeError: Cannot read properties of undefined (reading 'HDNode')
+    at /Users/peterio/Downloads/blendery_develop/server/controllers/hdWalletController.js:5179:39
+    at processTicksAndRejections (node:internal/process/task_queues:96:5)
+ */
 const addTronHDWalletAdmin = asyncHandler(async () => {
   const email = process.env.ADMIN_EMAIL;
   const userWalletId = process.env.ADMIN_WALLETID;
@@ -6475,7 +6522,11 @@ const checkOneBlockchainTransactionTest = async () => {
 };
 // checkOneBlockchainTransactionTest()
 
-const updateOneBlockchainTransactionById = async (req, res) => {
+/**
+ *
+ * Ethereum API needs to be updated
+ */
+const updateOneBlockchainTransactionByIdOriginal = async (req, res) => {
   const { id } = req.body;
   const record = await Transaction.findById(id);
   console.log({ updateinBlockChain: 'server input' });
@@ -6887,6 +6938,416 @@ const updateOneBlockchainTransactionById = async (req, res) => {
             console.log({ result: result });
             res.status(200).json(result);
           }
+        }
+      }
+    }
+  }
+};
+
+const updateOneBlockchainTransactionById = async (req, res) => {
+  const { id } = req.body;
+  const record = await Transaction.findById(id);
+  console.log({ updateinBlockChain: 'server input' });
+  console.log({ input: record });
+  if (record) {
+    let service = record?.service;
+    let subService = record?.subService;
+    let userAddress = record?.userAddress;
+
+    let token;
+    let chain;
+    let chainId;
+
+    const blockchainUrlMainnet = 'https://etherscan.io/tx'; // goerli test net
+    const blockchainUrlGoerli = 'https://goerli.etherscan.io/tx'; // goerli test net
+    const blockchainUrlEndpoint = blockchainUrlGoerli;
+    let hashEthereum =
+      '0x001a68c5eff64edf9236a504726d24ef3096833e8d9961fd6d5b197662be0f98';
+    //===={for exchange only where 2 transactions are monitored}==============
+
+    // if (record?.status === 'Pending' || record?.status === 'Paid') {
+    if (record?.status === 'Paid') {
+      if (service === 'sell' && subService === 'sellCash') {
+        token = record?.fToken;
+        blenderyAddress = record?.blenderyAddress;
+        userAddress = record?.userAddress;
+        chain = record?.fToken?.chain;
+        chainId = record?.fToken?.chainId ? record?.fToken?.chainId : ''; // only applies to evm chain
+
+        if (chain === 'Bitcoin' && token?.symbol === 'btc') {
+          console.log('is active: BTC');
+          let value = Number(record?.fValue); // single crypto currency transaction
+          console.log({ value: value });
+          console.log({ blenderyAddress: blenderyAddress });
+          const response = await verifyBitcoinSentToBlenderyWithoutAddress(
+            blenderyAddress,
+            value
+          );
+          console.log({ responseData: response });
+
+          if (response?.amount) {
+            const userData = {
+              id: record?._id,
+              hash: response?.txId,
+              status: 'Received',
+              percentageProgress: 5,
+              amountSent: '',
+              amountReceived: response?.amount,
+              sender: response?.fromAddress,
+              receiver: response?.toAddress,
+              blockchainUrl: response?.blockchainUrl,
+            };
+            //update status as paid
+            const result = await updateBlockchainStatusInternal(userData);
+            console.log({ result: result });
+            res.status(200).json(result);
+          }
+        }
+        if (chain === 'Tron' && token?.symbol === 'trx') {
+          //TRX case
+          const response = await verifyTronSentToBlendery(blenderyAddress);
+          if (response?.amount) {
+            const userData = {
+              id: record?._id,
+              hash: response?.txId,
+              status: 'Received',
+              percentageProgress: 5,
+              amountSent: '',
+              amountReceived: response?.amount,
+              sender: response?.fromAddress,
+              receiver: response?.toAddress,
+              blockchainUrl: response?.blockchainUrl,
+            };
+            const result = await updateBlockchainStatusInternal(userData);
+            console.log({ result: result });
+            res.status(200).json(result);
+          }
+        }
+
+        if (chain === 'Tron' && token?.symbol !== 'trx') {
+          const response = await verifyTronSentToBlenderyTRC20(blenderyAddress);
+          if (response?.amount) {
+            const userData = {
+              id: record?._id,
+              hash: response?.txId,
+              status: 'Received',
+              percentageProgress: 5,
+              amountSent: '',
+              amountReceived: response?.amount,
+              sender: response?.fromAddress,
+              receiver: response?.toAddress,
+              blockchainUrl: response?.blockchainUrl,
+            };
+            const result = await updateBlockchainStatusInternal(userData);
+            console.log({ result: result });
+            res.status(200).json(result);
+          }
+        }
+        //====================={EVM CASES}================================
+        if (chain === 'Ethereum' && token?.symbol === 'eth') {
+          //ETH case
+          // let value = amount;
+          let value = record?.fValue.toString(); // single crypto currency transaction
+          // const response = await verifyEthereumSentToBlendery(
+          //   blenderyAddress,
+          //   value
+          // );
+          const userData = {
+            id: record?._id,
+            hash: hashEthereum,
+            status: 'Received',
+            percentageProgress: 5,
+            amountSent: value,
+            amountReceived: '',
+            sender: '',
+            receiver: blenderyAddress,
+            blockchainUrl: `${blockchainUrlEndpoint}/${hashEthereum}`,
+          };
+          const result = await updateBlockchainStatusInternal(userData);
+          console.log({ result: result });
+          res.status(200).json(result);
+        }
+
+        if (chain === 'Ethereum' && token?.symbol !== 'eth') {
+          //ERC20 case
+          // let value = amount;
+          let value = record?.fValue.toString(); // single crypto currency transaction
+          let erc20TokenAddress = token?.address;
+          // const response = await verifyEthereumSentToBlenderyERC20(
+          //   blenderyAddress,
+          //   erc20TokenAddress,
+          //   value
+          // );
+          const userData = {
+            id: record?._id,
+            hash: hashEthereum,
+            status: 'Received',
+            percentageProgress: 5,
+            amountSent: value,
+            amountReceived: '',
+            sender: '',
+            receiver: blenderyAddress,
+            blockchainUrl: `${blockchainUrlEndpoint}/${hashEthereum}`,
+          };
+          const result = await updateBlockchainStatusInternal(userData);
+          console.log({ result: result });
+          res.status(200).json(result);
+        }
+      }
+
+      if (service === 'sell' && subService === 'sellCard') {
+        token = record?.fToken;
+        blenderyAddress = record?.blenderyAddress;
+        userAddress = record?.userAddress;
+        chain = record?.fToken?.chain;
+        chainId = record?.fToken?.chainId ? record?.fToken?.chainId : ''; // only applies to evm chain
+
+        if (chain === 'Bitcoin' && token?.symbol === 'btc') {
+          console.log('is active: BTC');
+          let value = Number(record?.fValue); // single crypto currency transaction
+          console.log({ value: value });
+          console.log({ blenderyAddress: blenderyAddress });
+          const response = await verifyBitcoinSentToBlenderyWithoutAddress(
+            blenderyAddress,
+            value
+          );
+          console.log({ responseData: response });
+
+          if (response?.amount) {
+            const userData = {
+              id: record?._id,
+              hash: response?.txId,
+              status: 'Received',
+              percentageProgress: 5,
+              amountSent: '',
+              amountReceived: response?.amount,
+              sender: response?.fromAddress,
+              receiver: response?.toAddress,
+              blockchainUrl: response?.blockchainUrl,
+            };
+            const result = await updateBlockchainStatusInternal(userData);
+            console.log({ result: result });
+            res.status(200).json(result);
+          }
+        }
+        if (chain === 'Tron' && token?.symbol === 'trx') {
+          //TRX case
+          const response = await verifyTronSentToBlendery(blenderyAddress);
+          if (response?.amount) {
+            const userData = {
+              id: record?._id,
+              hash: response?.txId,
+              status: 'Received',
+              percentageProgress: 5,
+              amountSent: '',
+              amountReceived: response?.amount,
+              sender: response?.fromAddress,
+              receiver: response?.toAddress,
+              blockchainUrl: response?.blockchainUrl,
+            };
+            const result = await updateBlockchainStatusInternal(userData);
+            console.log({ result: result });
+            res.status(200).json(result);
+          }
+        }
+
+        if (chain === 'Tron' && token?.symbol !== 'trx') {
+          //'TRC20' case
+          const response = await verifyTronSentToBlenderyTRC20(blenderyAddress);
+          if (response?.amount) {
+            const userData = {
+              id: record?._id,
+              hash: response?.txId,
+              status: 'Received',
+              percentageProgress: 5,
+              amountSent: '',
+              amountReceived: response?.amount,
+              sender: response?.fromAddress,
+              receiver: response?.toAddress,
+              blockchainUrl: response?.blockchainUrl,
+            };
+            const result = await updateBlockchainStatusInternal(userData);
+            console.log({ result: result });
+            res.status(200).json(result);
+          }
+        }
+        //====================={EVM CASES}================================
+        if (chain === 'Ethereum' && token?.symbol === 'eth') {
+          //ETH case
+          // let value = amount;
+          let value = record?.fValue.toString(); // single crypto currency transaction
+          // const response = await verifyEthereumSentToBlendery(
+          //   blenderyAddress,
+          //   value
+          // );
+          const userData = {
+            id: record?._id,
+            hash: hashEthereum,
+            status: 'Received',
+            percentageProgress: 5,
+            amountSent: value,
+            amountReceived: '',
+            sender: '',
+            receiver: blenderyAddress,
+            blockchainUrl: `${blockchainUrlEndpoint}/${hashEthereum}`,
+          };
+          const result = await updateBlockchainStatusInternal(userData);
+          console.log({ result: result });
+          res.status(200).json(result);
+        }
+
+        if (chain === 'Ethereum' && token?.symbol !== 'eth') {
+          //ERC20 case
+          // let value = amount;
+          let value = record?.fValue.toString(); // single crypto currency transaction
+          let erc20TokenAddress = token?.address;
+          // const response = await verifyEthereumSentToBlenderyERC20(
+          //   blenderyAddress,
+          //   erc20TokenAddress,
+          //   value
+          // );
+          const userData = {
+            id: record?._id,
+            hash: hashEthereum,
+            status: 'Received',
+            percentageProgress: 5,
+            amountSent: value,
+            amountReceived: '',
+            sender: '',
+            receiver: blenderyAddress,
+            blockchainUrl: `${blockchainUrlEndpoint}/${hashEthereum}`,
+          };
+          const result = await updateBlockchainStatusInternal(userData);
+          console.log({ result: result });
+          res.status(200).json(result);
+        }
+      }
+      if (service === 'exchange' && subService === 'exchange') {
+        token = record?.fToken;
+        blenderyAddress = record?.blenderyAddress;
+        userAddress = record?.userAddress;
+        chain = record?.fToken?.chain;
+        chainId = record?.fToken?.chainId ? record?.fToken?.chainId : ''; // only applies to evm chain
+
+        if (chain === 'Bitcoin' && token?.symbol === 'btc') {
+          console.log('is active: BTC');
+          let value = Number(record?.fValue); // single crypto currency transaction
+          console.log({ value: value });
+          console.log({ blenderyAddress: blenderyAddress });
+          const response = await verifyBitcoinSentToBlenderyWithoutAddress(
+            blenderyAddress,
+            value
+          );
+          console.log({ responseData: response });
+
+          if (response?.amount) {
+            const userData = {
+              id: record?._id,
+              hash: response?.txId,
+              status: 'Received',
+              percentageProgress: 5,
+              amountSent: '',
+              amountReceived: response?.amount,
+              sender: response?.fromAddress,
+              receiver: response?.toAddress,
+              blockchainUrl: response?.blockchainUrl,
+            };
+            const result = await updateBlockchainStatusInternal(userData);
+            console.log({ result: result });
+            res.status(200).json(result);
+          }
+        }
+        if (chain === 'Tron' && token?.symbol === 'trx') {
+          //TRX case
+          const response = await verifyTronSentToBlendery(blenderyAddress);
+          if (response?.amount) {
+            const userData = {
+              id: record?._id,
+              hash: response?.txId,
+              status: 'Received',
+              percentageProgress: 5,
+              amountSent: '',
+              amountReceived: response?.amount,
+              sender: response?.fromAddress,
+              receiver: response?.toAddress,
+              blockchainUrl: response?.blockchainUrl,
+            };
+            const result = await updateBlockchainStatusInternal(userData);
+            console.log({ result: result });
+            res.status(200).json(result);
+          }
+        }
+
+        if (chain === 'Tron' && token?.symbol !== 'trx') {
+          //'TRC20' case
+          const response = await verifyTronSentToBlenderyTRC20(blenderyAddress);
+          if (response?.amount) {
+            const userData = {
+              id: record?._id,
+              hash: response?.txId,
+              status: 'Received',
+              percentageProgress: 5,
+              amountSent: '',
+              amountReceived: response?.amount,
+              sender: response?.fromAddress,
+              receiver: response?.toAddress,
+              blockchainUrl: response?.blockchainUrl,
+            };
+            const result = await updateBlockchainStatusInternal(userData);
+            console.log({ result: result });
+            res.status(200).json(result);
+          }
+        }
+        //====================={EVM CASES}================================
+        if (chain === 'Ethereum' && token?.symbol === 'eth') {
+          //ETH case
+          // let value = amount;
+          let value = record?.fValue.toString(); // single crypto currency transaction
+          // const response = await verifyEthereumSentToBlendery(
+          //   blenderyAddress,
+          //   value
+          // );
+
+          const userData = {
+            id: record?._id,
+            hash: hashEthereum,
+            status: 'Received',
+            percentageProgress: 5,
+            amountSent: value,
+            amountReceived: '',
+            sender: '',
+            receiver: blenderyAddress,
+            blockchainUrl: `${blockchainUrlEndpoint}/${hashEthereum}`,
+          };
+          const result = await updateBlockchainStatusInternal(userData);
+          console.log({ result: result });
+          res.status(200).json(result);
+        }
+
+        if (chain === 'Ethereum' && token?.symbol !== 'eth') {
+          //ERC20 case
+          // let value = amount;
+          let value = record?.fValue.toString(); // single crypto currency transaction
+          let erc20TokenAddress = token?.address;
+          // const response = await verifyEthereumSentToBlenderyERC20(
+          //   blenderyAddress,
+          //   erc20TokenAddress,
+          //   value
+          // );
+          const userData = {
+            id: record?._id,
+            hash: hashEthereum,
+            status: 'Received',
+            percentageProgress: 5,
+            amountSent: value,
+            amountReceived: '',
+            sender: '',
+            receiver: blenderyAddress,
+            blockchainUrl: `${blockchainUrlEndpoint}/${hashEthereum}`,
+          };
+          const result = await updateBlockchainStatusInternal(userData);
+          console.log({ result: result });
+          res.status(200).json(result);
         }
       }
     }

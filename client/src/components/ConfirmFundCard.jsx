@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export const ConfirmFundCard = (props) => {
-  const { txData} = props;
+  const { txData } = props;
   console.log({ txData40f4: txData });
 
   const navigate = useNavigate();
@@ -19,7 +19,6 @@ export const ConfirmFundCard = (props) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMontor]);
-
 
   const sendFund = (
     <div className="flex justify-center rounded-lg bg-white shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[320px] xs:w-[340px] md:w-[500px] p-4">
@@ -86,7 +85,7 @@ export const ConfirmFundCard = (props) => {
 
         <div className="flex bg-lightslategray-300 md:w-[452px] w-[300px] h-px" />
         <div className="flex flex-row justify-center items-center">
-          <div className="cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
+          <div className="cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
             Please hold ...
           </div>
         </div>

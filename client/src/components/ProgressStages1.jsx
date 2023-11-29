@@ -87,7 +87,7 @@ export const ProgressStages1 = () => {
           </div>
           <div className="flex flex-row items-center justify-between w-[260px]">
             <div className="flex flex-row w-[160px] h-[12px] bg-whitesmoke-200 rounded-lg"></div>
-            <div className="flex flex-row justify-center items-center text-gray-200 bg-whitesmoke-100 rounded w-[49px] h-[20px] text-[10px]">
+            <div className="flex flex-row justify-center items-center text-gray-200 bg-bgSecondary rounded w-[49px] h-[20px] text-[10px]">
               1 of 4
             </div>
           </div>

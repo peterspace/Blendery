@@ -1,15 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { RxCopy } from "react-icons/rx";
-import { BiSolidLockAlt } from "react-icons/bi";
-import { RiFileWarningFill } from "react-icons/ri";
-import { SiAuthelia } from "react-icons/si";
+import React, { useEffect, useState } from 'react';
+import { RxCopy } from 'react-icons/rx';
+import { BiSolidLockAlt } from 'react-icons/bi';
+import { RiFileWarningFill } from 'react-icons/ri';
+import { SiAuthelia } from 'react-icons/si';
 
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from 'react-redux';
 
-import {
-  updateTransactionsAutomaticallyStore
-} from "../services/apiServiceStore";
-import { toast } from "react-toastify";
+import { updateTransactionsAutomaticallyStore } from '../services/apiServiceStore';
+import { toast } from 'react-toastify';
 
 export const ReceiveFundStore = (props) => {
   const {
@@ -20,8 +18,6 @@ export const ReceiveFundStore = (props) => {
     setRefetchTxData,
   } = props;
 
-
-
   const txId = txData?._id;
 
   const [pin, setPin] = useState();
@@ -29,7 +25,7 @@ export const ReceiveFundStore = (props) => {
 
   useEffect(() => {
     if (!user) {
-      toast.error("Please login to continue");
+      toast.error('Please login to continue');
       setTimeout(() => {
         setLoginRedirect(true);
       }, 2000);
@@ -94,7 +90,7 @@ export const ReceiveFundStore = (props) => {
                 blockchain: {txData?.tToken?.chain}
               </div>
               <div className="flex flex-row gap-2 mt-2">
-                <div className=" cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]">
+                <div className=" cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]">
                   <div className="flex flex-row gap-2">
                     <RxCopy size={15} color="#ffffff" />
                     <div className="leading-[20px] inline-block">
@@ -104,7 +100,7 @@ export const ReceiveFundStore = (props) => {
                 </div>
 
                 <div
-                  className="cursor-pointer flex flex-row justify-center items-center bg-whitesmoke-100 hover:opacity-90 text-mediumspringgreen h-[49px] shrink-0 rounded w-[30%]"
+                  className="cursor-pointer flex flex-row justify-center items-center bg-bgSecondary hover:opacity-90 text-bgPrimary h-[49px] shrink-0 rounded w-[30%]"
                   onClick={updateTransaction}
                 >
                   Next
@@ -114,8 +110,8 @@ export const ReceiveFundStore = (props) => {
           </div>
           <div className="mt-2 flex flex-row bg-orangeLight rounded p-1 md:w-[452px] w-[370px]">
             <div className="ml-1 flex justify-center items-center w-[24px] flex-shrink-0">
-              {" "}
-              <RiFileWarningFill color="#FFB000" size={15} />{" "}
+              {' '}
+              <RiFileWarningFill color="#FFB000" size={15} />{' '}
             </div>
             <div className="text-xs leading-[14.4px] text-darkslategray-200 inline-block">
               Please note that you can send funds to the address above only
@@ -125,8 +121,8 @@ export const ReceiveFundStore = (props) => {
           <div className="mt-2 mb-4 flex bg-lightslategray-300 md:w-[452px] w-[370px] h-px" />
           <div className="flex flex-row bg-orangeLight rounded p-1 md:w-[452px] w-[370px]">
             <div className="ml-1 flex justify-center items-center w-[24px] flex-shrink-0">
-              {" "}
-              <RiFileWarningFill color="#FFB000" size={15} />{" "}
+              {' '}
+              <RiFileWarningFill color="#FFB000" size={15} />{' '}
             </div>
             <div className="text-xs leading-[14.4px] text-darkslategray-200 inline-block w-[424px]">
               Please do not disclose this pin to anyone except the dispatcher
@@ -137,7 +133,7 @@ export const ReceiveFundStore = (props) => {
 
         <div className="flex flex-row justify-end">
           <div
-            className="cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[30%]"
+            className="cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[30%]"
             onClick={updateTransaction}
           >
             Paid

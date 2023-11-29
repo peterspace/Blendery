@@ -70,7 +70,7 @@ export const Header = (props) => {
 
   useEffect(() => {
     if (isRedirectHome) {
-      newFunc()
+      newFunc();
       navigate('/');
       setIsRedirectHome(false);
     }
@@ -80,7 +80,7 @@ export const Header = (props) => {
 
   useEffect(() => {
     if (isRedirectDashboard) {
-      newFunc()
+      newFunc();
       navigate('/dashboard');
       setIsRedirectDashboard(false);
     }
@@ -109,91 +109,95 @@ export const Header = (props) => {
 
   const handleLogout = () => {
     dispatch(Logout());
-    newFunc()
+    newFunc();
     // window.location.replace('/');
   };
 
   const isHome = (
     <>
-      <div className="flex flex-col md:flex-row gap-[32px] md:justify-between md:gap-0 mt-[8px] w-screen">
-        <div className="flex flex-col md:flex-row gap-[32px] ml-[20px]">
-          <div
-            className="cursor-pointer text-smi text-mediumseagreen-200 leading-[24px] text-center inline-block"
-            onClick={() => {
-              setIsRedirectHome(true);
-              setActiveTab(tabs[0]);
-            }}
-          >
-            Blendery
-          </div>
-          {isApp ? (
-           
-            null
-          ) : (
-            <div className="flex flex-col md:flex-row gap-[32px] ml-[20px]">
-              <div className="cursor-pointer leading-[24px] text-center inline-block">
-                Personal
-              </div>
-              <div className="cursor-pointer text-smi leading-[24px] text-center inline-block]">
-                Business
-              </div>
-            </div>
-          )}
-        </div>
-        <div className="flex flex-col md:flex-row gap-[32px] mr-[20px]">
-          <div className="cursor-pointer text-smi leading-[24px] text-center inline-block">
-            Support
-          </div>
-
-          {user?.token ? (
-            <>
-              <div
-                className="cursor-pointer text-smi leading-[24px] text-center inline-block"
-                onClick={() => {
-                  setIsRedirectDashboard(true);
-                }}
-              >
-                Dashboard
-              </div>
-              <div
-                className="cursor-pointer text-smi leading-[24px] text-center inline-block"
-                onClick={() => {
-                  handleLogout();
-                }}
-              >
-                Logout
-              </div>
-              <div
-                className="cursor-pointer flex justify-center h-[24px] items-center"
-                onClick={() => {
-                  setMode((prev) => !prev);
-                }}
-              >
-                {mode === true ? (
-                  <BsMoonStars size={18} color={'#404b51'} />
-                ) : (
-                  <BsFillMoonStarsFill size={18} color={'#4f46e5'} />
-                )}
-              </div>
-            </>
-          ) : (
+      <div className="flex flex-col justify-between h-[10vh]">
+        <div className="flex flex-col md:flex-row gap-[32px] md:justify-between md:gap-0 mt-[8px] w-screen">
+          <div className="flex flex-col md:flex-row gap-[32px] ml-[20px]">
             <div
-              className="cursor-pointer text-smi leading-[24px] text-center inline-block"
+              className="cursor-pointer text-smi text-mediumseagreen-200 leading-[24px] text-center inline-block"
               onClick={() => {
-                setIsLogin(true);
-                // use localStorage
+                setIsRedirectHome(true);
+                setActiveTab(tabs[0]);
               }}
             >
-              Login
+              Blendery
             </div>
-          )}
+            {isApp ? null : (
+              <div className="flex flex-col md:flex-row gap-[32px] ml-[20px]">
+                <div className="cursor-pointer leading-[24px] text-center inline-block">
+                  Personal
+                </div>
+                <div className="cursor-pointer text-smi leading-[24px] text-center inline-block]">
+                  Business
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="flex flex-col md:flex-row gap-[32px] mr-[20px]">
+            <div className="cursor-pointer text-smi leading-[24px] text-center inline-block">
+              Support
+            </div>
+
+            {user?.token ? (
+              <>
+                <div
+                  className="cursor-pointer text-smi leading-[24px] text-center inline-block"
+                  onClick={() => {
+                    setIsRedirectDashboard(true);
+                  }}
+                >
+                  Dashboard
+                </div>
+                <div
+                  className="cursor-pointer text-smi leading-[24px] text-center inline-block"
+                  onClick={() => {
+                    handleLogout();
+                  }}
+                >
+                  Logout
+                </div>
+                <div
+                  className="cursor-pointer flex justify-center h-[24px] items-center"
+                  onClick={() => {
+                    setMode((prev) => !prev);
+                  }}
+                >
+                  {mode === true ? (
+                    <BsMoonStars size={18} color={'#404b51'} />
+                  ) : (
+                    <BsFillMoonStarsFill size={18} color={'#4f46e5'} />
+                  )}
+                </div>
+              </>
+            ) : (
+              <div
+                className="cursor-pointer text-smi leading-[24px] text-center inline-block"
+                onClick={() => {
+                  setIsLogin(true);
+                  // use localStorage
+                }}
+              >
+                Login
+              </div>
+            )}
+          </div>
         </div>
+        <div
+          className={`flex w-full h-px ${
+            mode === true ? 'bg-lightslategray-300' : 'bg-gray-100'
+          }`}
+        />
       </div>
     </>
   );
 
   return (
-    <div className="flex flex-col bg-white md:flex-row justify-center gap-4">
+    <div className="flex flex-col bg-white md:flex-row justify-center h-[10vh]">
       <div className="flex flex-row">{isHome}</div>
     </div>
   );

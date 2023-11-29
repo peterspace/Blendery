@@ -79,7 +79,7 @@ export const ReceiveFundCash = (props) => {
                 blockchain: {txData?.fToken?.chain}
               </div>
               <div className="flex flex-row gap-2 mt-2">
-                <div className=" cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]">
+                <div className=" cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]">
                   <div className="flex flex-row gap-2">
                     <RxCopy size={15} color="#ffffff" />
                     <div className="leading-[20px] inline-block">
@@ -115,7 +115,7 @@ export const ReceiveFundCash = (props) => {
               <div className="flex flex-row gap-2 mt-2">
                 {showpin ? (
                   <div
-                    className=" cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]"
+                    className=" cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]"
                     onClick={() => setshowPin(false)}
                   >
                     <div className="flex flex-row gap-2">
@@ -126,7 +126,7 @@ export const ReceiveFundCash = (props) => {
                   </div>
                 ) : (
                   <div
-                    className=" cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]"
+                    className=" cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]"
                     onClick={() => setshowPin(true)}
                   >
                     <div className="flex flex-row gap-2">
@@ -154,7 +154,7 @@ export const ReceiveFundCash = (props) => {
 
         <div className="flex flex-row justify-end">
           <div
-            className="cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[30%]"
+            className="cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[30%]"
             onClick={updateTransaction}
           >
             Paid
@@ -210,7 +210,7 @@ export const ReceiveFundCash = (props) => {
         </div>
         <div className="flex bg-lightslategray-300 md:w-[452px] w-[300px] h-px" />
         <div className="flex flex-row justify-center items-center">
-          <div className="cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
+          <div className="cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
             Please hold ...
           </div>
         </div>

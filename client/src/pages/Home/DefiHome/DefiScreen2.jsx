@@ -29,9 +29,25 @@ export const DefiScreen2 = (props) => {
     transactionRates,
     userAddress,
     setUserAddress,
-    blockchainNetwork,
-    setBlockchainNetwork,
+    chain,
+    // setChain,
     chainId,
+    //====================={new}===============================
+    isFromLoading,
+    fromBalance,
+    fromPrice,
+    isToLoading,
+    toBalance,
+    priceDeviation,
+    tValue,
+    fromBalancePercent,
+    //========================={modals control}=======================================
+    isConnected,
+    isFromTokenPage,
+    isToTokenPage,
+    isSlippagePage,
+    isConnecting,
+    setIsConnectingL,
   } = props;
 
   // const allTokensFromL = useSelector((state) => state.token?.tokenListDefi);
@@ -44,33 +60,41 @@ export const DefiScreen2 = (props) => {
           <Progress percentageProgress={percentageProgress} />
         </div>
         <div className="flex flex-col justify-start items-start xl:justify-center xl:items-center mt-6 xl:mt-0 gap-4">
-          <EstimatorDefi
-           fTitle={fTitle}
-           tTitle={tTitle}
-           fToken={fToken}
-           setFromToken={setFromToken}
-           tToken={tToken}
-           setToToken={setToToken}
-           fValue={fValue}
-           setFromValue={setFromValue}
-           loading={loading}
-           service={service}
-           allTokensFrom={allTokensFrom}
-           allTokensTo={allTokensTo}
-           exchangeRate={exchangeRate}
-           transactionRates={transactionRates}
-            blockchainNetwork={blockchainNetwork}
-            setBlockchainNetwork={setBlockchainNetwork}
-            setPercentageProgress={setPercentageProgress}
-          />
-          <WalletInfo
-          setPercentageProgress={setPercentageProgress}
-          setUserAddress={setUserAddress}
-          userAddress={userAddress}
-          service={service}
-          fToken={fToken}
-          fValue={fValue}
-          />
+          <>
+            <EstimatorDefi
+              fTitle={fTitle}
+              tTitle={tTitle}
+              fToken={fToken}
+              setFromToken={setFromToken}
+              tToken={tToken}
+              setToToken={setToToken}
+              fValue={fValue}
+              setFromValue={setFromValue}
+              loading={loading}
+              service={service}
+              allTokensFrom={allTokensFrom}
+              allTokensTo={allTokensTo}
+              exchangeRate={exchangeRate}
+              transactionRates={transactionRates}
+              chain={chain}
+              // setChain={setChain}
+              setPercentageProgress={setPercentageProgress}
+              //============={New}=================
+              isFromLoading={isFromLoading}
+              fromBalance={fromBalance}
+              fromPrice={fromPrice}
+              isToLoading={isToLoading}
+              toBalance={toBalance}
+              priceDeviation={priceDeviation}
+              tValue={tValue}
+              fromBalancePercent={fromBalancePercent}
+              //======================{modals control}===================================
+              isConnected={isConnected}
+              isFromTokenPage={isFromTokenPage}
+              isToTokenPage={isToTokenPage}
+              isSlippagePage={isSlippagePage}
+            />
+          </>
         </div>
         <div className="flex-col xl:flex-row h-[374px]">
           <DetailsLocal

@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from 'axios';
 // import { toast } from 'react-toastify';
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -54,14 +54,23 @@ const getTokenListDefi = async () => {
   }
 };
 
-const getTokensDefiById = async (chainId) => {
-  const response = await axios.get(
-    `${BACKEND_URL}/token/getTokensDefiById/${chainId}`
-  );
-  if (response.data) {
-    return response.data;
-  }
+// const getTokensDefiById = async (chainId) => {
+//   const response = await axios.get(
+//     `${BACKEND_URL}/token/getTokensDefiById/${chainId}`
+//   );
+//   if (response.data) {
+//     return response.data;
+//   }
+// };
+
+const getTokensDefiById = async (userData) => {
+  if (!userData) return;
+
+  const response = userData;
+
+  return response;
 };
+
 const getTokenListFiat = async () => {
   const response = await axios.get(`${BACKEND_URL}/token/getTokenListFiat`);
   if (response.data) {

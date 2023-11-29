@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { getTransactionRate } from "../redux/features/transaction/transactionSlice";
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getTransactionRate } from '../redux/features/transaction/transactionSlice';
 
-import { FaBitcoin } from "react-icons/fa"; // Bitcoin
-import { SiTether } from "react-icons/si"; // Tether
-import { FaEthereum } from "react-icons/fa"; //Ethereum
-import { SiLitecoin } from "react-icons/si"; //Litecoin
-import { TokenCard } from "./TokenCard";
-import { TokenCardDefi } from "./TokenCardDefi";
+import { FaBitcoin } from 'react-icons/fa'; // Bitcoin
+import { SiTether } from 'react-icons/si'; // Tether
+import { FaEthereum } from 'react-icons/fa'; //Ethereum
+import { SiLitecoin } from 'react-icons/si'; //Litecoin
+import { TokenCard } from './TokenCard';
+import { TokenCardDefi } from './TokenCardDefi';
 import {
   getTokenList,
   getTokenListDefi,
@@ -16,26 +16,26 @@ import {
   getTokenListSell,
   getTokenListExchange,
   getTokensDefiById,
-} from "../redux/features/token/tokenSlice";
+} from '../redux/features/token/tokenSlice';
 
 //android small = w-[320px]/ 352px
 //iphone = w-[340px]/ 372px
 const fiat = [
   {
-    name: "US Dollar",
-    symbol: "USD",
-    rate: "1.1",
+    name: 'US Dollar',
+    symbol: 'USD',
+    rate: '1.1',
     rateBuy: 1.05,
     rateSell: 0.95,
-    logoURI: "/usd.png",
+    logoURI: '/usd.png',
   },
   {
-    name: "Euro",
-    symbol: "EUR",
-    rate: "1.1",
+    name: 'Euro',
+    symbol: 'EUR',
+    rate: '1.1',
     rateBuy: 1.05,
     rateSell: 0.95,
-    logoURI: "/euro.png",
+    logoURI: '/euro.png',
   },
   // {
   //   name: 'British PoundS',
@@ -81,50 +81,50 @@ const fiat = [
 
 const cities = [
   {
-    country: "United States",
-    cities: ["New york"],
-    flag: "",
+    country: 'United States',
+    cities: ['New york'],
+    flag: '',
   },
   {
-    country: "United Kingdom",
-    cities: ["London"],
-    flag: "",
+    country: 'United Kingdom',
+    cities: ['London'],
+    flag: '',
   },
   {
-    country: "France",
-    cities: ["Paris"],
-    flag: "",
+    country: 'France',
+    cities: ['Paris'],
+    flag: '',
   },
 
   {
-    country: "Germany",
-    cities: ["Berlin"],
-    flag: "",
+    country: 'Germany',
+    cities: ['Berlin'],
+    flag: '',
   },
   {
-    country: "Spain",
-    cities: ["Barcelona"],
-    flag: "",
+    country: 'Spain',
+    cities: ['Barcelona'],
+    flag: '',
   },
   {
-    country: "Russia",
-    cities: ["Saint Petersburg", "Moscow"],
-    flag: "",
+    country: 'Russia',
+    cities: ['Saint Petersburg', 'Moscow'],
+    flag: '',
   },
   {
-    country: "Finland",
-    cities: ["Helsinki"],
-    flag: "",
+    country: 'Finland',
+    cities: ['Helsinki'],
+    flag: '',
   },
   {
-    country: "Hungary",
-    cities: ["Budapest"],
-    flag: "",
+    country: 'Hungary',
+    cities: ['Budapest'],
+    flag: '',
   },
   {
-    country: "Czech",
-    cities: ["Prague"],
-    flag: "",
+    country: 'Czech',
+    cities: ['Prague'],
+    flag: '',
   },
 ];
 
@@ -174,7 +174,7 @@ export const EstimatorCryptoStoreCard = (props) => {
   const estimatedGas = transactionRates ? transactionRates?.estimatedGas : 0;
   const transactionRatesError = transactionRates
     ? transactionRates?.message
-    : "";
+    : '';
   console.log({ transactionRatesError: transactionRatesError });
   const transactionRatesLoading = transactionRates
     ? transactionRates?.isLoading
@@ -195,8 +195,8 @@ export const EstimatorCryptoStoreCard = (props) => {
   /*********************************************     REACT STATES    **************************************************** */
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
-  const [fTitle, setFTitle] = useState("You send");
-  const [tTitle, setTTitle] = useState("You get");
+  const [fTitle, setFTitle] = useState('You send');
+  const [tTitle, setTTitle] = useState('You get');
 
   //================{PAGES}==================
   const [isFromTokenPage, setIsFromTokenPage] = useState(false);
@@ -223,7 +223,6 @@ export const EstimatorCryptoStoreCard = (props) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
- 
 
   useEffect(() => {
     if (allTokensFromL && !fToken) {
@@ -261,8 +260,6 @@ export const EstimatorCryptoStoreCard = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allTokensToL]);
 
-
-
   const estimator = (
     <div className="flex justify-center rounded-lg bg-white shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[320px] xs:w-[340px] md:w-[500px] p-4">
       {isFromTokenPage === false && isToTokenPage === false ? (
@@ -270,7 +267,7 @@ export const EstimatorCryptoStoreCard = (props) => {
           <div className="flex flex-col gap-[10px]">
             <div className="flex flex-row gap-4 mt-2">
               <div
-                className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] inline-block text-darkslategray-200 text-[24px]`}
+                className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block text-darkslategray-200 text-[24px]`}
               >
                 Calculate amount (Buy Card)
               </div>
@@ -332,13 +329,13 @@ export const EstimatorCryptoStoreCard = (props) => {
             ) : (
               <div className="flex flex-row justify-between">
                 <div className="h-3 py-2">
-                  1 {fToken?.symbol.toUpperCase()} ~ {exchangeRate}{" "}
+                  1 {fToken?.symbol.toUpperCase()} ~ {exchangeRate}{' '}
                   {tToken?.symbol.toUpperCase()}
                 </div>
                 {/* <div className="h-3 py-2">{isToLoading
                            ? 'Fetching price...'
                            : `${`1 ${fToken?.symbol.toUpperCase()} = ${exchangeRate}  ${tToken?.symbol.toUpperCase()}`}`}</div> */}
-                <div className="rounded bg-whitesmoke-100 p-2">
+                <div className="rounded bg-bgSecondary p-2">
                   <img
                     className="w-3.5 h-3 overflow-hidden"
                     alt=""
@@ -360,7 +357,7 @@ export const EstimatorCryptoStoreCard = (props) => {
                     placeholder="0.1"
                     // value={`~ ${tValue}`}
                     // value={`~ ${1.675}`}
-                    value={loading ? "loading" : `~ ${tValue}`}
+                    value={loading ? 'loading' : `~ ${tValue}`}
                     disabled={true}
                   />
                 </div>

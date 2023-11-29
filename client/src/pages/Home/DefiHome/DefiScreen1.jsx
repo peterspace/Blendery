@@ -2,6 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { TokenCard } from '../../../components/TokenCard';
 import { TokenCardNetworks } from '../../../components/TokenCardNetworks';
 import { networksOptions } from '../../../constants';
+import { getTokensDefiByIdService } from '../../../services/apiService';
+import { getTokensDefiById } from '../../../redux/features/token/tokenSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  updateIsChangeChainId,
+  updateConnectedNetwork,
+  updateChain,
+} from '../../../redux/features/swap/swapSlice';
+import {
+  useConnect,
+  useAccount,
+  useSwitchNetwork,
+  useSigner,
+  useBalance,
+} from 'wagmi';
 
 export const DefiScreen1 = (props) => {
   const {
@@ -26,12 +41,16 @@ export const DefiScreen1 = (props) => {
     allTokensTo,
     exchangeRate,
     transactionRates,
-    blockchainNetwork,
-    setBlockchainNetwork,
+    chain,
+    setChain,
     chainId,
+    tValue,
   } = props;
   //======================={RATES and PRICES}========================================================
-  const tValue = transactionRates ? transactionRates?.tValueFormatted : 0;
+  const dispatch = useDispatch();
+  const { switchNetwork } = useSwitchNetwork();
+  const { isConnected } = useAccount();
+
   //================{CARDS}==================
   const [isNetworkPage, setIsNetworkPage] = useState(false);
   const [isFromTokenPage, setIsFromTokenPage] = useState(false);
@@ -39,6 +58,12 @@ export const DefiScreen1 = (props) => {
   const [filteredfTokens, setFilteredfTokens] = useState();
   const [filteredtTokens, setFilteredtTokens] = useState();
   const [isChainChange, setIsChainChange] = useState(false);
+  const [checkChain, setCheckChain] = useState();
+  // console.log({ checkChain: checkChain });
+
+  const connectedNetworkSwitchL = useSelector(
+    (state) => state.swap?.connectedNetwork
+  );
 
   //============================================{Token selection}==============================
   useEffect(() => {
@@ -95,6 +120,52 @@ export const DefiScreen1 = (props) => {
     setPercentageProgress(2);
   }
 
+  //====================================={Token Switchh}===============================================
+
+  function swapTokensPosition() {
+    let tmpToken = fToken;
+    setFromToken(tToken);
+    setToToken(tmpToken);
+  }
+
+  // whenever the user connects to a wallet e.g metamask or switches wallet while connected, reopen chainModal to update chain
+  useEffect(() => {
+    if (connectedNetworkSwitchL === true) {
+      setIsNetworkPage(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [connectedNetworkSwitchL]);
+
+  async function getConnectedChain() {
+    const response = await getTokensDefiByIdService(checkChain?.chainId);
+    if (response) {
+      dispatch(getTokensDefiById(response));
+    }
+
+    // window.location.reload(); // reconsider removing
+  }
+
+  useEffect(() => {
+    if (checkChain && isConnected) {
+      getConnectedChain();
+      dispatch(updateChain(checkChain));
+      switchNetwork(checkChain?.id);
+      dispatch(updateIsChangeChainId(true));
+      dispatch(updateConnectedNetwork(false));
+      localStorage.setItem('chainSwitch', JSON.stringify(true));
+      setIsNetworkPage(false);
+    }
+    if (checkChain && !isConnected) {
+      getConnectedChain();
+      dispatch(updateChain(checkChain));
+      dispatch(updateIsChangeChainId(true));
+      dispatch(updateConnectedNetwork(false));
+      localStorage.setItem('chainSwitch', JSON.stringify(true));
+      setIsNetworkPage(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [checkChain]);
+
   return (
     <>
       {/* ================================{SWAP MAIN ACTIVE STATE}===================================== */}
@@ -112,15 +183,15 @@ export const DefiScreen1 = (props) => {
                   <div className="flex justify-center items-center flex-shrink-0">
                     <img
                       className="w-[24px] h-$ shrink-0 overflow-hidden rounded-full"
-                      src={blockchainNetwork?.image}
-                      alt={blockchainNetwork.symbol}
+                      src={chain?.image}
+                      alt={chain.symbol}
                     />
                   </div>
                   <div className="flex flex-row gap-1">
                     <div
                       className={`text-base font-sans font-medium leading-[24px] inline-block text-black`}
                     >
-                      {blockchainNetwork.name}
+                      {chain.name}
                     </div>
                   </div>
                 </div>
@@ -186,7 +257,10 @@ export const DefiScreen1 = (props) => {
               {/* <div className="h-3 py-2">{isToLoading
                           ? 'Fetching price...'
                           : `${`1 ${fToken?.symbol.toUpperCase()} = ${exchangeRate}  ${tToken?.symbol.toUpperCase()}`}`}</div> */}
-              <div className="rounded bg-whitesmoke-100 p-2">
+              <div
+                className="cursor-pointer rounded bg-bgSecondary p-2"
+                onClick={swapTokensPosition}
+              >
                 <img
                   className="w-3.5 h-3 overflow-hidden"
                   alt=""
@@ -242,7 +316,7 @@ export const DefiScreen1 = (props) => {
           </div>
 
           <div
-            className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded-md"
+            className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded-md"
             onClick={nextFunc}
           >
             {`${service} ${fToken?.symbol.toUpperCase()} now`}
@@ -255,7 +329,8 @@ export const DefiScreen1 = (props) => {
       isToTokenPage === false ? (
         <TokenCardNetworks
           setIsTokenPage={setIsNetworkPage}
-          setToken={setBlockchainNetwork}
+          // setToken={setChain}
+          setToken={setCheckChain}
           allTokens={networksOptions}
           service={service}
           setIsChainChange={setIsChainChange}

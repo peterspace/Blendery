@@ -55,7 +55,7 @@ export const CheckoutCash = (props) => {
               Checkout
             </div>
             <div
-              className="cursor-pointer flex flex-row justify-center items-center bg-whitesmoke-100 hover:opacity-90 text-mediumspringgreen shrink-0 rounded px-6 py-3"
+              className="cursor-pointer flex flex-row justify-center items-center bg-bgSecondary hover:opacity-90 text-bgPrimary shrink-0 rounded px-6 py-3"
               onClick={() => {
                 setPercentageProgress(1);
               }}

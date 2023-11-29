@@ -87,7 +87,7 @@ const HistoryChart = (props) => {
       className={`flex justify-center rounded-lg shadow-lg p-1 w-full ${
         mode === true
           ? 'bg-white'
-          : 'bg-bgDarker outline outline-bgDarkOutline outline-[1px]'
+          : 'bg-bgDarkMode outline outline-bgDarkOutline outline-[1px]'
       }`}
     >
       <Line options={options} data={data} />

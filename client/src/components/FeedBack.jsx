@@ -57,13 +57,13 @@ export const FeedBack = (props) => {
 
   const newCard = (
     <div className="flex flex-col gap-[24px]">
-      {/* <div className="text-lg font-sans font-bold text-mediumspringgreen inline-block">
+      {/* <div className="text-lg font-sans font-bold text-bgPrimary inline-block">
         {title}
       </div> */}
       <div className="text-lg flex flex-row justify-center items-center font-sans font-bold gap-1">
-        <span className='text-tripmagray-100'>{`What `}</span>
-        <span className='text-mediumspringgreen'>{`Blendery `}</span>
-        <span className='text-tripmagray-100'>{`users are saying`}</span>
+        <span className="text-tripmagray-100">{`What `}</span>
+        <span className="text-bgPrimary">{`Blendery `}</span>
+        <span className="text-tripmagray-100">{`users are saying`}</span>
         {/* {title} */}
       </div>
       <div className="flex flex-col xl:flex-row gap-[16px]">

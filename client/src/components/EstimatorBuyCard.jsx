@@ -26,9 +26,10 @@ export const EstimatorBuyCard = (props) => {
     tTitle,
     allTokensFrom,
     allTokensTo,
-    tValue,
     exchangeRate,
     cities,
+    transactionRates,
+    loadingExchangeRate,
   } = props;
 
   /********************************************************************************************************************** */
@@ -37,6 +38,8 @@ export const EstimatorBuyCard = (props) => {
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
   const [isNotCountrySupported, setIsNotCountrySupported] = useState(false);
+  //======================={RATES and PRICES}========================================================
+  const tValue = transactionRates ? transactionRates?.tValueFormatted : 0;
   //================{CARDS}==================
   const [isFromTokenPage, setIsFromTokenPage] = useState(false);
   const [isToTokenPage, setIsToTokenPage] = useState(false);
@@ -96,14 +99,14 @@ export const EstimatorBuyCard = (props) => {
       {isFromTokenPage === false && isToTokenPage === false ? (
         <div className="flex flex-col gap-[24px]">
           <div className="flex flex-col gap-[10px]">
-          <div className="flex flex-row justify-between mt-[24px]">
+            <div className="flex flex-row justify-between mt-[24px]">
               <div
-                className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] inline-block text-darkslategray-200 text-[24px]`}
+                className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block text-darkslategray-200 text-[24px]`}
               >
                 Calculate amount (Buy Card)
               </div>
               <div
-                className="cursor-pointer flex flex-row justify-center items-center bg-whitesmoke-100 hover:opacity-90 text-mediumspringgreen shrink-0 rounded px-6 py-3"
+                className="cursor-pointer flex flex-row justify-center items-center bg-bgSecondary hover:opacity-90 text-bgPrimary shrink-0 rounded px-6 py-3"
                 onClick={() => {
                   setPercentageProgress(1);
                 }}
@@ -160,14 +163,15 @@ export const EstimatorBuyCard = (props) => {
             </div>
 
             <div className="flex flex-row justify-between">
-              <div className="h-3 py-2">
-                1 {fToken?.symbol.toUpperCase()} ~ {exchangeRate}{' '}
+            <div className="h-3 py-2">
+                1 {fToken?.symbol.toUpperCase()} ~{" "}
+                {loadingExchangeRate ? "fetching rates" : exchangeRate}{" "}
                 {tToken?.symbol.toUpperCase()}
               </div>
               {/* <div className="h-3 py-2">{isToLoading
                            ? 'Fetching price...'
                            : `${`1 ${fToken?.symbol.toUpperCase()} = ${exchangeRate}  ${tToken?.symbol.toUpperCase()}`}`}</div> */}
-              <div className="rounded bg-whitesmoke-100 p-2">
+              <div className="rounded bg-bgSecondary p-2">
                 <img
                   className="w-3.5 h-3 overflow-hidden"
                   alt=""

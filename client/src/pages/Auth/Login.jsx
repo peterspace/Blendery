@@ -1,27 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import queryString from "query-string";
-import { FcGoogle } from "react-icons/fc";
-import { FaFacebookSquare } from "react-icons/fa";
-import { AiFillApple, AiOutlineClose } from "react-icons/ai";
-import {
-  loginUser,
-  validateEmail,
-  authenticateUserFacebook,
-  successUserFacebook,
-  errorUserFacebook,
-  authenticateUserGoogle,
-  successUserGoogle,
-  errorUserGoogle,
-} from "../../services/apiService";
+import React, { useState, useEffect } from 'react';
+import { FcGoogle } from 'react-icons/fc';
+import { FaFacebookSquare } from 'react-icons/fa';
+import { loginUser, validateEmail } from '../../services/apiService';
 
-import { loginSocial } from "../../services/apiService";
+import { toast } from 'react-toastify';
 
-import { toast } from "react-toastify";
-
-import { useDispatch } from "react-redux";
-import { LoginUser } from "../../redux/features/user/userSlice";
-import { useFormik } from "formik";
+import { useDispatch } from 'react-redux';
+import { LoginUser } from '../../redux/features/user/userSlice';
+import { useFormik } from 'formik';
 
 export const Login = (props) => {
   const {
@@ -33,14 +19,9 @@ export const Login = (props) => {
     setIsLoggedIn,
     setRedirectHome,
   } = props;
-
-  const navigate = useNavigate();
-  const location = useLocation();
   const dispatch = useDispatch();
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [redirect, setRedirect] = useState(false);
   const [isLocal, setIsLocal] = useState(false);
   const [isFacebook, setIsFacebook] = useState(false);
@@ -50,18 +31,18 @@ export const Login = (props) => {
   const { values, handleChange, handleSubmit, touched, errors, resetForm } =
     useFormik({
       initialValues: {
-        email: "",
-        password: "",
+        email: '',
+        password: '',
       },
       validate: (values) => {
         const errors = {};
 
         if (!values.email) {
-          errors.email = "Email address is required!";
+          errors.email = 'Email address is required!';
         }
 
         if (!values.password) {
-          errors.password = "Password is required!";
+          errors.password = 'Password is required!';
         }
 
         return errors;
@@ -76,7 +57,7 @@ export const Login = (props) => {
 
     if (isLocal) {
       if (!validateEmail(email)) {
-        return toast.error("Please enter a valid email");
+        return toast.error('Please enter a valid email');
       }
 
       userData = {
@@ -90,8 +71,8 @@ export const Login = (props) => {
       console.log({ userData: data });
       if (data) {
         dispatch(LoginUser(data));
-        localStorage.setItem("isLoggedIn", JSON.stringify(true));
-        localStorage.setItem("user", JSON.stringify(data));
+        localStorage.setItem('isLoggedIn', JSON.stringify(true));
+        localStorage.setItem('user', JSON.stringify(data));
         // setUser(data);
         setIsLoggedIn(true);
         setTimeout(() => {
@@ -101,7 +82,7 @@ export const Login = (props) => {
         // window.location.reload(); // relaod to update changes m,ade by localStoarge
       }
     } catch (e) {
-      alert("Login failed");
+      alert('Login failed');
     }
   }
 
@@ -151,7 +132,7 @@ export const Login = (props) => {
   // }, [redirectHome]);
 
   const handleSuccessLogin = () => {
-    console.log("loggedIn sucessfull");
+    console.log('loggedIn sucessfull');
     // navigate('/dashboard');
   };
 
@@ -238,7 +219,7 @@ export const Login = (props) => {
             </div>
             <div className="flex flex-row justify-center items-center">
               <div
-                className="cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full"
+                className="cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full"
                 onClick={handleSubmit}
               >
                 Login
@@ -257,7 +238,7 @@ export const Login = (props) => {
         <div className="flex flex-col justify-center items-center gap-[16px]">
           {/* <a href={`${BACKEND_URL}/auth/google`}>
             <div
-              className="cursor-pointer flex flex-row justify-center items-center bg-white hover:opacity-90 text-mediumspringgreen h-[49px] shrink-0 rounded w-full outline outline-mediumspringgreen outline-[1.5px]"
+              className="cursor-pointer flex flex-row justify-center items-center bg-white hover:opacity-90 text-bgPrimary h-[49px] shrink-0 rounded w-full outline outline-bgPrimary outline-[1.5px]"
               onClick={() => {
                 setIsLocal(false);
                 setIsFacebook(false);
@@ -269,7 +250,7 @@ export const Login = (props) => {
             </div>
           </a> */}
           <div
-            className="cursor-pointer flex flex-row justify-center items-center bg-white hover:opacity-90 text-mediumspringgreen h-[49px] shrink-0 rounded w-full outline outline-mediumspringgreen outline-[1.5px]"
+            className="cursor-pointer flex flex-row justify-center items-center bg-white hover:opacity-90 text-bgPrimary h-[49px] shrink-0 rounded w-full outline outline-bgPrimary outline-[1.5px]"
             onClick={() => {
               setIsLocal(false);
               setIsFacebook(false);
@@ -280,7 +261,7 @@ export const Login = (props) => {
             <span className="ml-2"> Continue with Google</span>
           </div>
           <div
-            className="cursor-pointer flex flex-row justify-center items-center bg-white hover:opacity-90 text-mediumspringgreen h-[49px] shrink-0 rounded w-full outline outline-mediumspringgreen outline-[1.5px]"
+            className="cursor-pointer flex flex-row justify-center items-center bg-white hover:opacity-90 text-bgPrimary h-[49px] shrink-0 rounded w-full outline outline-bgPrimary outline-[1.5px]"
             onClick={() => {
               setIsLocal(false);
               setIsFacebook(false);
@@ -295,7 +276,7 @@ export const Login = (props) => {
         <div className="flex flex-row justify-between">
           <div className="flex flex-row">
             <div
-              className="cursor-pointer text-smi leading-[22px] text-mediumspringgreen hover:text-opacity-80 inline-block"
+              className="cursor-pointer text-smi leading-[22px] text-bgPrimary hover:text-opacity-80 inline-block"
               onClick={() => {
                 setIsLogin(false);
                 setIsRegister(false);
@@ -310,7 +291,7 @@ export const Login = (props) => {
               {"Don't have an account?"}
             </div>
             <div
-              className="cursor-pointer text-smi leading-[22px] text-mediumspringgreen hover:text-opacity-80 inline-block"
+              className="cursor-pointer text-smi leading-[22px] text-bgPrimary hover:text-opacity-80 inline-block"
               onClick={() => {
                 setIsLogin(false);
                 setIsRegister(true);

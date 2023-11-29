@@ -22,8 +22,6 @@ import { FcGoogle } from 'react-icons/fc';
 import { FaFacebookSquare } from 'react-icons/fa';
 
 export const ProgressStages5 = () => {
-
-
   const progressStage1 = (
     <div className="flex justify-center rounded-lg w-[228px] p-4 bg-gray-100">
       <div className="flex flex-row gap-2 w-full">
@@ -79,7 +77,7 @@ export const ProgressStages5 = () => {
   const progressStage4 = (
     <div className="flex justify-center rounded-lg w-[228px] p-4 bg-gray-100">
       <div className="flex flex-row gap-2 w-full">
-      <div className="flex justify-center items-center w-[24px] h-[24px] flex-shrink-0">
+        <div className="flex justify-center items-center w-[24px] h-[24px] flex-shrink-0">
           {' '}
           <FiCheckCircle color="#4f46e5" size={24} />{' '}
         </div>
@@ -106,9 +104,9 @@ export const ProgressStages5 = () => {
           </div>
           <div className="flex flex-row items-center justify-between w-[260px]">
             <div className="flex flex-row w-[160px] bg-whitesmoke-200 rounded-lg">
-              <div className="flex bg-mediumspringgreen rounded-lg w-[100%] h-[12px]" />
+              <div className="flex bg-bgPrimary rounded-lg w-[100%] h-[12px]" />
             </div>
-            <div className="flex flex-row justify-center items-center text-gray-200 bg-whitesmoke-100 rounded w-[49px] h-[20px] text-[10px]">
+            <div className="flex flex-row justify-center items-center text-gray-200 bg-bgSecondary rounded w-[49px] h-[20px] text-[10px]">
               4 of 4
             </div>
           </div>

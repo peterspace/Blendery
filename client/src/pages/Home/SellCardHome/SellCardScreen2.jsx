@@ -1,9 +1,11 @@
-import React, { useState } from "react";
-import { Progress } from "../../../components/Progress";
-import { EstimatorSellCard } from "../../../components/EstimatorSellCard";
-import { DetailsCardLocal } from "../../../components/DetailsCardLocal";
-import { Providers } from "../../../components/Providers";
-import { BankInfo } from "../../../components/BankInfo";
+import React, { useState, useEffect } from 'react';
+import { Progress } from '../../../components/Progress';
+import { EstimatorSellCard } from '../../../components/EstimatorSellCard';
+import { DetailsCardLocal } from '../../../components/DetailsCardLocal';
+import { Providers } from '../../../components/Providers';
+import { BankInfo } from '../../../components/BankInfo';
+import { useDispatch, useSelector } from 'react-redux';
+import { getTokenListExchange } from '../../../redux/features/token/tokenSlice';
 
 export const SellCardScreen2 = (props) => {
   const {
@@ -46,9 +48,18 @@ export const SellCardScreen2 = (props) => {
     setCardNumber,
     phone,
     setPhone,
+    transactionRates,
+    loadingExchangeRate,
   } = props;
+
+  const dispatch = useDispatch();
   const [selectedProvider, setSelectedProvider] = useState("Phone");
 
+
+  useEffect(() => {
+    dispatch(getTokenListExchange());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <div className="flex flex-col xl:flex-row justify-center">
       <div className="flex flex-col xl:flex-row gap-[32px] mt-[8px]">
@@ -79,7 +90,9 @@ export const SellCardScreen2 = (props) => {
             tValue={tValue}
             exchangeRate={exchangeRate}
             cities={cities}
+            transactionRates={transactionRates}
             setPercentageProgress={setPercentageProgress}
+            loadingExchangeRate={loadingExchangeRate}
           />
           {providers?.map((provider, i) => (
             <Providers
@@ -90,7 +103,6 @@ export const SellCardScreen2 = (props) => {
               setSelectedProvider={setSelectedProvider}
             />
           ))}
-
           {/* <Banking Info /> */}
           {provider && (
             <>
@@ -121,6 +133,8 @@ export const SellCardScreen2 = (props) => {
             fValue={fValue}
             fTitle={fTitle}
             tTitle={tTitle}
+            transactionRates={transactionRates}
+            loadingExchangeRate={loadingExchangeRate}
           />
         </div>
       </div>

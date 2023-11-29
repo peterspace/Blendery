@@ -4,14 +4,21 @@ import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 
 export const CardProviderBlendery = (props) => {
-  const { setPercentageProgress, service, provider, setLoginRedirect, txData, setTxInfo } = props;
+  const {
+    setPercentageProgress,
+    service,
+    provider,
+    setLoginRedirect,
+    txData,
+    setTxInfo,
+  } = props;
 
   const dispatch = useDispatch();
   const user = localStorage.getItem('user')
     ? JSON.parse(localStorage.getItem('user'))
     : null;
 
-    const txId = txData?._id;
+  const txId = txData?._id;
 
   useEffect(() => {
     if (!user) {
@@ -26,7 +33,7 @@ export const CardProviderBlendery = (props) => {
   useEffect(() => {
     if (txData?.status === 'Paid') {
       // setPercentageProgress(4);
-      setTxInfo(txData)
+      setTxInfo(txData);
       setPercentageProgress(txData?.percentageProgress); // update stage from backend
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -58,7 +65,7 @@ export const CardProviderBlendery = (props) => {
           </div>
         </div>
         <div
-          className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded"
+          className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded"
           onClick={() => setPercentageProgress(4)}
         >
           {service} crypto

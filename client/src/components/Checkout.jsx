@@ -1,9 +1,17 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
 
 export const Checkout = (props) => {
-
-  const { setPercentageProgress, fTitle, tTitle } = props;
+  const {
+    setPercentageProgress,
+    fTitle,
+    tTitle,
+    fToken,
+    tToken,
+    fValue,
+    userAddress,
+    transactionRates,
+    loadingExchangeRate,
+  } = props;
 
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
@@ -11,9 +19,9 @@ export const Checkout = (props) => {
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
 
-  const transactionRates = useSelector(
-    (state) => state.transaction?.getTransactionRate
-  );
+  // const transactionRates = useSelector(
+  //   (state) => state.transaction?.getTransactionRate
+  // );
   const youSend = transactionRates ? transactionRates?.youSend : 0;
   const youGet = transactionRates ? transactionRates?.youGet : 0;
   const processingFee = transactionRates ? transactionRates?.processingFee : 0;
@@ -30,22 +38,6 @@ export const Checkout = (props) => {
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
 
-  const fToken = localStorage.getItem('fTokenE')
-    ? JSON.parse(localStorage.getItem('fTokenE'))
-    : null;
-
-  const tToken = localStorage.getItem('tTokenE')
-    ? JSON.parse(localStorage.getItem('tTokenE'))
-    : null;
-
-  const fValue = localStorage.getItem('fValueE')
-    ? JSON.parse(localStorage.getItem('fValueE'))
-    : '1';
-  const userAddress = localStorage.getItem('userAddress')
-    ? JSON.parse(localStorage.getItem('userAddress'))
-    : null;
-
-
   const checkout = (
     <div className="flex justify-center rounded-lg bg-white shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[320px] xs:w-[340px] md:w-[500px] p-4">
       <div className="flex flex-col gap-[24px]">
@@ -55,7 +47,7 @@ export const Checkout = (props) => {
               Checkout
             </div>
             <div
-              className="cursor-pointer flex flex-row justify-center items-center bg-whitesmoke-100 hover:opacity-90 text-mediumspringgreen shrink-0 rounded px-6 py-3"
+              className="cursor-pointer flex flex-row justify-center items-center bg-bgSecondary hover:opacity-90 text-bgPrimary shrink-0 rounded px-6 py-3"
               onClick={() => {
                 setPercentageProgress(2);
               }}

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useQuery } from 'react-query';
+import axios from 'axios';
 //===============================================================
 import { BuyCardHome } from './BuyCardHome/BuyCardHome';
 import { BuyCashHome } from './BuyCashHome/BuyCashHome';
@@ -55,6 +57,7 @@ import { networksOptions } from '../../constants';
 export const AppContainer = (props) => {
   const {
     mode,
+    setMode,
     user,
     service,
     setService,
@@ -65,12 +68,14 @@ export const AppContainer = (props) => {
   } = props;
 
   const dispatch = useDispatch();
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
   const tokensDefiEthereum = useSelector(
     (state) => state.token?.tokensDefiEthereum
   );
 
   const [isLightMode, setIsLightMode] = useState(true);
-
+  const allTokensDefi = useSelector((state) => state.token?.tokensDefiById);
   const percentageProgressL = localStorage.getItem('percentageProgress')
     ? JSON.parse(localStorage.getItem('percentageProgress'))
     : 1;
@@ -78,12 +83,8 @@ export const AppContainer = (props) => {
   const [percentageProgress, setPercentageProgress] =
     useState(percentageProgressL);
 
-  const blockchainNetworkL = localStorage.getItem('blockchainNetworkE')
-    ? JSON.parse(localStorage.getItem('blockchainNetworkE'))
-    : networksOptions[0];
-  const [blockchainNetwork, setBlockchainNetwork] =
-    useState(blockchainNetworkL);
-  const chainId = blockchainNetwork?.chainId;
+  const [isToLoading, setIsToLoading] = useState(false);
+  const [isFromLoading, setIsFromLoading] = useState(false);
 
   //====={Controllers}===========================
 
@@ -98,14 +99,10 @@ export const AppContainer = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [percentageProgress]);
 
-  useEffect(() => {
-    dispatch(getTokensDefiById(chainId));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chainId]);
-
   //==============={update lists at intervals}===============================
 
   useEffect(() => {
+    setMode(true); // automatically set ,ode to "light" mode
     dispatch(getTokenListDefi());
     dispatch(getTokenListFiat());
     dispatch(getTokenListBuy());
@@ -126,17 +123,6 @@ export const AppContainer = (props) => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subService]);
-
-  useEffect(() => {
-    if (blockchainNetwork) {
-      localStorage.setItem(
-        'blockchainNetworkE',
-        JSON.stringify(blockchainNetwork)
-      );
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [blockchainNetwork]);
 
   useEffect(() => {
     if (user) {
@@ -183,7 +169,7 @@ export const AppContainer = (props) => {
 
   return (
     <>
-      <div className="relative bg-white w-full h-screen overflow-auto text-left text-sm text-gray-400 font-montserrat">
+      <div className="flex flex-col">
         {percentageProgress === 1 ? (
           <>
             <div
@@ -195,9 +181,9 @@ export const AppContainer = (props) => {
                 <div className="flex flex-col gap-[10px]">
                   <div className="flex flex-row gap-4 mt-2">
                     <div
-                      className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] ${
+                      className={`cursor-pointer hover:text-bgPrimary leading-[24px] ${
                         service === 'exchange' && subService === 'exchange'
-                          ? 'text-mediumspringgreen text-base font-black inline-block underline underline-offset-[16px]'
+                          ? 'text-bgPrimary text-base font-black inline-block underline underline-offset-[16px]'
                           : 'text-darkgray-200 text-mini'
                       }`}
                       onClick={nextFuncExchange}
@@ -205,13 +191,13 @@ export const AppContainer = (props) => {
                       Exchange
                     </div>
                     <div
-                      className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] inline-block ${
+                      className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block ${
                         service === 'buy' && subService === 'buyCash'
-                          ? 'text-mediumspringgreen text-base font-black inline-block underline underline-offset-[16px]'
+                          ? 'text-bgPrimary text-base font-black inline-block underline underline-offset-[16px]'
                           : 'text-darkgray-200 text-mini'
                       } ${
                         service === 'buy' && subService === 'buyCard'
-                          ? 'text-mediumspringgreen text-base font-black inline-block underline underline-offset-[16px]'
+                          ? 'text-bgPrimary text-base font-black inline-block underline underline-offset-[16px]'
                           : 'text-darkgray-200 text-mini'
                       }`}
                       onClick={nextFuncBuyCard}
@@ -219,13 +205,13 @@ export const AppContainer = (props) => {
                       Buy
                     </div>
                     <div
-                      className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] inline-block ${
+                      className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block ${
                         service === 'sell' && subService === 'sellCash'
-                          ? 'text-mediumspringgreen text-base font-black inline-block underline underline-offset-[16px]'
+                          ? 'text-bgPrimary text-base font-black inline-block underline underline-offset-[16px]'
                           : 'text-darkgray-200 text-mini'
                       } ${
                         service === 'sell' && subService === 'sellCard'
-                          ? 'text-mediumspringgreen text-base font-black inline-block underline underline-offset-[16px]'
+                          ? 'text-bgPrimary text-base font-black inline-block underline underline-offset-[16px]'
                           : 'text-darkgray-200 text-mini'
                       }`}
                       onClick={nextFuncSellCard}
@@ -234,9 +220,9 @@ export const AppContainer = (props) => {
                     </div>
 
                     <div
-                      className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] inline-block ${
+                      className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block ${
                         service === 'defi' && subService === 'defi'
-                          ? 'text-mediumspringgreen text-base font-black inline-block underline underline-offset-[16px]'
+                          ? 'text-bgPrimary text-base font-black inline-block underline underline-offset-[16px]'
                           : 'text-darkgray-200 text-mini'
                       }`}
                       onClick={nextFuncDefi}
@@ -256,8 +242,7 @@ export const AppContainer = (props) => {
                         setTxInfo={setTxInfo}
                         txInfo={txInfo}
                         user={user}
-                        percentageProgress={percentageProgress}
-                        setPercentageProgress={setPercentageProgress}
+                        setPercentageProgressHome={setPercentageProgress}
                       />
                     )}
                     {service === 'buy' && subService === 'buyCash' && (
@@ -270,8 +255,7 @@ export const AppContainer = (props) => {
                         setTxInfo={setTxInfo}
                         txInfo={txInfo}
                         user={user}
-                        percentageProgress={percentageProgress}
-                        setPercentageProgress={setPercentageProgress}
+                        setPercentageProgressHome={setPercentageProgress}
                       />
                     )}
                     {service === 'buy' && subService === 'buyCard' && (
@@ -284,8 +268,7 @@ export const AppContainer = (props) => {
                         setTxInfo={setTxInfo}
                         txInfo={txInfo}
                         user={user}
-                        percentageProgress={percentageProgress}
-                        setPercentageProgress={setPercentageProgress}
+                        setPercentageProgressHome={setPercentageProgress}
                       />
                     )}
 
@@ -299,8 +282,7 @@ export const AppContainer = (props) => {
                         setTxInfo={setTxInfo}
                         txInfo={txInfo}
                         user={user}
-                        percentageProgress={percentageProgress}
-                        setPercentageProgress={setPercentageProgress}
+                        setPercentageProgressHome={setPercentageProgress}
                       />
                     )}
 
@@ -314,8 +296,7 @@ export const AppContainer = (props) => {
                         setTxInfo={setTxInfo}
                         txInfo={txInfo}
                         user={user}
-                        percentageProgress={percentageProgress}
-                        setPercentageProgress={setPercentageProgress}
+                        setPercentageProgressHome={setPercentageProgress}
                       />
                     )}
 
@@ -326,14 +307,10 @@ export const AppContainer = (props) => {
                         setService={setService}
                         subService={subService}
                         setSubService={setSubService}
-                        blockchainNetwork={blockchainNetwork}
-                        setBlockchainNetwork={setBlockchainNetwork}
-                        chainId={chainId}
                         setTxInfo={setTxInfo}
                         txInfo={txInfo}
                         user={user}
-                        percentageProgress={percentageProgress}
-                        setPercentageProgress={setPercentageProgress}
+                        setPercentageProgressHome={setPercentageProgress}
                       />
                     )}
                   </>
@@ -354,8 +331,7 @@ export const AppContainer = (props) => {
                   setTxInfo={setTxInfo}
                   txInfo={txInfo}
                   user={user}
-                  percentageProgress={percentageProgress}
-                  setPercentageProgress={setPercentageProgress}
+                  setPercentageProgressHome={setPercentageProgress}
                 />
               )}
               {service === 'buy' && subService === 'buyCash' && (
@@ -368,8 +344,7 @@ export const AppContainer = (props) => {
                   setTxInfo={setTxInfo}
                   txInfo={txInfo}
                   user={user}
-                  percentageProgress={percentageProgress}
-                  setPercentageProgress={setPercentageProgress}
+                  setPercentageProgressHome={setPercentageProgress}
                 />
               )}
               {service === 'buy' && subService === 'buyCard' && (
@@ -382,8 +357,7 @@ export const AppContainer = (props) => {
                   setTxInfo={setTxInfo}
                   txInfo={txInfo}
                   user={user}
-                  percentageProgress={percentageProgress}
-                  setPercentageProgress={setPercentageProgress}
+                  setPercentageProgressHome={setPercentageProgress}
                 />
               )}
 
@@ -397,8 +371,7 @@ export const AppContainer = (props) => {
                   setTxInfo={setTxInfo}
                   txInfo={txInfo}
                   user={user}
-                  percentageProgress={percentageProgress}
-                  setPercentageProgress={setPercentageProgress}
+                  setPercentageProgressHome={setPercentageProgress}
                 />
               )}
 
@@ -412,8 +385,7 @@ export const AppContainer = (props) => {
                   setTxInfo={setTxInfo}
                   txInfo={txInfo}
                   user={user}
-                  percentageProgress={percentageProgress}
-                  setPercentageProgress={setPercentageProgress}
+                  setPercentageProgressHome={setPercentageProgress}
                 />
               )}
 
@@ -424,14 +396,14 @@ export const AppContainer = (props) => {
                   setService={setService}
                   subService={subService}
                   setSubService={setSubService}
-                  blockchainNetwork={blockchainNetwork}
-                  setBlockchainNetwork={setBlockchainNetwork}
-                  chainId={chainId}
                   setTxInfo={setTxInfo}
                   txInfo={txInfo}
                   user={user}
-                  percentageProgress={percentageProgress}
-                  setPercentageProgress={setPercentageProgress}
+                  setPercentageProgressHome={setPercentageProgress}
+                  isToLoading={isToLoading}
+                  setIsToLoading={setIsToLoading}
+                  isFromLoading={isFromLoading}
+                  setIsFromLoading={setIsFromLoading}
                 />
               )}
             </div>

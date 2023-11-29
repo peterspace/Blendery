@@ -71,7 +71,7 @@ const YandexPayBuy = (props) => {
   const sendFund = (
     <>
       <button
-        className="primary bg-mediumspringgreen hover:bg-indigo-500 mt-4"
+        className="primary bg-bgPrimary hover:bg-indigo-500 mt-4"
         onClick={handleGetConfirmationUrl}
       >
         {/* Pay {amount} {currency ? currency : 'RUB'} */}

@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export const DetailsStore = (props) => {
-  const { fTitle, tTitle, txData } = props
-
+  const { fTitle, tTitle, txData } = props;
 
   const details = (
     <div className="flex justify-center rounded-lg bg-white shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[276px] p-4">
@@ -11,7 +10,7 @@ export const DetailsStore = (props) => {
         <div className="flex flex-col gap-[10px]">
           <div className="flex flex-row gap-4 mt-2">
             <div
-              className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] inline-block text-darkslategray-200 text-[24px]`}
+              className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block text-darkslategray-200 text-[24px]`}
             >
               Transaction Detail
             </div>

@@ -30,6 +30,11 @@ const {
   checkOneBlockchainTransaction,
 } = require('../controllers/hdWalletController.js');
 
+let fee = process.env.SWAP_FEE;
+let dexAddress = process.env.DEX_ADDRESS;
+const token = process.env.ONE_INCH_TOKEN;
+const version = 'v5.2';
+
 //============={HTML MESSAGE TEMPLATES}====================================================
 // mongoose return unnecessary data with object so convert it into json
 // const { password, ...rest } = Object.assign({}, user.toJSON());
@@ -715,6 +720,7 @@ const createTransaction = asyncHandler(async (req, res) => {
       tValue,
       amount,
     });
+    // console.log()
 
     if (savedTransaction) {
       res.status(200).json(savedTransaction);
@@ -941,7 +947,6 @@ const updateTransactionById = asyncHandler(async (req, res) => {
     progress,
   } = req.body;
   console.log({ buycashDataDBIn: req.body });
-
 
   const transaction = await Transaction.findById(id);
 
@@ -1838,15 +1843,32 @@ const getAllManagersTransactionByAdmin = asyncHandler(async (req, res) => {
 //   }
 // });
 
+// const getAllTransactions = asyncHandler(async (req, res) => {
+//   const admin = await User.findById(req.user._id); // get managers userId from "protect middleware"
+
+//   // console.log({ admin: admin });
+
+//   if (admin.role === 'Admin') {
+//     res.json(await Transaction.find().populate('user').exec());
+//   }
+// });
+
 const getAllTransactions = asyncHandler(async (req, res) => {
-  const admin = await User.findById(req.user._id); // get managers userId from "protect middleware"
-
-  // console.log({ admin: admin });
-
-  if (admin.role === 'Admin') {
-    res.json(await Transaction.find().populate('user').exec());
+  const user = await User.findById(req.user._id); // get userId from "protect middleware"
+  const response = await Transaction.find().populate('message');
+  if (response) {
+    res.status(200).json(response);
   }
 });
+
+// const getAllTransactions = asyncHandler(async (req, res) => {
+//   console.log({ status: 'active' });
+//   const response = await Transaction.find().populate('message');
+//   console.log({ tx: response });
+//   if (response) {
+//     res.status(200).json(response);
+//   }
+// });
 
 /**************************************************************************************************************
  **************************************************************************************************************
@@ -3790,6 +3812,386 @@ const updateBlockChainTransactionStore = asyncHandler(async (req, res) => {
   //   res.status(200).json(response);
   // }
 });
+
+/**************************************************************************************************************
+ **************************************************************************************************************
+
+                                          Defi Block
+                      
+ **************************************************************************************************************
+ **************************************************************************************************************
+ */
+
+const getTokenPriceDataSwap = async (id) => {
+  const url = 'https://api.coingecko.com/api/v3/';
+  const param = `coins/${id}`;
+  const response = await axios.get(url + param);
+  return response.data;
+};
+
+const getChainRateSwap = asyncHandler(async (req, res) => {
+  const { chain } = req.body;
+
+  //=================================================================================================
+  const chainPriceResponse = await getTokenPriceDataSwap(chain?.idPrice);
+  const chainPriceData = chainPriceResponse?.market_data?.current_price;
+  //=================================================================================================
+  let chainExchangeRate = Number(chainPriceData?.usd); // usd price
+
+  if (isNaN(chainExchangeRate)) {
+    chainExchangeRate = 0;
+  }
+  const response = {
+    chainExchangeRateRaw: chainExchangeRate,
+    chainExchangeRate: chainExchangeRate.toFixed(3),
+  };
+
+  res.status(200).json(response);
+});
+
+const getChainPrice = asyncHandler(async (req, res) => {
+  const { chainExchangeRate, balance } = req.body;
+
+  let chainPrice = Number(chainExchangeRate) * Number(balance);
+
+  if (isNaN(chainPrice)) {
+    chainPrice = 0;
+  }
+  const response = {
+    chainPriceRaw: chainPrice,
+    chainPrice: chainPrice.toFixed(3),
+  };
+
+  res.status(200).json(response);
+});
+
+const getTransactionRateSwap = asyncHandler(async (req, res) => {
+  const { exchangeRate, fValue } = req.body;
+  console.log({ TransactionRateSwapActive: true });
+  let tValue = Number(fValue) * Number(exchangeRate);
+
+  let tValueFormatted = Number(tValue).toFixed(4);
+  if (isNaN(tValue)) {
+    tValue = 0;
+  }
+
+  if (isNaN(tValueFormatted)) {
+    tValueFormatted = 0;
+  }
+
+  const response = {
+    tValue,
+    tValueFormatted,
+  };
+  console.log({ TransactionRateSwapResult: response });
+  res.status(200).json(response);
+});
+
+const getPriceOneInch = async (
+  chainId,
+  fAddress,
+  fDecimals,
+  tAddress,
+  tDecimals,
+  fValue
+) => {
+  let validatedValue;
+  if (fAddress != '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee') {
+    validatedValue = parseUnits(
+      fValue.toString(),
+      fDecimals.toString()
+    ).toString();
+  } else {
+    validatedValue = parseEther(fValue.toString()).toString();
+  }
+
+  console.log({ validatedValue: validatedValue });
+
+  const url = `https://api.1inch.dev/swap/${version}/${chainId}/quote`;
+
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    params: {
+      src: fAddress,
+      dst: tAddress,
+      amount: validatedValue,
+      fee,
+    },
+  };
+
+  try {
+    const response = await axios.get(url, config);
+    if (response?.data) {
+      console.log({ response: response?.data });
+      const { toAmount } = response?.data;
+
+      const toTokenAmount = toAmount;
+      console.log({ toTokenAmount: toTokenAmount });
+
+      let toTokenAmountFormatted = '';
+      let toTokenAmountFixed;
+
+      if (tAddress != '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee') {
+        toTokenAmountFormatted = formatUnits(
+          toTokenAmount.toString(),
+          tDecimals.toString()
+        ).toString();
+        toTokenAmountFixed = Number(toTokenAmountFormatted).toFixed(3);
+      } else {
+        toTokenAmountFormatted = parseEther(
+          toTokenAmount.toString()
+        ).toString();
+        toTokenAmountFixed = Number(toTokenAmountFormatted).toFixed(3);
+
+        console.log({ toTokenAmountFixed: toTokenAmountFixed });
+      }
+      const result = {
+        validatedValue,
+        tValue: toTokenAmount,
+        tValueFormatted: toTokenAmountFixed,
+        // estimatedGas: estimatedGas,
+        // allProtocols: protocols,
+      };
+      console.log({ toTokenAmountFormatted: toTokenAmountFormatted });
+      console.log({ result: result });
+      return result;
+    }
+  } catch (error) {
+    const err = error.response.data;
+    console.log(err);
+    return { status: err.success, message: err.message };
+  }
+};
+
+const getTokenExchangeRateSwap = asyncHandler(async (req, res) => {
+  const { fToken, tToken, chainId } = req.body;
+  // console.log({ exchangeRateActive: true });
+
+  const fAddress = fToken?.address; // DAI
+  const fDecimals = fToken?.decimals;
+  const tAddress = tToken?.address;
+  const tDecimals = tToken?.decimals;
+  const fValue = '1';
+  //======{oneInch Rate}
+  const { validatedValue, tValue, tValueFormatted } = await getPriceOneInch(
+    chainId,
+    fAddress,
+    fDecimals,
+    tAddress,
+    tDecimals,
+    fValue
+  );
+
+  // console.log({ tValueFormattedResult: tValueFormatted });
+
+  let exchangeRate = Number(tValueFormatted);
+  if (isNaN(exchangeRate)) {
+    exchangeRate = 0;
+  }
+
+  //=================================================================================================
+  const fromPrice = await getTokenPriceDataSwap(fToken?.id);
+  const fromPriceData = fromPrice?.market_data?.current_price;
+  const toPrice = await getTokenPriceDataSwap(tToken?.id);
+  const toPriceData = toPrice?.market_data?.current_price;
+  //=================================================================================================
+  const fUSDPrice = Number(fromPriceData?.usd); // usd price
+  const tUSDPrice = Number(toPriceData?.usd); // usd price
+  const response = {
+    fUSDPrice,
+    tUSDPrice,
+    exchangeRateRaw: exchangeRate,
+    exchangeRate: exchangeRate.toFixed(3),
+    // validatedValue,
+    // tValue, // unit value
+  };
+  // console.log({ exchangeRateResult: response });
+
+  res.status(200).json(response);
+});
+const getSpender = asyncHandler(async (req, res) => {
+  const { chainId } = req.body;
+
+  if (!chainId) {
+    res.status(400);
+    throw new Error('chainId not found');
+  }
+  const url = `https://api.1inch.dev/swap/${version}/${chainId}/approve/spender`;
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    params: {},
+  };
+
+  try {
+    const result = await axios.get(url, config);
+    if (result?.data) {
+      const response = {
+        spenderData: result?.data.address,
+      };
+      res.status(200).json(response);
+    }
+  } catch (error) {
+    const message =
+      (error.response && error.response.data && error.response.data.message) ||
+      error.message ||
+      error.toString();
+    console.log(message);
+    res.status(400).json(message);
+  }
+});
+
+// check values
+
+const getSwapApproval = asyncHandler(async (req, res) => {
+  const { chainId, fToken, fValue } = req.body;
+
+  if (!chainId) {
+    res.status(400);
+    throw new Error('chainId not found');
+  }
+
+  if (!fToken) {
+    res.status(400);
+    throw new Error('fromToken not found');
+  }
+
+  let validatedValue;
+  if (fToken?.address != '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee') {
+    validatedValue = parseUnits(
+      fValue.toString(),
+      fToken?.decimals.toString()
+    ).toString();
+  } else {
+    validatedValue = parseEther(fValue.toString()).toString();
+  }
+
+  console.log({ validatedValue: validatedValue });
+
+  const url = `https://api.1inch.dev/swap/${version}/${chainId}/approve/transaction`;
+
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    params: {
+      tokenAddress: fToken?.address,
+      amount: validatedValue,
+    },
+  };
+
+  try {
+    const result = await axios.get(url, config);
+
+    if (result?.data) {
+      const response = {
+        approveData: result?.data,
+      };
+      res.status(200).json(response);
+    }
+  } catch (error) {
+    const message =
+      (error.response && error.response.data && error.response.data.message) ||
+      error.message ||
+      error.toString();
+    console.log(message);
+    res.status(400).json(message);
+  }
+});
+const swap = asyncHandler(async (req, res) => {
+  const { chainId, fToken, tToken, walletAddress, slippage, fValue } = req.body;
+  console.log('swapping in progress');
+  // console.log({ swappDtataIn: req.body });
+  if (!chainId) {
+    res.status(400);
+    throw new Error('chainId not found');
+  }
+
+  if (!fToken) {
+    res.status(400);
+    throw new Error('fromToken not found');
+  }
+
+  if (!tToken) {
+    res.status(400);
+    throw new Error('tToken not found');
+  }
+
+  if (!walletAddress) {
+    res.status(400);
+    throw new Error('walletAddress not found');
+  }
+
+  let validatedValue;
+  if (fToken.address != '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee') {
+    validatedValue = parseUnits(
+      fValue.toString(),
+      fToken?.decimals.toString()
+    ).toString();
+  } else {
+    validatedValue = parseEther(fValue.toString()).toString();
+  }
+
+  console.log({ validatedValue: validatedValue });
+
+  const params = {
+    src: fToken.address,
+    dst: tToken?.address,
+    amount: validatedValue,
+    from: walletAddress,
+    slippage: slippage,
+    fee,
+    referrer: dexAddress,
+  };
+
+  console.log({ swapParams: params });
+
+  const url = `https://api.1inch.dev/swap/${version}/${Number(chainId)}/swap`;
+
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    params: {
+      src: fToken.address,
+      dst: tToken?.address,
+      amount: validatedValue,
+      from: walletAddress,
+      slippage: slippage,
+      fee,
+      referrer: dexAddress,
+    },
+  };
+
+  console.log({ swapConfig: config });
+
+  try {
+    const result = await axios.get(url, config);
+    console.log({ swappingDataServerBefore: result?.data });
+
+    if (result?.data) {
+      console.log({ swappingDataServer: result?.data });
+
+      // return result?.data;
+      const response = {
+        swapData: result?.data,
+      };
+      res.status(200).json(response);
+    }
+  } catch (error) {
+    console.log({ swapError: error });
+    const message =
+      (error.response && error.response.data && error.response.data.message) ||
+      error.message ||
+      error.toString();
+    console.log(message);
+    res.status(400).json(message);
+  }
+});
+
 //============================================================================================================================
 
 module.exports = {
@@ -3845,4 +4247,13 @@ module.exports = {
   getAllTransactionsByUserStore,
   updateTransactionsAutomaticallyStore,
   updateBlockChainTransactionStore,
+
+  //============================{DEFI}======================================================
+  getTokenExchangeRateSwap,
+  getTransactionRateSwap,
+  getChainRateSwap,
+  getChainPrice,
+  getSpender,
+  getSwapApproval,
+  swap,
 };

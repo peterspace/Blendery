@@ -1,89 +1,96 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import swapService from './swapService';
+import { networksOptions } from '../../../constants';
+//updated with defi functions
+const chainLocal = localStorage.getItem('chainDefi')
+  ? JSON.parse(localStorage.getItem('chainDefi'))
+  : networksOptions[0];
+const slippageLocal = localStorage.getItem('slippage')
+  ? JSON.parse(localStorage.getItem('slippage'))
+  : '1';
 
-export const tokenList = createAsyncThunk(
-  'swap/tokenList',
+export const getTokenExchangeRateSwap = createAsyncThunk(
+  'swap/getTokenExchangeRateSwap',
+  async (userData, thunkAPI) => {
+    try {
+      return await swapService.getTokenExchangeRateSwap(userData);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+export const getTransactionRateSwap = createAsyncThunk(
+  'swap/getTransactionRateSwap',
+  async (userData, thunkAPI) => {
+    try {
+      return await swapService.getTransactionRateSwap(userData);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+export const getChainRateSwap = createAsyncThunk(
+  'swap/getChainRateSwap',
+  async (userData, thunkAPI) => {
+    try {
+      return await swapService.getChainRateSwap(userData);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+export const getChainPrice = createAsyncThunk(
+  'swap/getChainPrice',
+  async (userData, thunkAPI) => {
+    try {
+      return await swapService.getChainPrice(userData);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+export const getSpender = createAsyncThunk(
+  'swap/getSpender',
+  async (userData, thunkAPI) => {
+    try {
+      return await swapService.getSpender(userData);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+export const getSwapApproval = createAsyncThunk(
+  'swap/getSwapApproval',
+  async (userData, thunkAPI) => {
+    try {
+      return await swapService.getSwapApproval(userData);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+export const swap = createAsyncThunk(
+  'swap/swap',
+  async (userData, thunkAPI) => {
+    try {
+      return await swapService.swap(userData);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+export const getTokensDefiById = createAsyncThunk(
+  'swap/getTokensDefiById',
   async (chainId, thunkAPI) => {
     try {
-      return await swapService.tokenList(chainId);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
-    }
-  }
-);
-
-export const tokenPrice = createAsyncThunk(
-  'swap/tokenPrice',
-  async (swapData, thunkAPI) => {
-    try {
-      return await swapService.tokenPrice(swapData);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
-    }
-  }
-);
-
-export const chainPrice = createAsyncThunk(
-  'swap/chainPrice',
-  async (chainId, thunkAPI) => {
-    try {
-      return await swapService.chainPrice(chainId);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
-    }
-  }
-);
-
-//======================{AddRemove User Tokens}===================================================
-export const updateFromPrice = createAsyncThunk(
-  'swap/updateFromPrice',
-  async (userData, thunkAPI) => {
-    try {
-      return await swapService.updateFromPrice(userData);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
-    }
-  }
-);
-
-export const updatePrice = createAsyncThunk(
-  'swap/updatePrice',
-  async (userData, thunkAPI) => {
-    try {
-      return await swapService.updatePrice(userData);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
-    }
-  }
-);
-
-export const fetchChainPrice = createAsyncThunk(
-  'swap/fetchChainPrice',
-  async (userData, thunkAPI) => {
-    try {
-      return await swapService.fetchChainPrice(userData);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
-    }
-  }
-);
-
-export const fetchSpender = createAsyncThunk(
-  'swap/fetchSpender',
-  async (chainId, thunkAPI) => {
-    try {
-      return await swapService.fetchSpender(chainId);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
-    }
-  }
-);
-
-export const updateSwapEstimates = createAsyncThunk(
-  'swap/updateSwapEstimates',
-  async (userData, thunkAPI) => {
-    try {
-      return await swapService.updateSwapEstimates(userData);
+      return await swapService.getTokensDefiById(chainId);
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
     }
@@ -96,129 +103,160 @@ const swapState = {
   isLoading: false,
   isSuccess: false,
   message: '',
+  chain: chainLocal,
+  slippage: slippageLocal,
+  switchNetwork: null,
+  connectedNetwork: false,
+  isConnecting: false,
+  isChangeChainId: null,
+  sideBarActive: false,
 };
 export const swapSlice = createSlice({
   name: 'swap',
   initialState: swapState,
-  reducers: {},
+  reducers: {
+    updateChain(state, action) {
+      state.chain = action.payload;
+    },
+    updateSwitchNetwork(state, action) {
+      state.switchNetwork = action.payload;
+    },
+    updateConnectedNetwork(state, action) {
+      state.connectedNetwork = action.payload;
+    },
+
+    updateSlippage(state, action) {
+      state.slippage = action.payload;
+    },
+
+    updateConnecting(state, action) {
+      state.isConnecting = action.payload;
+    },
+    updateIsChangeChainId(state, action) {
+      state.isChangeChainId = action.payload;
+    },
+    updateSideBarActive(state, action) {
+      state.sideBarActive = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
-      .addCase(tokenList.pending, (state) => {
+      .addCase(getTokenExchangeRateSwap.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(tokenList.fulfilled, (state, action) => {
+      .addCase(getTokenExchangeRateSwap.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
-        state.tokenList = action.payload; // wallet data
+        state.getTokenExchangeRateSwap = action.payload; // wallet data
       })
-      .addCase(tokenList.rejected, (state, action) => {
+      .addCase(getTokenExchangeRateSwap.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.isSuccess = false;
         state.message = action.error;
       })
-      .addCase(tokenPrice.pending, (state) => {
+      .addCase(getTransactionRateSwap.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(tokenPrice.fulfilled, (state, action) => {
+      .addCase(getTransactionRateSwap.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
-        state.tokenPrice = action.payload; // wallet data
+        state.getTransactionRateSwap = action.payload; // wallet data
       })
-      .addCase(tokenPrice.rejected, (state, action) => {
+      .addCase(getTransactionRateSwap.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.isSuccess = false;
         state.message = action.error;
       })
-      .addCase(chainPrice.pending, (state) => {
+      .addCase(getChainRateSwap.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(chainPrice.fulfilled, (state, action) => {
+      .addCase(getChainRateSwap.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
-        state.chainPrice = action.payload; // wallet data
+        state.getChainRateSwap = action.payload; // wallet data
       })
-      .addCase(chainPrice.rejected, (state, action) => {
+      .addCase(getChainRateSwap.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.isSuccess = false;
         state.message = action.error;
       })
       //======================{AddRemove User Tokens}===================================================
-      .addCase(updateFromPrice.pending, (state) => {
+      .addCase(getChainPrice.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(updateFromPrice.fulfilled, (state, action) => {
+      .addCase(getChainPrice.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
-        state.updateFromPrice = action.payload; // wallet data
+        state.getChainPrice = action.payload; // wallet data
       })
-      .addCase(updateFromPrice.rejected, (state, action) => {
+      .addCase(getChainPrice.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.isSuccess = false;
         state.message = action.error;
       })
-      .addCase(updatePrice.pending, (state) => {
+      .addCase(getSpender.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(updatePrice.fulfilled, (state, action) => {
+      .addCase(getSpender.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
-        state.updatePrice = action.payload; // wallet data
+        state.getSpender = action.payload; // wallet data
       })
-      .addCase(updatePrice.rejected, (state, action) => {
+      .addCase(getSpender.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.isSuccess = false;
         state.message = action.error;
       })
-      .addCase(fetchChainPrice.pending, (state) => {
+      .addCase(getSwapApproval.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(fetchChainPrice.fulfilled, (state, action) => {
+      .addCase(getSwapApproval.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
-        state.fetchChainPrice = action.payload; // wallet data
+        state.getSwapApproval = action.payload; // wallet data
       })
-      .addCase(fetchChainPrice.rejected, (state, action) => {
+      .addCase(getSwapApproval.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.isSuccess = false;
         state.message = action.error;
       })
-      .addCase(fetchSpender.pending, (state) => {
+      .addCase(swap.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(fetchSpender.fulfilled, (state, action) => {
+      .addCase(swap.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
-        state.fetchSpender = action.payload; // wallet data
+        state.swap = action.payload; // wallet data
       })
-      .addCase(fetchSpender.rejected, (state, action) => {
+      .addCase(swap.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.isSuccess = false;
         state.message = action.error;
       })
-      .addCase(updateSwapEstimates.pending, (state) => {
+      .addCase(getTokensDefiById.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(updateSwapEstimates.fulfilled, (state, action) => {
+      .addCase(getTokensDefiById.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
-        state.updateSwapEstimates = action.payload; // wallet data
+        state.getTokensDefiById = action.payload; // wallet data
       })
-      .addCase(updateSwapEstimates.rejected, (state, action) => {
+      .addCase(getTokensDefiById.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.isSuccess = false;
@@ -226,4 +264,14 @@ export const swapSlice = createSlice({
       });
   },
 });
+
+export const {
+  updateChain,
+  updateSwitchNetwork,
+  updateConnectedNetwork,
+  updateSlippage,
+  updateConnecting,
+  updateIsChangeChainId,
+  updateSideBarActive,
+} = swapSlice.actions;
 export default swapSlice.reducer;

@@ -40,8 +40,12 @@ export const VerifiedReceivedFundCard = (props) => {
   }, [isMontor]);
 
   async function newFunc() {
-    localStorage.removeItem('fTokenE');
-    localStorage.removeItem('tTokenE');
+    //================{new updates}===============================
+    localStorage.removeItem('fTokenSellCard');
+    localStorage.removeItem('tTokenSellCard');
+    localStorage.removeItem('fValueSellCard');
+    localStorage.removeItem('transactionRatesSellCard');
+    //================{new updates}===============================
     localStorage.removeItem('telegram');
     localStorage.removeItem('userAddress');
     localStorage.removeItem('benderyAddress');
@@ -54,7 +58,6 @@ export const VerifiedReceivedFundCard = (props) => {
     localStorage.removeItem('blockchainNetworkE');
     localStorage.removeItem('provider');
     dispatch(getTransactionByTxIdInternal(null));
-
     navigate('/');
   }
 
@@ -106,7 +109,7 @@ export const VerifiedReceivedFundCard = (props) => {
                   Status
                 </div>
                 <div className="flex flex-col justify-start w-[50%]">
-                  <div className="text-base leading-[24px] bg-whitesmoke-100 hover:opacity-90 text-mediumspringgreen w-fit px-1.5 py-0.5 rounded">
+                  <div className="text-base leading-[24px] bg-bgSecondary hover:opacity-90 text-bgPrimary w-fit px-1.5 py-0.5 rounded">
                     {/* Completed */}
                     {txData?.status}
                   </div>
@@ -115,7 +118,7 @@ export const VerifiedReceivedFundCard = (props) => {
                   </div>
                   <div className="flex flex-row gap-2 mt-2">
                     <div
-                      className=" cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]"
+                      className=" cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]"
                       onClick={() => setIsMontor(true)}
                     >
                       <div className="flex flex-row gap-2">
@@ -144,7 +147,7 @@ export const VerifiedReceivedFundCard = (props) => {
               className="flex flex-row justify-center items-center"
               onClick={newFunc}
             >
-              <div className="cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
+              <div className="cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
                 New Transaction
               </div>
             </div>
@@ -198,7 +201,7 @@ export const VerifiedReceivedFundCard = (props) => {
                   Status
                 </div>
                 <div className="flex flex-col justify-start w-[50%]">
-                  <div className="text-base leading-[24px] bg-whitesmoke-100 hover:opacity-90 text-mediumspringgreen w-fit px-1.5 py-0.5 rounded">
+                  <div className="text-base leading-[24px] bg-bgSecondary hover:opacity-90 text-bgPrimary w-fit px-1.5 py-0.5 rounded">
                     {/* In progress */}
                     {txData?.status}
                   </div>
@@ -207,7 +210,7 @@ export const VerifiedReceivedFundCard = (props) => {
                   </div>
                   <div className="flex flex-row gap-2 mt-2">
                     <div
-                      className=" cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]"
+                      className=" cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]"
                       onClick={() => setIsMontor(true)}
                     >
                       <div className="flex flex-row gap-2">
@@ -236,7 +239,7 @@ export const VerifiedReceivedFundCard = (props) => {
               className="flex flex-row justify-center items-center"
               onClick={updateTransaction}
             >
-              <div className="cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
+              <div className="cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
                 Payment received
               </div>
             </div>

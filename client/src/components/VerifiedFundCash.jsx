@@ -3,7 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { RiFileWarningFill } from 'react-icons/ri';
 import { SiHiveBlockchain } from 'react-icons/si';
 import { useDispatch } from 'react-redux';
-import { updateTransactionsAutomatically, getTransactionByTxIdInternal } from '../redux/features/transaction/transactionSlice';
+import {
+  updateTransactionsAutomatically,
+  getTransactionByTxIdInternal,
+} from '../redux/features/transaction/transactionSlice';
 
 export const VerifiedFundCash = (props) => {
   const { txData } = props;
@@ -35,8 +38,12 @@ export const VerifiedFundCash = (props) => {
   }, [isMontor]);
 
   async function newFunc() {
-    localStorage.removeItem('fTokenE');
-    localStorage.removeItem('tTokenE');
+    //================{new updates}===============================
+    localStorage.removeItem('fTokenBuyCash');
+    localStorage.removeItem('tTokenBuyCash');
+    localStorage.removeItem('fValueBuyCash');
+    localStorage.removeItem('transactionRatesBuyCash');
+    //================{new updates}===============================
     localStorage.removeItem('telegram');
     localStorage.removeItem('userAddress');
     localStorage.removeItem('benderyAddress');
@@ -100,7 +107,7 @@ export const VerifiedFundCash = (props) => {
                   Status
                 </div>
                 <div className="flex flex-col justify-start w-[50%]">
-                  <div className="text-base leading-[24px] bg-whitesmoke-100 hover:opacity-90 text-mediumspringgreen w-fit px-1.5 py-0.5 rounded">
+                  <div className="text-base leading-[24px] bg-bgSecondary hover:opacity-90 text-bgPrimary w-fit px-1.5 py-0.5 rounded">
                     {/* Completed */}
                     {txData?.status}
                   </div>
@@ -109,7 +116,7 @@ export const VerifiedFundCash = (props) => {
                   </div>
                   <div className="flex flex-row gap-2 mt-2">
                     <div
-                      className=" cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]"
+                      className=" cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]"
                       onClick={() => setIsMontor(true)}
                     >
                       <div className="flex flex-row gap-2">
@@ -138,7 +145,7 @@ export const VerifiedFundCash = (props) => {
               className="flex flex-row justify-center items-center"
               onClick={newFunc}
             >
-              <div className="cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
+              <div className="cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
                 New Transaction
               </div>
             </div>
@@ -192,7 +199,7 @@ export const VerifiedFundCash = (props) => {
                   Status
                 </div>
                 <div className="flex flex-col justify-start w-[50%]">
-                  <div className="text-base leading-[24px] bg-whitesmoke-100 hover:opacity-90 text-mediumspringgreen w-fit px-1.5 py-0.5 rounded">
+                  <div className="text-base leading-[24px] bg-bgSecondary hover:opacity-90 text-bgPrimary w-fit px-1.5 py-0.5 rounded">
                     {/* In progress */}
                     {txData?.status}
                   </div>
@@ -201,7 +208,7 @@ export const VerifiedFundCash = (props) => {
                   </div>
                   <div className="flex flex-row gap-2 mt-2">
                     <div
-                      className=" cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]"
+                      className=" cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]"
                       onClick={() => setIsMontor(true)}
                     >
                       <div className="flex flex-row gap-2">
@@ -230,7 +237,7 @@ export const VerifiedFundCash = (props) => {
               className="flex flex-row justify-center items-center"
               onClick={updateTransaction}
             >
-              <div className="cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
+              <div className="cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
                 Payment received
               </div>
             </div>

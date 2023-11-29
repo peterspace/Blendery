@@ -306,7 +306,7 @@ export const Estimator = (props) => {
           <div className="flex flex-col gap-[10px]">
             <div className="flex flex-row gap-4 mt-2">
               <div
-                className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] inline-block text-darkslategray-200 text-[24px]`}
+                className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block text-darkslategray-200 text-[24px]`}
               >
                 Calculate amount
               </div>
@@ -360,7 +360,7 @@ export const Estimator = (props) => {
             </div>
 
             <div className="flex flex-row justify-center">
-              <div className="rounded bg-whitesmoke-100 p-2">
+              <div className="rounded bg-bgSecondary p-2">
                 <img
                   className="w-3.5 h-3 overflow-hidden"
                   alt=""

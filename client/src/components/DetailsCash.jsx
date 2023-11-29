@@ -9,7 +9,7 @@ export const DetailsCash = (props) => {
         <div className="flex flex-col gap-[10px]">
           <div className="flex flex-row gap-4 mt-2">
             <div
-              className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] inline-block text-darkslategray-200 text-[24px]`}
+              className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block text-darkslategray-200 text-[24px]`}
             >
               Transaction Detail
             </div>

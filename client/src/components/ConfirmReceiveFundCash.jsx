@@ -15,7 +15,6 @@ export const ConfirmReceiveFundCash = (props) => {
   console.log({ blockChainDataConfrim: blockChainData });
   console.log({ txData40f4: txData });
 
-
   useEffect(() => {
     if (isMontor) {
       setTimeout(() => {
@@ -28,22 +27,25 @@ export const ConfirmReceiveFundCash = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMontor]);
 
-
-
   async function newFunc() {
-    localStorage.removeItem('fTokenE');
-    localStorage.removeItem('tTokenE');
-    localStorage.removeItem('telegram');
-    localStorage.removeItem('userAddress');
-    localStorage.removeItem('benderyAddress');
-    localStorage.removeItem('country');
-    localStorage.removeItem('cityData');
-    localStorage.removeItem('city');
-    localStorage.removeItem('paymentMethod');
-    localStorage.removeItem('txInfo');
-    localStorage.removeItem('percentageProgress');
-    localStorage.removeItem('blockchainNetworkE');
-    localStorage.removeItem('provider');
+     //================{new updates}===============================
+     localStorage.removeItem('fTokenSellCash');
+     localStorage.removeItem('tTokenSellCash');
+     localStorage.removeItem('fValueSellCash');
+     localStorage.removeItem('transactionRatesSellCash');
+     //================{new updates}===============================
+ 
+     localStorage.removeItem('telegram');
+     localStorage.removeItem('userAddress');
+     localStorage.removeItem('benderyAddress');
+     localStorage.removeItem('country');
+     localStorage.removeItem('cityData');
+     localStorage.removeItem('city');
+     localStorage.removeItem('paymentMethod');
+     localStorage.removeItem('txInfo');
+     localStorage.removeItem('percentageProgress');
+     localStorage.removeItem('blockchainNetworkE');
+     localStorage.removeItem('provider');
     dispatch(getTransactionByTxIdInternal(null));
     navigate('/');
   }
@@ -116,7 +118,7 @@ export const ConfirmReceiveFundCash = (props) => {
               Status
             </div>
             <div className="flex flex-col justify-start w-[50%]">
-              <div className="text-base leading-[24px] bg-whitesmoke-100 hover:opacity-90 text-mediumspringgreen w-fit px-1.5 py-0.5 rounded">
+              <div className="text-base leading-[24px] bg-bgSecondary hover:opacity-90 text-bgPrimary w-fit px-1.5 py-0.5 rounded">
                 {/* Pending */}
                 {txData?.status}
               </div>
@@ -126,7 +128,7 @@ export const ConfirmReceiveFundCash = (props) => {
               <div className="flex flex-row gap-2 mt-2">
                 {txData?.status === 'Completed' && (
                   <div
-                    className=" cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]"
+                    className=" cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]"
                     onClick={() => setIsMontor(true)}
                   >
                     <div className="flex flex-row gap-2">
@@ -137,7 +139,7 @@ export const ConfirmReceiveFundCash = (props) => {
                 )}
 
                 <div
-                  className="cursor-pointer flex flex-row justify-center items-center bg-whitesmoke-100 hover:opacity-90 text-mediumspringgreen h-[49px] shrink-0 rounded w-[30%]"
+                  className="cursor-pointer flex flex-row justify-center items-center bg-bgSecondary hover:opacity-90 text-bgPrimary h-[49px] shrink-0 rounded w-[30%]"
                   onClick={newFunc}
                 >
                   New
@@ -158,7 +160,7 @@ export const ConfirmReceiveFundCash = (props) => {
         </div>
         <div className="flex bg-lightslategray-300 md:w-[452px] w-[300px] h-px" />
         <div className="flex flex-row justify-center items-center">
-          <div className="cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
+          <div className="cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
             Please hold ...
           </div>
         </div>

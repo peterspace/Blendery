@@ -9,9 +9,12 @@ import {
   getTransactionByTxId,
   getTransactionByTxIdInternal,
 } from '../../../redux/features/transaction/transactionSlice';
+import { createTransactionService } from '../../../services/apiService';
+
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { getTokenListExchange } from '../../../redux/features/token/tokenSlice';
 
 export const BuyCashScreen3 = (props) => {
   const {
@@ -29,6 +32,8 @@ export const BuyCashScreen3 = (props) => {
     country,
     city,
     telegram,
+    transactionRates,
+    loadingExchangeRate,
   } = props;
 
   const dispatch = useDispatch();
@@ -40,12 +45,7 @@ export const BuyCashScreen3 = (props) => {
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
   const { user } = useSelector((state) => state.user);
-  const createTransactionResponse = useSelector(
-    (state) => state.transaction?.createTransaction
-  );
-  const transactionRates = useSelector(
-    (state) => state.transaction?.getTransactionRate
-  );
+
   const youSend = transactionRates ? transactionRates?.youSend : 0;
   const youGet = transactionRates ? transactionRates?.youGet : 0;
   const processingFee = transactionRates ? transactionRates?.processingFee : 0;
@@ -63,7 +63,7 @@ export const BuyCashScreen3 = (props) => {
     : false;
   console.log({ transactionRatesLoading: transactionRatesLoading });
   const amount = transactionRates ? transactionRates?.amount : 0;
- 
+
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
   /*********************************************     REACT STATES    **************************************************** */
@@ -74,15 +74,9 @@ export const BuyCashScreen3 = (props) => {
   const [isSend, setIsSend] = useState(false);
 
   useEffect(() => {
-    if (createTransactionResponse) {
-      setTxInfo(createTransactionResponse);
-      let txData = createTransactionResponse;
-      dispatch(getTransactionByTxId(txData?._id)); // fetch updated transaction every minute
-      dispatch(getTransactionByTxIdInternal(createTransactionResponse));
-      navigate(`buyCash/${txData?._id}`); // proceed to stage 3
-    }
+    dispatch(getTokenListExchange());
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [createTransactionResponse]);
+  }, []);
 
   const submitTransaction = async () => {
     if (Number(fValue) < 0) {
@@ -112,8 +106,38 @@ export const BuyCashScreen3 = (props) => {
       tValue,
       amount,
     };
-    dispatch(createTransaction(userData));
+    const response = await createTransactionService(userData);
+    if (response?._id) {
+      newFunc();
+      dispatch(getTransactionByTxId(response?._id));
+      dispatch(getTransactionByTxIdInternal(response));
+      setTimeout(() => {
+        navigate(`/buyCash`); // proceed to stage 3
+      }, 200);
+    }
   };
+
+  async function newFunc() {
+    //================{new updates}===============================
+    localStorage.removeItem('fTokenBuyCash');
+    localStorage.removeItem('tTokenBuyCash');
+    localStorage.removeItem('fValueBuyCash');
+    localStorage.removeItem('transactionRatesBuyCash');
+    //================{new updates}===============================
+    localStorage.removeItem('telegram');
+    localStorage.removeItem('userAddress');
+    localStorage.removeItem('benderyAddress');
+    localStorage.removeItem('country');
+    localStorage.removeItem('cityData');
+    localStorage.removeItem('city');
+    localStorage.removeItem('paymentMethod');
+    localStorage.removeItem('txInfo');
+    localStorage.removeItem('percentageProgressBuyCash');
+    localStorage.removeItem('percentageProgressHome');
+    localStorage.removeItem('blockchainNetworkE');
+    localStorage.removeItem('provider');
+    dispatch(getTransactionByTxIdInternal(null));
+  }
 
   useEffect(() => {
     if (isSend && user?.token) {
@@ -140,6 +164,12 @@ export const BuyCashScreen3 = (props) => {
                 setPercentageProgress={setPercentageProgress}
                 fTitle={fTitle}
                 tTitle={tTitle}
+                fToken={fToken}
+                tToken={tToken}
+                fValue={fValue}
+                userAddress={userAddress}
+                transactionRates={transactionRates}
+                loadingExchangeRate={loadingExchangeRate}
               />
               <Signup
                 setIsCheckout={setIsCheckout}
@@ -155,6 +185,12 @@ export const BuyCashScreen3 = (props) => {
                 setPercentageProgress={setPercentageProgress}
                 fTitle={fTitle}
                 tTitle={tTitle}
+                fToken={fToken}
+                tToken={tToken}
+                fValue={fValue}
+                userAddress={userAddress}
+                transactionRates={transactionRates}
+                loadingExchangeRate={loadingExchangeRate}
               />
               <Confirm submitTransaction={setIsSend} />
             </div>

@@ -113,7 +113,7 @@ export const SendFundCardBuy = (props) => {
               />
             </div>
           </div>
-          <div className="cursor-pointer flex flex-row justify-center items-center bg-white hover:opacity-90 text-mediumspringgreen h-[49px] shrink-0 rounded w-full outline outline-mediumspringgreen outline-[1.5px]">
+          <div className="cursor-pointer flex flex-row justify-center items-center bg-white hover:opacity-90 text-bgPrimary h-[49px] shrink-0 rounded w-full outline outline-bgPrimary outline-[1.5px]">
             <span className="flex flex-row ml-6">
               {`Pay ${
                 txData?.fValue
@@ -122,7 +122,7 @@ export const SendFundCardBuy = (props) => {
           </div>
         </div>
 
-        <div className="cursor-pointer flex flex-row justify-center gap-2 items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
+        <div className="cursor-pointer flex flex-row justify-center gap-2 items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
           <span className="flex flex-row ml-6">
             {txData?.blenderyCardNumber}
           </span>
@@ -131,7 +131,7 @@ export const SendFundCardBuy = (props) => {
 
         <div className="flex bg-lightslategray-300 md:w-[452px] w-[370px] h-px" />
         <div
-          className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded-md"
+          className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded-md"
           onClick={updateTransaction}
         >
           Paid

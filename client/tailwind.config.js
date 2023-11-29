@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
   theme: {
     extend: {
@@ -44,9 +45,13 @@ export default {
           100: '#e6e6e6',
           200: '#dfe4e8',
         },
-        // mediumspringgreen: '#10d078',
-        mediumspringgreen: '#4f46e5', // tailwind bg-indigo-600
+        // bgPrimary: '#10d078',
+        //==========={updates}=================================
+        bgPrimary: '#4f46e5', // tailwind bg-indigo-600
+        bgSecondary: '#f6f7f8',
+        bgDarkMode: '#1b1b2b',
         blueviolet: '#5f41ff',
+        border: '#9b9b9b',
         whitesmoke: {
           100: '#f6f7f8',
           200: '#f0f1f1',
@@ -78,6 +83,15 @@ export default {
         bgDark: '#27273F',
         bgDarkOutline: '#141421',
         bgDarker: '#1b1b2b',
+        primaryFill: 'rgba(19, 13, 26, 0.64)',
+        secondaryFill: 'rgba(255, 255, 255, 0.08)',
+        secondaryFillLight: 'rgba(255, 255, 255, 0.16)',
+        secondaryFillDim: 'rgba(255, 255, 255, 0.64)',
+        attentionFill: 'rgba(255, 178, 55, 0.12)',
+        'surface-success-d': 'rgba(23, 241, 139, 0.12)',
+        'surface-tint-64-d': 'rgba(255, 255, 255, 0.64)',
+        primary: '#e11d48',
+        'primary-foreground': '#f3f4f6',
       },
       spacing: {},
       fontFamily: {

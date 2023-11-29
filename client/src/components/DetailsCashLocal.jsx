@@ -1,16 +1,9 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-
 export const DetailsCashLocal = (props) => {
-  const {
-    fToken,
-    tToken,
-    fValue,
-    fTitle,
-    tTitle,
-  } = props;
-   /********************************************************************************************************************** */
+  const { fToken, tToken, fValue, fTitle, tTitle } = props;
+  /********************************************************************************************************************** */
   /********************************************************************************************************************** */
   /*********************************************     REDUX STATES    **************************************************** */
   /********************************************************************************************************************** */
@@ -35,7 +28,7 @@ export const DetailsCashLocal = (props) => {
         <div className="flex flex-col gap-[10px]">
           <div className="flex flex-row gap-4 mt-2">
             <div
-              className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] inline-block text-darkslategray-200 text-[24px]`}
+              className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block text-darkslategray-200 text-[24px]`}
             >
               Transaction Detail
             </div>

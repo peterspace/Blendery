@@ -8,9 +8,11 @@ import {
   getTransactionByTxId,
   getTransactionByTxIdInternal,
 } from '../../../redux/features/transaction/transactionSlice';
-import { useDispatch, useSelector } from 'react-redux';
+import { createTransactionService } from '../../../services/apiService';
 import { toast } from 'react-toastify';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { getTokenListExchange } from '../../../redux/features/token/tokenSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 export const SellCardScreen3 = (props) => {
   const {
@@ -32,6 +34,8 @@ export const SellCardScreen3 = (props) => {
     phone,
     country,
     city,
+    transactionRates,
+    loadingExchangeRate,
   } = props;
 
   const dispatch = useDispatch();
@@ -43,13 +47,6 @@ export const SellCardScreen3 = (props) => {
   /********************************************************************************************************************** */
   const { user } = useSelector((state) => state.user);
 
-  const createTransactionResponse = useSelector(
-    (state) => state.transaction?.createTransaction
-  );
-
-  const transactionRates = useSelector(
-    (state) => state.transaction?.getTransactionRate
-  );
   const youSend = transactionRates ? transactionRates?.youSend : 0;
   const youGet = transactionRates ? transactionRates?.youGet : 0;
   const processingFee = transactionRates ? transactionRates?.processingFee : 0;
@@ -67,7 +64,7 @@ export const SellCardScreen3 = (props) => {
     : false;
   console.log({ transactionRatesLoading: transactionRatesLoading });
   const amount = transactionRates ? transactionRates?.amount : 0;
- 
+
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
   /*********************************************     REACT STATES    **************************************************** */
@@ -78,15 +75,31 @@ export const SellCardScreen3 = (props) => {
   const [isSend, setIsSend] = useState(false);
 
   useEffect(() => {
-    if (createTransactionResponse) {
-      setTxInfo(createTransactionResponse);
-      let txData = createTransactionResponse;
-      dispatch(getTransactionByTxId(txData?._id));
-      dispatch(getTransactionByTxIdInternal(createTransactionResponse));
-      navigate(`sellCard/${txData?._id}`); // proceed to stage 3
-    }
+    dispatch(getTokenListExchange());
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [createTransactionResponse]);
+  }, []);
+
+  async function newFunc() {
+    //================{new updates}===============================
+    localStorage.removeItem('fTokenSellCard');
+    localStorage.removeItem('tTokenSellCard');
+    localStorage.removeItem('fValueSellCard');
+    localStorage.removeItem('transactionRatesSellCard');
+    //================{new updates}===============================
+    localStorage.removeItem('telegram');
+    localStorage.removeItem('userAddress');
+    localStorage.removeItem('benderyAddress');
+    localStorage.removeItem('country');
+    localStorage.removeItem('cityData');
+    localStorage.removeItem('city');
+    localStorage.removeItem('paymentMethod');
+    localStorage.removeItem('txInfo');
+    localStorage.removeItem('percentageProgressSellCard');
+    localStorage.removeItem('percentageProgressHome');
+    localStorage.removeItem('blockchainNetworkE');
+    localStorage.removeItem('provider');
+    dispatch(getTransactionByTxIdInternal(null));
+  }
 
   const submitTransaction = async () => {
     if (Number(fValue) < 0) {
@@ -119,8 +132,15 @@ export const SellCardScreen3 = (props) => {
       cardNumber,
       phone,
     };
-
-    dispatch(createTransaction(userData));
+    const response = await createTransactionService(userData);
+    if (response?._id) {
+      newFunc();
+      dispatch(getTransactionByTxId(response?._id));
+      dispatch(getTransactionByTxIdInternal(response));
+      setTimeout(() => {
+        navigate(`/sellCard`); // proceed to stage 3
+      }, 200);
+    }
   };
 
   useEffect(() => {
@@ -155,6 +175,12 @@ export const SellCardScreen3 = (props) => {
                 bankName={bankName}
                 cardNumber={cardNumber}
                 phone={phone}
+                fToken={fToken}
+                tToken={tToken}
+                fValue={fValue}
+                userAddress={userAddress}
+                transactionRates={transactionRates}
+                loadingExchangeRate={loadingExchangeRate}
               />
               <Signup
                 setIsCheckout={setIsCheckout}
@@ -176,6 +202,12 @@ export const SellCardScreen3 = (props) => {
                 bankName={bankName}
                 cardNumber={cardNumber}
                 phone={phone}
+                fToken={fToken}
+                tToken={tToken}
+                fValue={fValue}
+                userAddress={userAddress}
+                transactionRates={transactionRates}
+                loadingExchangeRate={loadingExchangeRate}
               />
               <Confirm submitTransaction={setIsSend} />
             </div>

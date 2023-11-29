@@ -75,7 +75,7 @@ const Markets = (props) => {
     // <section className="flex mt-8 flex-col gap-[8px] rounded-lg p-2 outline outline-lightslategray-300 outline-[1px]">
     // <section className="flex mt-8 flex-col gap-[8px] p-2">
     <section
-      className={`flex flex-col rounded ${
+      className={`flex flex-col rounded h-full ${
         mode === true
           ? 'bg-white'
           : 'bg-bgDark outline outline-bgDarkOutline outline-[1px]'
@@ -83,7 +83,7 @@ const Markets = (props) => {
     >
       <div
         className={`flex flex-row justify-center text-lg font-sans font-bold py-4 ${
-          mode === true ? 'text-mediumspringgreen' : 'text-white'
+          mode === true ? 'text-bgPrimary' : 'text-white'
         }`}
       >
         {'Markets'}
@@ -95,9 +95,9 @@ const Markets = (props) => {
       />
 
       <MarketsTitle mode={mode} />
-     
+
       <div
-        className={`overflow-scroll m-2 flex flex-col h-[300px] ${
+        className={`overflow-scroll m-2 flex flex-col max-h-0 ${
           mode === true
             ? 'bg-white outline outline-lightslategray-300 outline-[1px]'
             : 'bg-bgDark outline outline-darkslategray-400 outline-[1px]'

@@ -1,35 +1,24 @@
-import React, { useState, useEffect } from "react";
-import { Link, Navigate } from "react-router-dom";
-import { FcGoogle } from "react-icons/fc";
-import { FaFacebookSquare } from "react-icons/fa";
-import { AiFillApple, AiOutlineClose } from "react-icons/ai";
-import {
-  loginUser,
-  validateEmail,
-  forgotPassword,
-  resetPassword,
-} from "../../services/apiService";
-
-import { toast } from "react-toastify";
-
-import { useDispatch } from "react-redux";
-import { useFormik } from "formik";
+import React, { useState } from 'react';
+import { Navigate } from 'react-router-dom';
+import { validateEmail, forgotPassword } from '../../services/apiService';
+import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { useFormik } from 'formik';
 
 export const Forgot = (props) => {
   const { setIsLogin, setIsRegister, setIsForgot } = props;
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
 
   const { values, handleChange, handleSubmit, touched, errors, resetForm } =
     useFormik({
       initialValues: {
-        email: "",
+        email: '',
       },
       validate: (values) => {
         const errors = {};
 
         if (!values.email) {
-          errors.email = "Email address is required!";
+          errors.email = 'Email address is required!';
         }
 
         return errors;
@@ -46,7 +35,7 @@ export const Forgot = (props) => {
   // async function LoginSubmit() {
   async function forgot(email) {
     if (!validateEmail(email)) {
-      return toast.error("Please enter a valid email");
+      return toast.error('Please enter a valid email');
     }
 
     const userData = {
@@ -57,9 +46,9 @@ export const Forgot = (props) => {
       const data = forgotPassword(userData);
       resetForm();
       if (data) {
-        setMessage("Request sent");
+        setMessage('Request sent');
         setTimeout(() => {
-          setMessage("");
+          setMessage('');
           setIsLogin(true);
           setIsRegister(false);
           setIsForgot(false);
@@ -68,13 +57,13 @@ export const Forgot = (props) => {
         // window.location.reload(); // relaod to update changes m,ade by localStoarge
       }
     } catch (e) {
-      alert("Password reset failed");
+      alert('Password reset failed');
     }
   }
 
   if (redirectHome) {
     // return <Navigate to={'/landingPage'} />;
-    return <Navigate to={"/"} />;
+    return <Navigate to={'/'} />;
   }
 
   const login = (
@@ -125,20 +114,20 @@ export const Forgot = (props) => {
             </div>
             <div className="flex flex-row justify-center items-center">
               <div
-                className="cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full"
+                className="cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full"
                 onClick={handleSubmit}
               >
-                {message ? <>{message}</> : <>{"Get Reset Email"}</>}
+                {message ? <>{message}</> : <>{'Get Reset Email'}</>}
               </div>
             </div>
           </div>
 
           <div className="flex flex-row gap-2 justify-end">
             <div className="text-smi leading-[22px] text-gray-300 inline-block">
-              {"Remember your email and password?"}
+              {'Remember your email and password?'}
             </div>
             <div
-              className="cursor-pointer text-smi leading-[22px] text-mediumspringgreen hover:text-opacity-80 inline-block"
+              className="cursor-pointer text-smi leading-[22px] text-bgPrimary hover:text-opacity-80 inline-block"
               onClick={() => {
                 setIsLogin(true);
                 setIsRegister(false);

@@ -39,7 +39,6 @@ const storeRoutes = require('./routes/storeRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const enquiryRoute = require('./routes/enquiryRoutes');
-const swapRoutes = require('./routes/swapRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
 const placeRoutes = require('./routes/placeRoutes');
 //====================={AUTH}==============================
@@ -249,8 +248,6 @@ app.use('/chat', chatRoutes);
 app.use('/message', messageRoutes);
 // app.use('/contactus', enquiryRoute);
 app.use('/enquiry', enquiryRoute);
-
-app.use('/swap', swapRoutes);
 app.use('/transaction', transactionRoutes);
 app.use('/place', placeRoutes);
 app.use('/payment', paymentRoute);

@@ -5,12 +5,8 @@ import { Exchange4of4 } from './Exchange4of4';
 import { Exchange5of5 } from './Exchange5of5';
 import { Footer } from '../../components/Footer';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  getTransactionByTxIdInternal,
-} from '../../redux/features/transaction/transactionSlice';
-import {
-  getTransactionByTxIdService,
-} from '../../services/apiService';
+import { getTransactionByTxIdInternal } from '../../redux/features/transaction/transactionSlice';
+import { getTransactionByTxIdService } from '../../services/apiService';
 
 export const SellCash = (props) => {
   const { mode, user, service, subService, txInfo, setTxInfo } = props;

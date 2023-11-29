@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useState, useEffect } from 'react';
 
 import { Progress } from '../../../components/Progress';
 import { EstimatorBuyCash } from '../../../components/EstimatorBuyCash';
 import { CashInfo } from '../../../components/CashInfo';
 import { DetailsLocal } from '../../../components/DetailsLocal';
+import { useDispatch, useSelector } from 'react-redux';
+import { getTokenListExchange } from '../../../redux/features/token/tokenSlice';
 
 export const BuyCashScreen2 = (props) => {
   const {
@@ -44,8 +45,15 @@ export const BuyCashScreen2 = (props) => {
     setUserAddress,
     telegram,
     setTelegram,
-  } = props;
+    loadingExchangeRate,
 
+  } = props;
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getTokenListExchange());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="flex flex-col xl:flex-row justify-center">
@@ -77,7 +85,10 @@ export const BuyCashScreen2 = (props) => {
             tValue={tValue}
             exchangeRate={exchangeRate}
             cities={cities}
+            transactionRates={transactionRates}
             setPercentageProgress={setPercentageProgress}
+            loadingExchangeRate={loadingExchangeRate}
+
 
           />
           <CashInfo
@@ -98,6 +109,8 @@ export const BuyCashScreen2 = (props) => {
             fValue={fValue}
             fTitle={fTitle}
             tTitle={tTitle}
+            transactionRates={transactionRates}
+            loadingExchangeRate={loadingExchangeRate}
           />
         </div>
       </div>

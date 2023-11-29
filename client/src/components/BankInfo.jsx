@@ -1,7 +1,7 @@
-import { useEffect } from "react";
-import { useFormik } from "formik";
+import { useEffect } from 'react';
+import { useFormik } from 'formik';
 
-import { MdQrCodeScanner } from "react-icons/md";
+import { MdQrCodeScanner } from 'react-icons/md';
 
 export const BankInfo = (props) => {
   const {
@@ -25,39 +25,39 @@ export const BankInfo = (props) => {
   const { values, handleChange, handleSubmit, touched, errors, resetForm } =
     useFormik({
       initialValues: {
-        receiverAddress: "",
-        name: "",
-        phoneNumber: "",
-        bankName: "",
-        cardNumber: "",
+        receiverAddress: '',
+        name: '',
+        phoneNumber: '',
+        bankName: '',
+        cardNumber: '',
         isTermsChecked: false,
       },
       validate: (values) => {
         const errors = {};
 
         if (!values.receiverAddress) {
-          errors.receiverAddress = "Receiver address is required!";
+          errors.receiverAddress = 'Receiver address is required!';
         }
 
         if (!values.name) {
-          errors.name = "Name is required!";
+          errors.name = 'Name is required!';
         }
 
-        if (provider?.name === "Phone" && !values.phoneNumber) {
-          errors.phoneNumber = "Phone number is required!";
+        if (provider?.name === 'Phone' && !values.phoneNumber) {
+          errors.phoneNumber = 'Phone number is required!';
         }
 
-        if (provider?.name === "Phone" && !values.bankName) {
-          errors.bankName = "Bank name is required!";
+        if (provider?.name === 'Phone' && !values.bankName) {
+          errors.bankName = 'Bank name is required!';
         }
 
-        if (provider?.name === "Card" && !values.cardNumber) {
-          errors.cardNumber = "Card number is required!";
+        if (provider?.name === 'Card' && !values.cardNumber) {
+          errors.cardNumber = 'Card number is required!';
         }
 
         if (!values.isTermsChecked) {
           errors.isTermsChecked =
-            "Please indicate that you have read and agree to the Terms and Conditions and Privacy Policy";
+            'Please indicate that you have read and agree to the Terms and Conditions and Privacy Policy';
         }
 
         return errors;
@@ -84,14 +84,14 @@ export const BankInfo = (props) => {
           <div className="flex flex-col gap-[10px]">
             <div className="flex flex-row gap-4 mt-2">
               <div
-                className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] inline-block text-darkslategray-200 text-[24px]`}
+                className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block text-darkslategray-200 text-[24px]`}
               >
                 Payment Details
               </div>
             </div>
             <div className="flex bg-lightslategray-300 md:w-[452px] w-[320px] xs:w-[340px] h-px" />
           </div>
-          {provider?.name === "Phone" && (
+          {provider?.name === 'Phone' && (
             <>
               <div className="flex flex-col w-[320px] xs:w-[340px] md:w-[452px] gap-[8px]">
                 <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between mb-5">
@@ -204,7 +204,7 @@ export const BankInfo = (props) => {
                       type="checkbox"
                       value={values.isTermsChecked}
                       onChange={handleChange}
-                      className="outline-none bg-whitesmoke-100 accent-mediumspringgreen focus:accent-mediumspringgreen/30"
+                      className="outline-none bg-whitesmoke-100 accent-bgPrimary focus:accent-bgPrimary/30"
                     />
 
                     <div className="flex flex-row gap-1 text-xs md:text-smi">
@@ -224,7 +224,7 @@ export const BankInfo = (props) => {
               </div>
             </>
           )}
-          {provider?.name === "Card" && (
+          {provider?.name === 'Card' && (
             <>
               <div className="flex flex-col w-[320px] xs:w-[340px] md:w-[452px] gap-[8px]">
                 <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between mb-5">
@@ -311,7 +311,7 @@ export const BankInfo = (props) => {
                       type="checkbox"
                       value={values.isTermsChecked}
                       onChange={handleChange}
-                      className="outline-none bg-whitesmoke-100 accent-mediumspringgreen focus:accent-mediumspringgreen/30"
+                      className="outline-none bg-whitesmoke-100 accent-bgPrimary focus:accent-bgPrimary/30"
                     />
 
                     <div className="flex flex-row gap-1 text-xs md:text-smi">
@@ -333,7 +333,7 @@ export const BankInfo = (props) => {
           )}
 
           <div
-            className="mb-4 cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen text-white w-full hover:opacity-90 h-[49px] shrink-0 rounded transition ease-in-out delay-150"
+            className="mb-4 cursor-pointer flex flex-row justify-center items-center bg-bgPrimary text-white w-full hover:opacity-90 h-[49px] shrink-0 rounded transition ease-in-out delay-150"
             onClick={handleSubmit}
           >
             {service} {fValue} {fToken?.symbol}

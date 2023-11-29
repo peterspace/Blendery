@@ -1,22 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { getTransactionRate } from '../redux/features/transaction/transactionSlice';
 
-import { FaBitcoin } from 'react-icons/fa'; // Bitcoin
-import { SiTether } from 'react-icons/si'; // Tether
-import { FaEthereum } from 'react-icons/fa'; //Ethereum
-import { SiLitecoin } from 'react-icons/si'; //Litecoin
 import { TokenCard } from './TokenCard';
-import { TokenCardDefi } from './TokenCardDefi';
-import {
-  getTokenList,
-  getTokenListDefi,
-  getTokenListFiat,
-  getTokenListBuy,
-  getTokenListSell,
-  getTokenListExchange,
-  getTokensDefiById,
-} from '../redux/features/token/tokenSlice';
 
 //android small = w-[320px]/ 352px
 //iphone = w-[340px]/ 372px
@@ -25,27 +9,19 @@ export const EstimatorSellCard = (props) => {
   const {
     setPercentageProgress,
     service,
-    subService,
     fToken,
     setFromToken,
     tToken,
-    setToToken,
     fValue,
     setFromValue,
-    setCountry,
-    country,
-    cityData,
-    setCityData,
-    city,
-    setCity,
     loading,
     fTitle,
     tTitle,
     allTokensFrom,
     allTokensTo,
-    tValue,
     exchangeRate,
-    cities,
+    transactionRates,
+    loadingExchangeRate,
   } = props;
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
@@ -53,6 +29,8 @@ export const EstimatorSellCard = (props) => {
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
   const [isNotCountrySupported, setIsNotCountrySupported] = useState(false);
+  //======================={RATES and PRICES}========================================================
+  const tValue = transactionRates ? transactionRates?.tValueFormatted : 0;
   //================{CARDS}==================
   const [isFromTokenPage, setIsFromTokenPage] = useState(false);
   const [isToTokenPage, setIsToTokenPage] = useState(false);
@@ -114,12 +92,12 @@ export const EstimatorSellCard = (props) => {
           <div className="flex flex-col gap-[10px]">
             <div className="flex flex-row justify-between mt-[24px]">
               <div
-                className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] inline-block text-darkslategray-200 text-[24px]`}
+                className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block text-darkslategray-200 text-[24px]`}
               >
                 Calculate amount (Sell Card)
               </div>
               <div
-                className="cursor-pointer flex flex-row justify-center items-center bg-whitesmoke-100 hover:opacity-90 text-mediumspringgreen shrink-0 rounded px-6 py-3"
+                className="cursor-pointer flex flex-row justify-center items-center bg-bgSecondary hover:opacity-90 text-bgPrimary shrink-0 rounded px-6 py-3"
                 onClick={() => {
                   setPercentageProgress(1);
                 }}
@@ -177,13 +155,14 @@ export const EstimatorSellCard = (props) => {
 
             <div className="flex flex-row justify-between">
               <div className="h-3 py-2">
-                1 {fToken?.symbol.toUpperCase()} ~ {exchangeRate}{' '}
+                1 {fToken?.symbol.toUpperCase()} ~{' '}
+                {loadingExchangeRate ? 'fetching rates' : exchangeRate}{' '}
                 {tToken?.symbol.toUpperCase()}
               </div>
               {/* <div className="h-3 py-2">{isToLoading
                           ? 'Fetching price...'
                           : `${`1 ${fToken?.symbol.toUpperCase()} = ${exchangeRate}  ${tToken?.symbol.toUpperCase()}`}`}</div> */}
-              <div className="rounded bg-whitesmoke-100 p-2">
+              <div className="rounded bg-bgSecondary p-2">
                 <img
                   className="w-3.5 h-3 overflow-hidden"
                   alt=""

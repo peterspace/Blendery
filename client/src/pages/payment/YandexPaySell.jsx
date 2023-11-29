@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 
-import { createYandexPayBuy, createYandexPaySell } from '../../services/apiService';
+import {
+  createYandexPayBuy,
+  createYandexPaySell,
+} from '../../services/apiService';
 
 const YandexPaySell = (props) => {
   const {
@@ -27,8 +30,6 @@ const YandexPaySell = (props) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [redirect]);
-
-
 
   //   {
   //   "amount": "200", "currency":"RUB", "paymentMethod":"bank_card","description": "Заказ №72"
@@ -61,7 +62,7 @@ const YandexPaySell = (props) => {
   const sendFund = (
     <>
       <button
-        className="primary bg-mediumspringgreen hover:bg-indigo-500 mt-4"
+        className="primary bg-bgPrimary hover:bg-indigo-500 mt-4"
         onClick={handleGetConfirmationUrl}
       >
         Pay {amount} {currency ? currency : 'RUB'}
@@ -70,7 +71,6 @@ const YandexPaySell = (props) => {
   );
 
   return <>{sendFund}</>;
- 
 };
 
 export default YandexPaySell;

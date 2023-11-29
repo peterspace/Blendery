@@ -16,7 +16,7 @@ export const Signup = (props) => {
           </div>
           <div className="flex bg-lightslategray-300 md:w-[452px] w-[300px] h-px" />
         </div>
-        <div className="flex flex-row h-[62px] bg-whitesmoke-100 rounded">
+        <div className="flex flex-row h-[62px] bg-bgSecondary rounded">
           <input
             type="text"
             className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 placeholder-darkgray-100 inline-block w-full outline-none bg-gray-100"
@@ -25,10 +25,10 @@ export const Signup = (props) => {
         </div>
         <div className="flex flex-col gap-1">
           <div className="flex flex-row gap-2">
-            {/* <input type="checkbox" className="outline-none bg-whitesmoke-100" /> */}
+            {/* <input type="checkbox" className="outline-none bg-bgSecondary" /> */}
             <input
               type="checkbox"
-              className="outline-none bg-whitesmoke-100 accent-mediumspringgreen focus:accent-mediumspringgreen/30"
+              className="outline-none bg-bgSecondary accent-bgPrimary focus:accent-bgPrimary/30"
             />
 
             <div className="flex flex-row gap-1 text-xs md:text-smi">
@@ -40,13 +40,12 @@ export const Signup = (props) => {
         </div>
         <div
           className="flex flex-row justify-center items-center"
-         
           onClick={() => {
             setIsCheckout(false);
             setIsConfirm(true);
           }}
         >
-          <div className="cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
+          <div className="cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
             Sign up & make payment
           </div>
         </div>
@@ -62,7 +61,7 @@ export const Signup = (props) => {
           <div className="text-smi leading-[22px] text-gray-300 inline-block">
             Already have an account?
           </div>
-          <div className="cursor-pointer text-smi leading-[22px] text-mediumspringgreen hover:text-opacity-80 inline-block">
+          <div className="cursor-pointer text-smi leading-[22px] text-bgPrimary hover:text-opacity-80 inline-block">
             Log in
           </div>
         </div>

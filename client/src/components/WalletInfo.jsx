@@ -1,6 +1,6 @@
-import { useFormik } from "formik";
+import { useFormik } from 'formik';
 
-import { MdQrCodeScanner } from "react-icons/md";
+import { MdQrCodeScanner } from 'react-icons/md';
 
 export const WalletInfo = (props) => {
   const {
@@ -14,19 +14,19 @@ export const WalletInfo = (props) => {
 
   const { values, handleChange, handleSubmit, touched, errors } = useFormik({
     initialValues: {
-      recipientAddress: "",
+      recipientAddress: '',
       isTermsChecked: false,
     },
     validate: (values) => {
       const errors = {};
 
       if (!values.recipientAddress) {
-        errors.recipientAddress = "Recipient address is required!";
+        errors.recipientAddress = 'Recipient address is required!';
       }
 
       if (!values.isTermsChecked) {
         errors.isTermsChecked =
-          "Please indicate that you have read and agree to the Terms and Conditions and Privacy Policy";
+          'Please indicate that you have read and agree to the Terms and Conditions and Privacy Policy';
       }
 
       return errors;
@@ -44,7 +44,7 @@ export const WalletInfo = (props) => {
           <div className="flex flex-col gap-[10px]">
             <div className="flex flex-row gap-4 mt-2">
               <div
-                className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] inline-block text-darkslategray-200 text-[24px]`}
+                className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block text-darkslategray-200 text-[24px]`}
               >
                 Wallet address
               </div>
@@ -107,7 +107,7 @@ export const WalletInfo = (props) => {
                   type="checkbox"
                   value={values.isTermsChecked}
                   onChange={handleChange}
-                  className="outline-none bg-whitesmoke-100 accent-mediumspringgreen focus:accent-mediumspringgreen/30"
+                  className="outline-none bg-whitesmoke-100 accent-bgPrimary focus:accent-bgPrimary/30"
                 />
 
                 <div className="flex flex-row gap-1 text-xs md:text-smi">
@@ -127,7 +127,7 @@ export const WalletInfo = (props) => {
           </div>
 
           <div
-            className="mb-4 cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen text-white w-full hover:opacity-90 h-[49px] shrink-0 rounded transition ease-in-out delay-150"
+            className="mb-4 cursor-pointer flex flex-row justify-center items-center bg-bgPrimary text-white w-full hover:opacity-90 h-[49px] shrink-0 rounded transition ease-in-out delay-150"
             onClick={handleSubmit}
           >
             {service} {fValue} {fToken?.symbol}

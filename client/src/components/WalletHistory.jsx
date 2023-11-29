@@ -77,7 +77,7 @@ export const UserProfile = (props) => {
         className={`cursor-pointer flex flex-col font-light p-4 border border-indigo-600 border-b  ${
           mode === true
             ? 'bg-white hover:bg-gray-100 hover:outline hover:outline-lightslategray-300 hover:outline-[1px]'
-            : 'bg-bgDarker hover:bg-hoverDark hover:outline hover:outline-lightslategray-300 hover:outline-[1px]'
+            : 'bg-bgDarkMode hover:bg-hoverDark hover:outline hover:outline-lightslategray-300 hover:outline-[1px]'
         }`}
       >
         <div className="flex flex-row justify-between items-center w-[250px]">
@@ -140,15 +140,15 @@ export const WalletHistory = (props) => {
   const { mode } = props;
   const newCard = (
     <div
-    className={`flex flex-col rounded shadow-lg ${
-      mode === true
-        ? 'bg-white outline outline-lightslategray-300 outline-[1px]'
-        : 'bg-bgDarker outline outline-lightslategray-300 outline-[2px]'
-    }`}
+      className={`flex flex-col rounded shadow-lg w-[300px] ${
+        mode === true
+          ? 'bg-white outline outline-lightslategray-300 outline-[1px]'
+          : 'bg-bgDarkMode outline outline-lightslategray-300 outline-[2px]'
+      }`}
     >
       <div
         className={`mt-[24px] ml-4 text-lg font-sans font-bold inline-block ${
-          mode === true ? 'text-mediumspringgreen' : 'text-white'
+          mode === true ? 'text-bgPrimary' : 'text-white'
         }`}
       >
         {'My wallet'}

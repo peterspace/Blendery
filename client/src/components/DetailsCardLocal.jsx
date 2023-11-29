@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export const DetailsCardLocal = (props) => {
-  const { fToken, tToken, fValue, fTitle, tTitle } = props;
+  const { fToken, tToken, fValue, fTitle, tTitle, transactionRates, loadingExchangeRate } = props;
 
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
@@ -10,12 +10,10 @@ export const DetailsCardLocal = (props) => {
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
   //======================={RATES and PRICES}========================================================
-  const transactionRates = useSelector(
-    (state) => state.transaction?.getTransactionRate
-  );
+
   const youSend = transactionRates ? transactionRates?.youSend : 0;
   const youGet = transactionRates ? transactionRates?.youGet : 0;
-  const processingFee = transactionRates ? transactionRates?.processingFee : 0
+  const processingFee = transactionRates ? transactionRates?.processingFee : 0;
   const tValue = transactionRates ? transactionRates?.tValueFormatted : 0;
   const exchangeRate = transactionRates ? transactionRates?.exchangeRate : 0;
   const estimatedGas = transactionRates ? transactionRates?.estimatedGas : 0;
@@ -27,7 +25,7 @@ export const DetailsCardLocal = (props) => {
         <div className="flex flex-col gap-[10px]">
           <div className="flex flex-row gap-4 mt-2">
             <div
-              className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] inline-block text-darkslategray-200 text-[24px]`}
+              className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block text-darkslategray-200 text-[24px]`}
             >
               Transaction Detail
             </div>

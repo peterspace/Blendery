@@ -79,69 +79,67 @@ export const UserProfile = (props) => {
     //       : 'hover:bg-hoverDark hover:outline hover:outline-lightslategray-300 hover:outline-[1px]'
     //   }`}
     // >
-<div className="flex flex-col">
-<div
-      onClick={() => setIdx(l.id)}
-      className={`cursor-pointer flex flex-col font-light p-4 border border-indigo-600 border-b  ${
-        mode === true
-          ? 'bg-white hover:bg-gray-100 hover:outline hover:outline-lightslategray-300 hover:outline-[1px]'
-          : 'bg-bgDarker hover:bg-hoverDark hover:outline hover:outline-lightslategray-300 hover:outline-[1px]'
-      }`}
-    >
-      <div className="flex flex-row justify-between items-center w-[250px]">
-        <div className="flex flex-row gap-1">
-          <img
-            className="w-[40px] h-[40px] shrink-0 overflow-hidden rounded-full"
-            alt={l?.name}
-            src={l?.logoUrl}
-          />
-          <div className="flex flex-col">
-            <div className="cursor-pointer flex flex-col items-start">
-              <div
-                className={`text-base font-sans font-medium leading-[24px] inline-block ${
-                  mode === true ? 'text-black' : 'text-gray-100'
-                }`}
-              >
-                {l?.name}
-              </div>
-              <div
-                className={`text-[12px] font-sans font-medium leading-[24px] inline-block ${
-                  mode === true ? 'text-gray-200' : 'text-gray-100'
-                }`}
-              >
-                {l?.symbol}
+    <div className="flex flex-col">
+      <div
+        // onClick={() => setIdx(l.id)}
+        className={`cursor-pointer flex flex-col font-light p-4 border border-indigo-600 border-b  ${
+          mode === true
+            ? 'bg-white hover:bg-gray-100 hover:outline hover:outline-lightslategray-300 hover:outline-[1px]'
+            : 'bg-bgDarkMode hover:bg-hoverDark hover:outline hover:outline-lightslategray-300 hover:outline-[1px]'
+        }`}
+      >
+        <div className="flex flex-row justify-between items-center w-[250px]">
+          <div className="flex flex-row gap-1">
+            <img
+              className="w-[40px] h-[40px] shrink-0 overflow-hidden rounded-full"
+              alt={l?.name}
+              src={l?.logoUrl}
+            />
+            <div className="flex flex-col">
+              <div className="cursor-pointer flex flex-col items-start">
+                <div
+                  className={`text-base font-sans font-medium leading-[24px] inline-block ${
+                    mode === true ? 'text-black' : 'text-gray-100'
+                  }`}
+                >
+                  {l?.name}
+                </div>
+                <div
+                  className={`text-[12px] font-sans font-medium leading-[24px] inline-block ${
+                    mode === true ? 'text-gray-200' : 'text-gray-100'
+                  }`}
+                >
+                  {l?.symbol}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div className="flex flex-col justify-center items-end">
-          {l.status ? (
-            <div className="text-base text-green-600 font-sans font-medium leading-[24px] inline-block">
-              {l?.amount} {l.symbol}
+          <div className="flex flex-col justify-center items-end">
+            {l.status ? (
+              <div className="text-base text-green-600 font-sans font-medium leading-[24px] inline-block">
+                {l?.amount} {l.symbol}
+              </div>
+            ) : (
+              <div className="text-base text-rose-600 font-sans font-medium leading-[24px] inline-block">
+                {l?.amount} {l.symbol}
+              </div>
+            )}
+            <div
+              className={`text-[8px] font-sans font-medium leading-[24px] inline-block ${
+                mode === true ? 'text-gray-200' : 'text-gray-100'
+              }`}
+            >
+              {l?.date}
             </div>
-          ) : (
-            <div className="text-base text-rose-600 font-sans font-medium leading-[24px] inline-block">
-              {l?.amount} {l.symbol}
-            </div>
-          )}
-          <div
-            className={`text-[8px] font-sans font-medium leading-[24px] inline-block ${
-              mode === true ? 'text-gray-200' : 'text-gray-100'
-            }`}
-          >
-            {l?.date}
           </div>
         </div>
       </div>
-     
+      <div
+        className={`flex w-full h-px ${
+          mode === true ? 'bg-lightslategray-300' : 'bg-darkslategray-400'
+        }`}
+      />
     </div>
-    <div
-          className={`flex w-full h-px ${
-            mode === true ? 'bg-lightslategray-300' : 'bg-darkslategray-400'
-          }`}
-        />
-</div>
-    
   );
 
   return <>{newCard}</>;
@@ -150,26 +148,26 @@ export const History = (props) => {
   const { mode } = props;
   const newCard = (
     <div
-    className={`flex flex-col rounded shadow-lg ${
-      mode === true
-        ? 'bg-white outline outline-lightslategray-300 outline-[1px]'
-        : 'bg-bgDarker outline outline-lightslategray-300 outline-[2px]'
-    }`}
+      className={`flex flex-col rounded shadow-lg w-[300px] h-full ${
+        mode === true
+          ? 'bg-white outline outline-lightslategray-300 outline-[1px]'
+          : 'bg-bgDarkMode outline outline-lightslategray-300 outline-[2px]'
+      }`}
     >
       <div
         className={`mt-[24px] ml-4 text-lg font-sans font-bold inline-block ${
-          mode === true ? 'text-mediumspringgreen' : 'text-white'
+          mode === true ? 'text-bgPrimary' : 'text-white'
         }`}
       >
         {'Recent transactions'}
       </div>
       <div
-          className={`flex w-full h-px mt-6 ${
-            mode === true ? 'bg-lightslategray-300' : 'bg-darkslategray-400'
-          }`}
-        />
+        className={`flex w-full h-px mt-6 ${
+          mode === true ? 'bg-lightslategray-300' : 'bg-darkslategray-400'
+        }`}
+      />
 
-      <div className="mt-2 flex flex-col gap-[16px] overflow-scroll h-[300px]">
+      <div className="mt-2 flex flex-col gap-[16px] overflow-scroll max-h-0">
         <UserProfile l={menu[0]} mode={mode} />
         <UserProfile l={menu[1]} mode={mode} />
         <UserProfile l={menu[2]} mode={mode} />

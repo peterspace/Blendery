@@ -3,7 +3,7 @@ import { History } from '../../components/History';
 import { WalletBalances } from '../../components/WalletBalances';
 import Trending from '../../components/coins/Trending';
 import HistoryChart from '../../components/coins/HistoryChart';
-import { WalletHistory } from '../../components/WalletHistory';
+import Markets from '../../components/coins/Markets';
 const menu = [
   {
     name: 'Bitcoin',
@@ -45,36 +45,49 @@ export const WalletsPage = (props) => {
 
   return (
     <>
-      {/* <div className="flex flex-col justify-start items-start xl:justify-center xl:items-center mt-6 xl:mt-0 gap-4"> */}
-      <div className="flex flex-col justify-start items-start xl:justify-between gap-8 xl:gap-0 xl:h-full">
-        <div
-          className={`flex justify-center rounded-lg shadow-lg p-1 ${
-            mode === true
-              ? 'bg-white'
-              : 'bg-bgDark outline outline-bgDarkOutline outline-[1px]'
-          }`}
-        >
-          <WalletBalances setIdx={setIdx} mode={mode} />
-        </div>
-        <div
-          className={`flex justify-center rounded-lg shadow-lg p-1 w-full ${
-            mode === true
-              ? 'bg-white'
-              : 'bg-bgDark outline outline-bgDarkOutline outline-[1px]'
-          }`}
-        >
-          <HistoryChart idx={idx} mode={mode} />
-        </div>
-        <div
-          className={`flex flex-col gap-2 2xl:flex-row  2xl:gap-4 py-6 shadow-xl rounded-lg ${
-            mode === true
-              ? 'bg-white outline outline-lightslategray-300 outline-[1px]'
-              : 'bg-bgDark outline outline-bgDarkOutline outline-[1px]'
-          } w-full justify-center`}
-        >
-          <History mode={mode} />
-          <WalletHistory mode={mode} />
-          <Trending setIdx={setIdx} mode={mode} />
+      <div className="p-1 w-full h-[90vh]">
+        <div className="flex flex-row gap-2 h-[90vh] w-full">
+          <div className="flex flex-col gap-2 h-[90vh] w-full">
+            <div
+              className={`flex justify-center rounded-lg shadow-lg p-1 ${
+                mode === true
+                  ? 'bg-white'
+                  : 'bg-bgDark outline outline-bgDarkOutline outline-[1px]'
+              }`}
+            >
+              <WalletBalances setIdx={setIdx} mode={mode} />
+            </div>
+            <div
+              className={`flex justify-center rounded-lg shadow-lg p-1 ${
+                mode === true
+                  ? 'bg-white'
+                  : 'bg-bgDark outline outline-bgDarkOutline outline-[1px]'
+              }`}
+            >
+              <HistoryChart idx={idx} mode={mode} />
+            </div>
+            {/* <div
+              className={`flex justify-center rounded-lg shadow-lg p-1 ${
+                mode === true
+                  ? 'bg-white'
+                  : 'bg-bgDark outline outline-bgDarkOutline outline-[1px]'
+              }`}
+            >
+              <div className="p-1 w-full">
+                <Markets setIdx={setIdx} mode={mode} />
+              </div>
+            </div> */}
+          </div>
+          <div
+            className={`flex flex-col justify-between shadow-xl rounded-lg ${
+              mode === true
+                ? 'bg-white outline outline-lightslategray-300 outline-[1px]'
+                : 'bg-bgDark outline outline-bgDarkOutline outline-[1px]'
+            } justify-center`}
+          >
+            <History mode={mode} />
+            <Trending setIdx={setIdx} mode={mode} />
+          </div>
         </div>
       </div>
     </>

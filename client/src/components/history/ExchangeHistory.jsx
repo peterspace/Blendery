@@ -87,7 +87,7 @@ const ExchangeHistory = (props) => {
     <section className={`flex mt-8 flex-col gap-[8px]`}>
       <div
         className={`mt-[8px] ml-[8px] text-lg font-sans font-bold inline-block ${
-          mode === true ? 'text-mediumspringgreen' : 'text-white'
+          mode === true ? 'text-bgPrimary' : 'text-white'
         }`}
       >
         {'Exchange Transaction History'}

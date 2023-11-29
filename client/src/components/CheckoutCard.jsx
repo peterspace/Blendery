@@ -12,6 +12,12 @@ export const CheckoutCard = (props) => {
     bankName,
     cardNumber,
     phone,
+    fToken,
+    tToken,
+    fValue,
+    userAddress,
+    transactionRates,
+    loadingExchangeRate,
   } = props;
 
   /********************************************************************************************************************** */
@@ -20,9 +26,6 @@ export const CheckoutCard = (props) => {
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
 
-  const transactionRates = useSelector(
-    (state) => state.transaction?.getTransactionRate
-  );
   const youSend = transactionRates ? transactionRates?.youSend : 0;
   const youGet = transactionRates ? transactionRates?.youGet : 0;
   const processingFee = transactionRates ? transactionRates?.processingFee : 0;
@@ -32,9 +35,8 @@ export const CheckoutCard = (props) => {
   const exchangeRate = transactionRates ? transactionRates?.exchangeRate : 0;
   //===={To be added}========
   const estimatedGas = transactionRates ? transactionRates?.estimatedGas : 0;
-  console.log({service: service})
-  console.log({provider: provider})
-
+  console.log({ service: service });
+  console.log({ provider: provider });
 
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
@@ -42,20 +44,6 @@ export const CheckoutCard = (props) => {
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
 
-  const fToken = localStorage.getItem('fTokenE')
-    ? JSON.parse(localStorage.getItem('fTokenE'))
-    : null;
-
-  const tToken = localStorage.getItem('tTokenE')
-    ? JSON.parse(localStorage.getItem('tTokenE'))
-    : null;
-
-  const fValue = localStorage.getItem('fValueE')
-    ? JSON.parse(localStorage.getItem('fValueE'))
-    : '1';
-  const userAddress = localStorage.getItem('userAddress')
-    ? JSON.parse(localStorage.getItem('userAddress'))
-    : null;
 
   const checkout = (
     <div className="flex justify-center rounded-lg bg-white shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[320px] xs:w-[340px] md:w-[500px] p-4">
@@ -66,7 +54,7 @@ export const CheckoutCard = (props) => {
               Checkout
             </div>
             <div
-              className="cursor-pointer flex flex-row justify-center items-center bg-whitesmoke-100 hover:opacity-90 text-mediumspringgreen shrink-0 rounded px-6 py-3"
+              className="cursor-pointer flex flex-row justify-center items-center bg-bgSecondary hover:opacity-90 text-bgPrimary shrink-0 rounded px-6 py-3"
               onClick={() => {
                 setPercentageProgress(2);
               }}

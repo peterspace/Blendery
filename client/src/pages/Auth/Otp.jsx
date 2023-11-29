@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
-import { Navigate, useParams } from "react-router-dom";
-import { forgotOtp, verifyOtp, validateEmail } from "../../services/apiService";
+import { useState, useEffect } from 'react';
+import { Navigate, useParams } from 'react-router-dom';
+import { forgotOtp, verifyOtp, validateEmail } from '../../services/apiService';
 
-import { toast } from "react-toastify";
+import { toast } from 'react-toastify';
 
-import Modal from "./Modal";
-import { useDispatch } from "react-redux";
-import { LoginUser } from "../../redux/features/user/userSlice";
-import { useFormik } from "formik";
+import Modal from './Modal';
+import { useDispatch } from 'react-redux';
+import { LoginUser } from '../../redux/features/user/userSlice';
+import { useFormik } from 'formik';
 
 //eenglishwithpeter@gmail.com
 export const Otp = (props) => {
@@ -17,56 +17,56 @@ export const Otp = (props) => {
   const params = useParams();
   const { authId } = params;
   // initially true
-  const isForgotOtpL = localStorage.getItem("isForgotOtp")
-    ? JSON.parse(localStorage.getItem("isForgotOtp"))
+  const isForgotOtpL = localStorage.getItem('isForgotOtp')
+    ? JSON.parse(localStorage.getItem('isForgotOtp'))
     : true;
   const [isForgotOtp, setIsForgotOtp] = useState(isForgotOtpL);
 
   // initially false
-  const isVerifyOtpL = localStorage.getItem("isVerifyOtp")
-    ? JSON.parse(localStorage.getItem("isVerifyOtp"))
+  const isVerifyOtpL = localStorage.getItem('isVerifyOtp')
+    ? JSON.parse(localStorage.getItem('isVerifyOtp'))
     : false;
   const [isVerifyOtp, setIsVerifyOtp] = useState(isVerifyOtpL);
 
   const { values, handleChange, handleSubmit, touched, errors, resetForm } =
     useFormik({
       initialValues: {
-        email: "",
-        otp1: "",
-        otp2: "",
-        otp3: "",
-        otp4: "",
+        email: '',
+        otp1: '',
+        otp2: '',
+        otp3: '',
+        otp4: '',
       },
       validate: (values) => {
         const errors = {};
 
         if (isForgotOtp && !values.email) {
-          errors.email = "Email is required!";
+          errors.email = 'Email is required!';
         }
 
         if (isVerifyOtp) {
           if (!values.otp1) {
-            errors.otp1 = "OTP1 is required!";
+            errors.otp1 = 'OTP1 is required!';
           } else if (values.otp1.length !== 4) {
-            errors.otp1 = "OTP must be only 4 characters";
+            errors.otp1 = 'OTP must be only 4 characters';
           }
 
           if (!values.otp2) {
-            errors.otp2 = "OTP2 is required!";
+            errors.otp2 = 'OTP2 is required!';
           } else if (values.otp2.length !== 4) {
-            errors.otp2 = "OTP must be only 4 characters";
+            errors.otp2 = 'OTP must be only 4 characters';
           }
 
           if (!values.otp3) {
-            errors.otp3 = "OTP3 is required!";
+            errors.otp3 = 'OTP3 is required!';
           } else if (values.otp3.length !== 4) {
-            errors.otp3 = "OTP must be only 4 characters";
+            errors.otp3 = 'OTP must be only 4 characters';
           }
 
           if (!values.otp4) {
-            errors.otp4 = "OTP4 is required!";
+            errors.otp4 = 'OTP4 is required!';
           } else if (values.otp4.length !== 4) {
-            errors.otp4 = "OTP must be only 4 characters";
+            errors.otp4 = 'OTP must be only 4 characters';
           }
         }
 
@@ -87,12 +87,12 @@ export const Otp = (props) => {
   const [redirectVerify, setRedirectVerify] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem("isVerifyOtp", JSON.stringify(isVerifyOtp));
+    localStorage.setItem('isVerifyOtp', JSON.stringify(isVerifyOtp));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isVerifyOtp]);
 
   useEffect(() => {
-    localStorage.setItem("isForgotOtp", JSON.stringify(isForgotOtp));
+    localStorage.setItem('isForgotOtp', JSON.stringify(isForgotOtp));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isForgotOtp]);
 
@@ -105,7 +105,7 @@ export const Otp = (props) => {
 
   async function handleForgotSubmit(email) {
     if (!validateEmail(email)) {
-      return toast.error("Please enter a valid email");
+      return toast.error('Please enter a valid email');
     }
     const userData = {
       email,
@@ -124,7 +124,7 @@ export const Otp = (props) => {
 
   async function handleVerify(otp1, otp2, otp3, otp4) {
     if (!authId) {
-      return toast.error("OTP must be authorized");
+      return toast.error('OTP must be authorized');
     }
 
     const fullOtp = `${otp1}${otp2}${otp3}${otp4}`;
@@ -138,8 +138,8 @@ export const Otp = (props) => {
 
       if (data) {
         dispatch(LoginUser(data));
-        localStorage.setItem("isLoggedIn", JSON.stringify(true));
-        localStorage.setItem("user", JSON.stringify(data));
+        localStorage.setItem('isLoggedIn', JSON.stringify(true));
+        localStorage.setItem('user', JSON.stringify(data));
         // setUser(data);
         setIsLoggedIn(true);
         resetForm();
@@ -158,12 +158,12 @@ export const Otp = (props) => {
 
   if (redirectVerify) {
     // return <Navigate to={'/landingPage'} />;
-    return <Navigate to={"/account"} />;
+    return <Navigate to={'/account'} />;
   }
 
   if (redirectHome) {
     // return <Navigate to={'/landingPage'} />;
-    return <Navigate to={"/"} />;
+    return <Navigate to={'/'} />;
   }
 
   const login = (
@@ -215,7 +215,7 @@ export const Otp = (props) => {
                 </div>
                 <div className="flex flex-row justify-center items-center">
                   <div
-                    className="cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full"
+                    className="cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full"
                     onClick={handleSubmit}
                   >
                     Get OTP
@@ -266,7 +266,7 @@ export const Otp = (props) => {
                       </div>
                     </div>
                     <div className="flex flex-col mb-4 justify-center items-center">
-                      {" "}
+                      {' '}
                       <input
                         id="otp3"
                         name="otp3"
@@ -307,7 +307,7 @@ export const Otp = (props) => {
 
                 <div className="flex flex-row justify-center items-center">
                   <div
-                    className="cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full"
+                    className="cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full"
                     onClick={handleSubmit}
                   >
                     Verify
@@ -322,7 +322,7 @@ export const Otp = (props) => {
                 OTP expired?
               </div>
               <div
-                className="cursor-pointer text-smi leading-[22px] text-mediumspringgreen hover:text-opacity-80 inline-block"
+                className="cursor-pointer text-smi leading-[22px] text-bgPrimary hover:text-opacity-80 inline-block"
                 onClick={() => {
                   setIsVerifyOtp(false);
                   setIsForgotOtp(true);
@@ -339,7 +339,7 @@ export const Otp = (props) => {
                 Already have an account?
               </div>
               <div
-                className="cursor-pointer text-smi leading-[22px] text-mediumspringgreen hover:text-opacity-80 inline-block"
+                className="cursor-pointer text-smi leading-[22px] text-bgPrimary hover:text-opacity-80 inline-block"
                 onClick={() => {
                   setRedirectVerify(true);
                 }}

@@ -147,7 +147,7 @@ export const ConfirmFundStore = (props) => {
         {txData?.provider === 'BlenderyPay' ? null : (
           <div className="flex flex-row gap-2 mt-2">
             <div
-              className=" cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]"
+              className=" cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]"
               onClick={() => setIsMontor(true)}
             >
               <div className="flex flex-row gap-2">
@@ -159,7 +159,7 @@ export const ConfirmFundStore = (props) => {
             </div>
 
             <div
-              className="cursor-pointer flex flex-row justify-center items-center bg-whitesmoke-100 hover:opacity-90 text-mediumspringgreen h-[49px] shrink-0 rounded w-[30%]"
+              className="cursor-pointer flex flex-row justify-center items-center bg-bgSecondary hover:opacity-90 text-bgPrimary h-[49px] shrink-0 rounded w-[30%]"
               onClick={newFunc}
             >
               New
@@ -173,7 +173,7 @@ export const ConfirmFundStore = (props) => {
           // onClick={() => setPercentageProgress(5)}
           onClick={updateTransaction}
         >
-          <div className="cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
+          <div className="cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
             Please hold ...
           </div>
         </div>

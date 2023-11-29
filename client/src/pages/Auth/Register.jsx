@@ -1,27 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
-import { FcGoogle } from "react-icons/fc";
-import { FaFacebookSquare } from "react-icons/fa";
-import { AiFillApple, AiOutlineClose } from "react-icons/ai";
-
-import {
-  registerUser,
-  validateEmail,
-  registrationConfirmation,
-  authenticateUserFacebook,
-  successUserFacebook,
-  errorUserFacebook,
-  authenticateUserGoogle,
-  successUserGoogle,
-  errorUserGoogle,
-} from "../../services/apiService";
-
-import { registerSocial } from "../../services/apiService";
-
-import { toast } from "react-toastify";
-
-import { useDispatch } from "react-redux";
-import { useFormik } from "formik";
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FcGoogle } from 'react-icons/fc';
+import { FaFacebookSquare } from 'react-icons/fa';
+import { registerUser, validateEmail } from '../../services/apiService';
+import { toast } from 'react-toastify';
+import { useFormik } from 'formik';
 
 export const Register = (props) => {
   const { setIsLogin, setIsRegister, setIsForgot, redirectS, setRedirectHome } =
@@ -30,18 +13,15 @@ export const Register = (props) => {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   const [redirect, setRedirect] = useState(false);
-
-  const [isLocal, setIsLocal] = useState(false);
   const [isFacebook, setIsFacebook] = useState(false);
   const [isGoogle, setIsGoogle] = useState(false);
-  // const [redirectHome, setRedirectHome] = useState(false);
 
   const { values, handleChange, handleSubmit, touched, errors, resetForm } =
     useFormik({
       initialValues: {
-        name: "",
-        email: "",
-        password: "",
+        name: '',
+        email: '',
+        password: '',
         isTermsAgreed: false,
         isSubscriptionChecked: false,
       },
@@ -49,20 +29,20 @@ export const Register = (props) => {
         const errors = {};
 
         if (!values.name) {
-          errors.name = "Full name is required!";
+          errors.name = 'Full name is required!';
         }
 
         if (!values.email) {
-          errors.email = "Email address is required!";
+          errors.email = 'Email address is required!';
         }
 
         if (!values.password) {
-          errors.password = "Password is required!";
+          errors.password = 'Password is required!';
         }
 
         if (!values.isTermsAgreed) {
           errors.isTermsAgreed =
-            "Please indicate that you have read and agree to the Terms";
+            'Please indicate that you have read and agree to the Terms';
         }
 
         return errors;
@@ -78,14 +58,12 @@ export const Register = (props) => {
       },
     });
 
-  const dispatch = useDispatch();
-
   async function handleSignUp(name, email, password) {
     if (password.length < 6) {
-      return toast.error("Passwords must be up to 6 characters");
+      return toast.error('Passwords must be up to 6 characters');
     }
     if (!validateEmail(email)) {
-      return toast.error("Please enter a valid email");
+      return toast.error('Please enter a valid email');
     }
 
     // TODO: Subscription true/false have to be added
@@ -93,20 +71,20 @@ export const Register = (props) => {
       name,
       email,
       password,
-      role: "User",
+      role: 'User',
     };
 
     try {
       const data = await registerUser(userData);
       if (data) {
         // localStorage.setItem('isLoggedIn', JSON.stringify(true));
-        localStorage.setItem("user", JSON.stringify(data));
+        localStorage.setItem('user', JSON.stringify(data));
         setTimeout(() => {
           setRedirect(true);
         }, 2000);
       }
     } catch (e) {
-      alert("Registration failed. Please try again later");
+      alert('Registration failed. Please try again later');
     }
   }
 
@@ -132,14 +110,14 @@ export const Register = (props) => {
 
   useEffect(() => {
     if (redirect) {
-      navigate("/");
+      navigate('/');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [redirect]);
 
   useEffect(() => {
     if (redirectS) {
-      navigate("/auth");
+      navigate('/auth');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [redirectS]);
@@ -235,7 +213,7 @@ export const Register = (props) => {
                     type="checkbox"
                     value={values.isTermsAgreed}
                     onChange={handleChange}
-                    className="outline-none bg-whitesmoke-100 accent-mediumspringgreen focus:accent-mediumspringgreen/30"
+                    className="outline-none bg-whitesmoke-100 accent-bgPrimary focus:accent-bgPrimary/30"
                   />
 
                   <div className="flex flex-row gap-1 text-xs md:text-smi">
@@ -259,7 +237,7 @@ export const Register = (props) => {
                   value={values.isSubscriptionChecked}
                   onChange={handleChange}
                   type="checkbox"
-                  className="outline-none bg-whitesmoke-100 accent-mediumspringgreen focus:accent-mediumspringgreen/30"
+                  className="outline-none bg-whitesmoke-100 accent-bgPrimary focus:accent-bgPrimary/30"
                 />
 
                 <div className="flex flex-row gap-1 text-xs md:text-smi">
@@ -271,7 +249,7 @@ export const Register = (props) => {
             </div>
             <div className="flex flex-row justify-center items-center">
               <div
-                className="cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full"
+                className="cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full"
                 onClick={handleSubmit}
               >
                 Create account
@@ -289,9 +267,8 @@ export const Register = (props) => {
         </div>
         <div className="flex flex-col justify-center items-center gap-[16px]">
           <div
-            className="cursor-pointer flex flex-row justify-center items-center bg-white hover:opacity-90 text-mediumspringgreen h-[49px] shrink-0 rounded w-full outline outline-mediumspringgreen outline-[1.5px]"
+            className="cursor-pointer flex flex-row justify-center items-center bg-white hover:opacity-90 text-bgPrimary h-[49px] shrink-0 rounded w-full outline outline-bgPrimary outline-[1.5px]"
             onClick={() => {
-              setIsLocal(false);
               setIsFacebook(false);
               setIsGoogle(true);
             }}
@@ -300,9 +277,8 @@ export const Register = (props) => {
             <span className="ml-2"> Continue with Google</span>
           </div>
           <div
-            className="cursor-pointer flex flex-row justify-center items-center bg-white hover:opacity-90 text-mediumspringgreen h-[49px] shrink-0 rounded w-full outline outline-mediumspringgreen outline-[1.5px]"
+            className="cursor-pointer flex flex-row justify-center items-center bg-white hover:opacity-90 text-bgPrimary h-[49px] shrink-0 rounded w-full outline outline-bgPrimary outline-[1.5px]"
             onClick={() => {
-              setIsLocal(false);
               setIsFacebook(false);
               setIsGoogle(true);
             }}
@@ -317,7 +293,7 @@ export const Register = (props) => {
             Already have an account?
           </div>
           <div
-            className="cursor-pointer text-smi leading-[22px] text-mediumspringgreen hover:text-opacity-80 inline-block"
+            className="cursor-pointer text-smi leading-[22px] text-bgPrimary hover:text-opacity-80 inline-block"
             onClick={() => {
               setIsLogin(true);
               setIsRegister(false);

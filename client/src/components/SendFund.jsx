@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { RxCopy } from 'react-icons/rx';
 import { RiFileWarningFill } from 'react-icons/ri';
-import { updateTransactionsAutomatically, updateOneBlockchainTransactionByIdService } from '../services/apiService';
+import {
+  updateTransactionsAutomatically,
+  updateOneBlockchainTransactionByIdService,
+} from '../services/apiService';
 export const SendFund = (props) => {
-  const {
-    txData,
-    setRefetchTxData,
-  } = props;
+  const { txData, setRefetchTxData } = props;
   const [blockChainData, setBlockChainData] = useState();
 
   //========{begin to monitor transaction after this click}=========================
@@ -77,7 +77,7 @@ export const SendFund = (props) => {
                 blockchain: {txData?.fToken?.chain}
               </div>
               <div className="flex flex-row gap-2 mt-2">
-                <div className=" cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]">
+                <div className=" cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]">
                   <div className="flex flex-row gap-2">
                     <RxCopy size={15} color="#ffffff" />
                     <div className="leading-[20px] inline-block">
@@ -100,7 +100,7 @@ export const SendFund = (props) => {
         </div>
         <div className="flex bg-lightslategray-300 md:w-[452px] w-[370px] h-px" />
         <div className="flex flex-row justify-end" onClick={updateTransaction}>
-          <div className="cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[30%]">
+          <div className="cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[30%]">
             Paid
           </div>
         </div>

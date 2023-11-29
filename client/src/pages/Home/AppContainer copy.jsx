@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useQuery } from 'react-query';
+import axios from 'axios';
 //===============================================================
 import { BuyCardHome } from './BuyCardHome/BuyCardHome';
 import { BuyCashHome } from './BuyCashHome/BuyCashHome';
@@ -55,6 +57,7 @@ import { networksOptions } from '../../constants';
 export const AppContainer = (props) => {
   const {
     mode,
+    setMode,
     user,
     service,
     setService,
@@ -65,29 +68,28 @@ export const AppContainer = (props) => {
   } = props;
 
   const dispatch = useDispatch();
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
   const tokensDefiEthereum = useSelector(
     (state) => state.token?.tokensDefiEthereum
   );
 
   const [isLightMode, setIsLightMode] = useState(true);
+  const allTokensDefi = useSelector((state) => state.token?.tokensDefiById);
+  const percentageProgressL = localStorage.getItem('percentageProgress')
+    ? JSON.parse(localStorage.getItem('percentageProgress'))
+    : 1;
 
-  const blockchainNetworkL = localStorage.getItem('blockchainNetworkE')
-    ? JSON.parse(localStorage.getItem('blockchainNetworkE'))
-    : networksOptions[0];
-  const [blockchainNetwork, setBlockchainNetwork] =
-    useState(blockchainNetworkL);
-  const chainId = blockchainNetwork?.chainId;
+  const [percentageProgress, setPercentageProgress] =
+    useState(percentageProgressL);
 
-  //====={Controllers}===========================
-
-  useEffect(() => {
-    dispatch(getTokensDefiById(chainId));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chainId]);
+  const [isToLoading, setIsToLoading] = useState(false);
+  const [isFromLoading, setIsFromLoading] = useState(false);
 
   //==============={update lists at intervals}===============================
 
   useEffect(() => {
+    setMode(true); // automatically set ,ode to "light" mode
     dispatch(getTokenListDefi());
     dispatch(getTokenListFiat());
     dispatch(getTokenListBuy());
@@ -110,18 +112,6 @@ export const AppContainer = (props) => {
   }, [subService]);
 
   useEffect(() => {
-    if (blockchainNetwork) {
-      localStorage.setItem(
-        'blockchainNetworkE',
-        JSON.stringify(blockchainNetwork)
-      );
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [blockchainNetwork]);
-
-  
-  useEffect(() => {
     if (user) {
       dispatch(getUserTransactions());
       dispatch(getUserExchange());
@@ -133,7 +123,6 @@ export const AppContainer = (props) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
-
 
   async function nextFuncExchange() {
     setService('exchange');
@@ -165,171 +154,236 @@ export const AppContainer = (props) => {
     setSubService('defi');
   }
 
-
   return (
-   
     <>
-      <div className="relative bg-white w-full h-screen overflow-auto text-left text-sm text-gray-400 font-montserrat">
-        <div
-          className={`${styles.hero} flex flex-col justify-center items-center`}
-        >
-          <div
-            className={`mt-[64px] mb-[64px] flex justify-center rounded-lg bg-white shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[375px] md:w-[500px] p-4`}
-          >
-            <div className="flex flex-col gap-[10px]">
-              <div className="flex flex-row gap-4 mt-2">
-                <div
-                  className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] ${
-                    service === 'exchange' && subService === 'exchange'
-                      ? 'text-mediumspringgreen text-base font-black inline-block underline underline-offset-[16px]'
-                      : 'text-darkgray-200 text-mini'
-                  }`}
-                  onClick={nextFuncExchange}
-                >
-                  Exchange
-                </div>
-                <div
-                  className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] inline-block ${
-                    service === 'buy' && subService === 'buyCash'
-                      ? 'text-mediumspringgreen text-base font-black inline-block underline underline-offset-[16px]'
-                      : 'text-darkgray-200 text-mini'
-                  } ${
-                    service === 'buy' && subService === 'buyCard'
-                      ? 'text-mediumspringgreen text-base font-black inline-block underline underline-offset-[16px]'
-                      : 'text-darkgray-200 text-mini'
-                  }`}
-                  onClick={nextFuncBuyCard}
-                >
-                  Buy
-                </div>
-                <div
-                  className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] inline-block ${
-                    service === 'sell' && subService === 'sellCash'
-                      ? 'text-mediumspringgreen text-base font-black inline-block underline underline-offset-[16px]'
-                      : 'text-darkgray-200 text-mini'
-                  } ${
-                    service === 'sell' && subService === 'sellCard'
-                      ? 'text-mediumspringgreen text-base font-black inline-block underline underline-offset-[16px]'
-                      : 'text-darkgray-200 text-mini'
-                  }`}
-                  onClick={nextFuncSellCard}
-                >
-                  Sell
-                </div>
+      <div className="flex flex-col">
+        {percentageProgress === 1 ? (
+          <>
+            <div
+              className={`${styles.hero} flex flex-col justify-center items-center`}
+            >
+              <div
+                className={`mt-[64px] mb-[64px] flex justify-center rounded-lg bg-white shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[375px] md:w-[500px] p-4`}
+              >
+                <div className="flex flex-col gap-[10px]">
+                  <div className="flex flex-row gap-4 mt-2">
+                    <div
+                      className={`cursor-pointer hover:text-bgPrimary leading-[24px] ${
+                        service === 'exchange' && subService === 'exchange'
+                          ? 'text-bgPrimary text-base font-black inline-block underline underline-offset-[16px]'
+                          : 'text-darkgray-200 text-mini'
+                      }`}
+                      onClick={nextFuncExchange}
+                    >
+                      Exchange
+                    </div>
+                    <div
+                      className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block ${
+                        service === 'buy' && subService === 'buyCash'
+                          ? 'text-bgPrimary text-base font-black inline-block underline underline-offset-[16px]'
+                          : 'text-darkgray-200 text-mini'
+                      } ${
+                        service === 'buy' && subService === 'buyCard'
+                          ? 'text-bgPrimary text-base font-black inline-block underline underline-offset-[16px]'
+                          : 'text-darkgray-200 text-mini'
+                      }`}
+                      onClick={nextFuncBuyCard}
+                    >
+                      Buy
+                    </div>
+                    <div
+                      className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block ${
+                        service === 'sell' && subService === 'sellCash'
+                          ? 'text-bgPrimary text-base font-black inline-block underline underline-offset-[16px]'
+                          : 'text-darkgray-200 text-mini'
+                      } ${
+                        service === 'sell' && subService === 'sellCard'
+                          ? 'text-bgPrimary text-base font-black inline-block underline underline-offset-[16px]'
+                          : 'text-darkgray-200 text-mini'
+                      }`}
+                      onClick={nextFuncSellCard}
+                    >
+                      Sell
+                    </div>
 
-                <div
-                  className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] inline-block ${
-                    service === 'defi' && subService === 'defi'
-                      ? 'text-mediumspringgreen text-base font-black inline-block underline underline-offset-[16px]'
-                      : 'text-darkgray-200 text-mini'
-                  }`}
-                  onClick={nextFuncDefi}
-                >
-                  DeFi
+                    <div
+                      className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block ${
+                        service === 'defi' && subService === 'defi'
+                          ? 'text-bgPrimary text-base font-black inline-block underline underline-offset-[16px]'
+                          : 'text-darkgray-200 text-mini'
+                      }`}
+                      onClick={nextFuncDefi}
+                    >
+                      DeFi
+                    </div>
+                  </div>
+                  <div className="flex bg-lightslategray-300 w-full h-px" />
+                  <>
+                    {service === 'exchange' && subService === 'exchange' && (
+                      <ExchangeHome
+                        mode={mode}
+                        service={service}
+                        setService={setService}
+                        subService={subService}
+                        setSubService={setSubService}
+                        setTxInfo={setTxInfo}
+                        txInfo={txInfo}
+                        user={user}
+                      />
+                    )}
+                    {service === 'buy' && subService === 'buyCash' && (
+                      <BuyCashHome
+                        mode={mode}
+                        service={service}
+                        setService={setService}
+                        subService={subService}
+                        setSubService={setSubService}
+                        setTxInfo={setTxInfo}
+                        txInfo={txInfo}
+                        user={user}
+                      />
+                    )}
+                    {service === 'buy' && subService === 'buyCard' && (
+                      <BuyCardHome
+                        mode={mode}
+                        service={service}
+                        setService={setService}
+                        subService={subService}
+                        setSubService={setSubService}
+                        setTxInfo={setTxInfo}
+                        txInfo={txInfo}
+                        user={user}
+                      />
+                    )}
+
+                    {service === 'sell' && subService === 'sellCash' && (
+                      <SellCashHome
+                        mode={mode}
+                        service={service}
+                        setService={setService}
+                        subService={subService}
+                        setSubService={setSubService}
+                        setTxInfo={setTxInfo}
+                        txInfo={txInfo}
+                        user={user}
+                      />
+                    )}
+
+                    {service === 'sell' && subService === 'sellCard' && (
+                      <SellCardHome
+                        mode={mode}
+                        service={service}
+                        setService={setService}
+                        subService={subService}
+                        setSubService={setSubService}
+                        setTxInfo={setTxInfo}
+                        txInfo={txInfo}
+                        user={user}
+                      />
+                    )}
+
+                    {service === 'defi' && subService === 'defi' && (
+                      <DefiHome
+                        mode={mode}
+                        service={service}
+                        setService={setService}
+                        subService={subService}
+                        setSubService={setSubService}
+                        setTxInfo={setTxInfo}
+                        txInfo={txInfo}
+                        user={user}
+                      />
+                    )}
+                  </>
                 </div>
               </div>
-              <div className="flex bg-lightslategray-300 w-full h-px" />
-              <>
-                {service === 'exchange' && subService === 'exchange' && (
-                  <ExchangeHome
-                    mode={mode}
-                    service={service}
-                    setService={setService}
-                    subService={subService}
-                    setSubService={setSubService}
-                    setTxInfo={setTxInfo}
-                    txInfo={txInfo}
-                    user={user}
-                  />
-                )}
-                {service === 'buy' && subService === 'buyCash' && (
-                  <BuyCashHome
-                    mode={mode}
-                    service={service}
-                    setService={setService}
-                    subService={subService}
-                    setSubService={setSubService}
-                    setTxInfo={setTxInfo}
-                    txInfo={txInfo}
-                    user={user}
-                  />
-                )}
-                {service === 'buy' && subService === 'buyCard' && (
-                  <BuyCardHome
-                    mode={mode}
-                    service={service}
-                    setService={setService}
-                    subService={subService}
-                    setSubService={setSubService}
-                    setTxInfo={setTxInfo}
-                    txInfo={txInfo}
-                    user={user}
-                  />
-                )}
-
-                {service === 'sell' && subService === 'sellCash' && (
-                  <SellCashHome
-                    mode={mode}
-                    service={service}
-                    setService={setService}
-                    subService={subService}
-                    setSubService={setSubService}
-                    setTxInfo={setTxInfo}
-                    txInfo={txInfo}
-                    user={user}
-                  />
-                )}
-
-                {service === 'sell' && subService === 'sellCard' && (
-                  <SellCardHome
-                    mode={mode}
-                    service={service}
-                    setService={setService}
-                    subService={subService}
-                    setSubService={setSubService}
-                    setTxInfo={setTxInfo}
-                    txInfo={txInfo}
-                    user={user}
-                  />
-                )}
-
-                {service === 'defi' && subService === 'defi' && (
-                  <DefiHome
-                    mode={mode}
-                    service={service}
-                    setService={setService}
-                    subService={subService}
-                    setSubService={setSubService}
-                    blockchainNetwork={blockchainNetwork}
-                    setBlockchainNetwork={setBlockchainNetwork}
-                    chainId={chainId}
-                    setTxInfo={setTxInfo}
-                    txInfo={txInfo}
-                    user={user}
-                  />
-                )}
-              </>
             </div>
-          </div>
-        </div>
+          </>
+        ) : (
+          <>
+            <div className="h-screen mt-[64px] mb-[64px] overflow-auto">
+              {service === 'exchange' && subService === 'exchange' && (
+                <ExchangeHome
+                  mode={mode}
+                  service={service}
+                  setService={setService}
+                  subService={subService}
+                  setSubService={setSubService}
+                  setTxInfo={setTxInfo}
+                  txInfo={txInfo}
+                  user={user}
+                />
+              )}
+              {service === 'buy' && subService === 'buyCash' && (
+                <BuyCashHome
+                  mode={mode}
+                  service={service}
+                  setService={setService}
+                  subService={subService}
+                  setSubService={setSubService}
+                  setTxInfo={setTxInfo}
+                  txInfo={txInfo}
+                  user={user}
+                />
+              )}
+              {service === 'buy' && subService === 'buyCard' && (
+                <BuyCardHome
+                  mode={mode}
+                  service={service}
+                  setService={setService}
+                  subService={subService}
+                  setSubService={setSubService}
+                  setTxInfo={setTxInfo}
+                  txInfo={txInfo}
+                  user={user}
+                />
+              )}
 
-        {/* {service === 'exchange' && subService === 'exchange' && (
-)}
+              {service === 'sell' && subService === 'sellCash' && (
+                <SellCashHome
+                  mode={mode}
+                  service={service}
+                  setService={setService}
+                  subService={subService}
+                  setSubService={setSubService}
+                  setTxInfo={setTxInfo}
+                  txInfo={txInfo}
+                  user={user}
+                />
+              )}
 
-{service === 'buy' && subService === 'buyCash' && (
-)}
+              {service === 'sell' && subService === 'sellCard' && (
+                <SellCardHome
+                  mode={mode}
+                  service={service}
+                  setService={setService}
+                  subService={subService}
+                  setSubService={setSubService}
+                  setTxInfo={setTxInfo}
+                  txInfo={txInfo}
+                  user={user}
+                />
+              )}
 
-{service === 'buy' && subService === 'buyCard' && (
-)}
-
-{service === 'sell' && subService === 'sellCash' && (
-)}
-
-{service === 'sell' && subService === 'sellCard' && (
-)}
-
-{service === 'defi' && subService === 'defi' && (
-)} */}
+              {service === 'defi' && subService === 'defi' && (
+                <DefiHome
+                  mode={mode}
+                  service={service}
+                  setService={setService}
+                  subService={subService}
+                  setSubService={setSubService}
+                  setTxInfo={setTxInfo}
+                  txInfo={txInfo}
+                  user={user}
+                  isToLoading={isToLoading}
+                  setIsToLoading={setIsToLoading}
+                  isFromLoading={isFromLoading}
+                  setIsFromLoading={setIsFromLoading}
+                />
+              )}
+            </div>
+          </>
+        )}
 
         {/* =============={others}=======================*/}
         {service === 'exchange' && subService === 'exchange' && (

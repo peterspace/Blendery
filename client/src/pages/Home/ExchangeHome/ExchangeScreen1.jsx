@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { TokenCard } from '../../../components/TokenCard';
+import { getTokenListExchange } from "../../../redux/features/token/tokenSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 export const ExchangeScreen1 = (props) => {
   const {
@@ -22,19 +24,26 @@ export const ExchangeScreen1 = (props) => {
     setTxInfo,
     allTokensFrom,
     allTokensTo,
-    exchangeRate,
     transactionRates,
+    loadingExchangeRate,
   } = props;
+  const dispatch = useDispatch();
 
   //======================={RATES and PRICES}========================================================
   const tValue = transactionRates ? transactionRates?.tValueFormatted : 0;
+  const exchangeRate = transactionRates ? transactionRates?.exchangeRate : 0;
   //================{PAGES}==================
   const [isFromTokenPage, setIsFromTokenPage] = useState(false);
   const [isToTokenPage, setIsToTokenPage] = useState(false);
   const [filteredfTokens, setFilteredfTokens] = useState();
   const [filteredtTokens, setFilteredtTokens] = useState();
 
+
   //============================================{Token selection}==============================
+  useEffect(() => {
+    dispatch(getTokenListExchange());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (allTokensFrom) {
@@ -140,14 +149,15 @@ export const ExchangeScreen1 = (props) => {
             </div>
 
             <div className="flex flex-row justify-between">
-              <div className="h-3 py-2">
-                1 {fToken?.symbol.toUpperCase()} ~ {exchangeRate}{' '}
+             <div className="h-3 py-2">
+                1 {fToken?.symbol.toUpperCase()} ~{" "}
+                {loadingExchangeRate ? "fetching rates" : exchangeRate}{" "}
                 {tToken?.symbol.toUpperCase()}
               </div>
               {/* <div className="h-3 py-2">{isToLoading
                           ? 'Fetching price...'
                           : `${`1 ${fToken?.symbol} = ${exchangeRate}  ${tToken?.symbol}`}`}</div> */}
-              <div className="rounded bg-whitesmoke-100 p-2">
+              <div className="rounded bg-bgSecondary p-2">
                 <img
                   className="w-3.5 h-3 overflow-hidden"
                   alt=""
@@ -165,9 +175,7 @@ export const ExchangeScreen1 = (props) => {
                   <input
                     type="text"
                     className={`ml-2 font-bold text-lg leading-[24px] inline-block w-[90%] outline-none bg-gray-100 placeholder-darkgray-100 ${
-                      loading
-                        ? 'text-mediumspringgreen'
-                        : 'text-darkslategray-200'
+                      loading ? 'text-bgPrimary' : 'text-darkslategray-200'
                     }`}
                     placeholder="0.1"
                     // value={`~ ${tValue}`}
@@ -207,7 +215,7 @@ export const ExchangeScreen1 = (props) => {
           </div>
 
           <div
-            className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded-md"
+            className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded-md"
             onClick={nextFunc}
           >
             {`${service} ${fToken?.symbol.toUpperCase()} now`}
@@ -240,4 +248,3 @@ export const ExchangeScreen1 = (props) => {
     </>
   );
 };
-

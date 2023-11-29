@@ -111,13 +111,12 @@ export const UserProfile = (props) => {
 export const TotalBalance = () => {
   const newCard = (
     <div className="flex flex-col gap-[16px] rounded-lg p-4 bg-gray-100 outline outline-lightslategray-300 outline-[1px]">
-      <div className="mt-[24px] text-lg font-sans font-bold text-mediumspringgreen inline-block">
+      <div className="mt-[24px] text-lg font-sans font-bold text-bgPrimary inline-block">
         {'Total Balance'}
       </div>
       {/* <div className="flex flex-col md:flex-row gap-[16px]"> */}
       <div className="flex flex-col gap-[16px]">
         <UserProfile l={menu[0]} />
-        
       </div>
     </div>
   );

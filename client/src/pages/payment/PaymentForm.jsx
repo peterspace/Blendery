@@ -103,7 +103,7 @@ export default function PaymentForm(props) {
             </div>
           </fieldset>
           {/* <button>Pay</button> */}
-          <button className="primary bg-mediumspringgreen hover:bg-indigo-500 mt-4">
+          <button className="primary bg-bgPrimary hover:bg-indigo-500 mt-4">
             Pay ${amount}
           </button>
         </form>

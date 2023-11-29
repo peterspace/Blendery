@@ -38,7 +38,7 @@ export const Login = (props) => {
 
           <div className="flex bg-lightslategray-300 md:w-[452px] w-[370px] h-px" />
         </div>
-        <div className="flex flex-row h-[48px] bg-whitesmoke-100 rounded outline outline-lightslategray-300 outline-[1px]">
+        <div className="flex flex-row h-[48px] bg-bgSecondary rounded outline outline-lightslategray-300 outline-[1px]">
           <input
             type="text"
             className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 placeholder-darkgray-100 inline-block w-full outline-none bg-gray-100"
@@ -47,7 +47,7 @@ export const Login = (props) => {
             onChange={''}
           />
         </div>
-        <div className="flex flex-row h-[48px] bg-whitesmoke-100 rounded outline outline-lightslategray-300 outline-[1px]">
+        <div className="flex flex-row h-[48px] bg-bgSecondary rounded outline outline-lightslategray-300 outline-[1px]">
           <input
             type="text"
             className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 placeholder-darkgray-100 inline-block w-full outline-none bg-gray-100"
@@ -58,7 +58,7 @@ export const Login = (props) => {
         </div>
         <div className="flex flex-row justify-center items-center">
           <div
-            className="cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full"
+            className="cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full"
             onClick={() => {
               setIsLogin(false);
               setIsRegister(false);
@@ -77,15 +77,15 @@ export const Login = (props) => {
           <div className="flex bg-lightslategray-300 w-[150px] h-px" />
         </div>
         <div className="flex flex-col justify-center items-center gap-[16px]">
-          <div className="cursor-pointer flex flex-row justify-center items-center bg-white hover:opacity-90 text-mediumspringgreen h-[49px] shrink-0 rounded w-full outline outline-mediumspringgreen outline-[1.5px]">
+          <div className="cursor-pointer flex flex-row justify-center items-center bg-white hover:opacity-90 text-bgPrimary h-[49px] shrink-0 rounded w-full outline outline-bgPrimary outline-[1.5px]">
             <FcGoogle size={20} />
             <span className="ml-2"> Continue with Google</span>
           </div>
-          <div className="cursor-pointer flex flex-row justify-center items-center bg-white hover:opacity-90 text-mediumspringgreen h-[49px] shrink-0 rounded w-full outline outline-mediumspringgreen outline-[1.5px]">
+          <div className="cursor-pointer flex flex-row justify-center items-center bg-white hover:opacity-90 text-bgPrimary h-[49px] shrink-0 rounded w-full outline outline-bgPrimary outline-[1.5px]">
             <AiFillApple size={20} />
             <span className="ml-2">Continue with Apple</span>
           </div>
-          <div className="cursor-pointer flex flex-row justify-center items-center bg-white hover:opacity-90 text-mediumspringgreen h-[49px] shrink-0 rounded w-full outline outline-mediumspringgreen outline-[1.5px]">
+          <div className="cursor-pointer flex flex-row justify-center items-center bg-white hover:opacity-90 text-bgPrimary h-[49px] shrink-0 rounded w-full outline outline-bgPrimary outline-[1.5px]">
             <FaFacebookSquare size={20} />
             <span className="ml-2"> Continue with Facebook</span>
           </div>
@@ -96,7 +96,7 @@ export const Login = (props) => {
             {"Don't have an account?"}
           </div>
           <div
-            className="cursor-pointer text-smi leading-[22px] text-mediumspringgreen hover:text-opacity-80 inline-block"
+            className="cursor-pointer text-smi leading-[22px] text-bgPrimary hover:text-opacity-80 inline-block"
             onClick={() => {
               setIsLogin(false);
               setIsRegister(true);

@@ -506,7 +506,7 @@ export const CardExchange = (props) => {
               {/* <div className="h-3 py-2">{isToLoading
                           ? 'Fetching price...'
                           : `${`1 ${fToken?.symbol} = ${exchangeRate}  ${tToken?.symbol}`}`}</div> */}
-              <div className="rounded bg-whitesmoke-100 p-2">
+              <div className="rounded bg-bgSecondary p-2">
                 <img
                   className="w-3.5 h-3 overflow-hidden"
                   alt=""
@@ -567,7 +567,7 @@ export const CardExchange = (props) => {
           </div>
 
           <div
-            className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded-md"
+            className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded-md"
             onClick={nextFunc}
           >
             {`${service} ${fToken?.symbol.toUpperCase()} now`}

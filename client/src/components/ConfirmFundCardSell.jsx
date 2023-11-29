@@ -7,14 +7,19 @@ import { SiHiveBlockchain } from 'react-icons/si';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { updateOneBlockchainTransactionByIdService } from '../services/apiService';
-import {getTransactionByTxIdInternal } from '../redux/features/transaction/transactionSlice';
-
+import { getTransactionByTxIdInternal } from '../redux/features/transaction/transactionSlice';
 
 import { toast } from 'react-toastify';
 
 // update "plese hold" ... to "Next"
 export const ConfirmFundCardSell = (props) => {
-  const { setPercentageProgress, setLoginRedirect, txData, setTxInfo, setRefetchTxData } = props;
+  const {
+    setPercentageProgress,
+    setLoginRedirect,
+    txData,
+    setTxInfo,
+    setRefetchTxData,
+  } = props;
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.user);
@@ -45,11 +50,10 @@ export const ConfirmFundCardSell = (props) => {
   }, [isMontor]);
 
   const updateTransaction = async () => {
-    fetchUpdatedBlockchainData()
+    fetchUpdatedBlockchainData();
     setTimeout(() => {
-      setRefetchTxData(true)
-      }, 2000); // after 1 sec
-    
+      setRefetchTxData(true);
+    }, 2000); // after 1 sec
   };
   const fetchUpdatedBlockchainData = async () => {
     let userData = txData?._id;
@@ -58,8 +62,13 @@ export const ConfirmFundCardSell = (props) => {
   };
 
   async function newFunc() {
-    localStorage.removeItem('fTokenE');
-    localStorage.removeItem('tTokenE');
+    //================{new updates}===============================
+    localStorage.removeItem('fTokenSellCard');
+    localStorage.removeItem('tTokenSellCard');
+    localStorage.removeItem('fValueSellCard');
+    localStorage.removeItem('transactionRatesSellCard');
+    //================{new updates}===============================
+
     localStorage.removeItem('telegram');
     localStorage.removeItem('userAddress');
     localStorage.removeItem('benderyAddress');
@@ -74,6 +83,8 @@ export const ConfirmFundCardSell = (props) => {
     dispatch(getTransactionByTxIdInternal(null));
     navigate('/');
   }
+
+  
 
   const sendFund = (
     <div className="flex justify-center rounded-lg bg-white shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[320px] xs:w-[340px] md:w-[500px] p-4">
@@ -133,14 +144,14 @@ export const ConfirmFundCardSell = (props) => {
               Status
             </div>
             <div className="flex flex-col justify-start w-[50%]">
-              <div className="text-base leading-[24px] bg-whitesmoke-100 hover:opacity-90 text-mediumspringgreen w-fit px-1.5 py-0.5 rounded">
+              <div className="text-base leading-[24px] bg-bgSecondary hover:opacity-90 text-bgPrimary w-fit px-1.5 py-0.5 rounded">
                 {/* Pending */}
                 {txData?.status}
               </div>
               <div className="flex flex-row gap-2 mt-2">
                 {txData?.status === 'Completed' && (
                   <div
-                    className=" cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]"
+                    className=" cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]"
                     onClick={() => setIsMontor(true)}
                   >
                     <div className="flex flex-row gap-2">
@@ -151,7 +162,7 @@ export const ConfirmFundCardSell = (props) => {
                 )}
 
                 <div
-                  className="cursor-pointer flex flex-row justify-center items-center bg-whitesmoke-100 hover:opacity-90 text-mediumspringgreen h-[49px] shrink-0 rounded w-[30%]"
+                  className="cursor-pointer flex flex-row justify-center items-center bg-bgSecondary hover:opacity-90 text-bgPrimary h-[49px] shrink-0 rounded w-[30%]"
                   onClick={newFunc}
                 >
                   New
@@ -175,7 +186,7 @@ export const ConfirmFundCardSell = (props) => {
           className="flex flex-row justify-center items-center"
           onClick={updateTransaction}
         >
-          <div className="cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
+          <div className="cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
             Please hold ...
           </div>
         </div>

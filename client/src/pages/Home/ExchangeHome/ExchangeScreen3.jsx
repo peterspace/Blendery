@@ -8,9 +8,11 @@ import {
   getTransactionByTxId,
   getTransactionByTxIdInternal,
 } from '../../../redux/features/transaction/transactionSlice';
-import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { createTransactionService } from '../../../services/apiService';
+import { useDispatch, useSelector } from 'react-redux';
+import { getTokenListExchange } from '../../../redux/features/token/tokenSlice';
 
 export const ExchangeScreen3 = (props) => {
   const {
@@ -25,11 +27,13 @@ export const ExchangeScreen3 = (props) => {
     service,
     subService,
     setTxInfo,
+    transactionRates,
+    loadingExchangeRate,
   } = props;
 
   const dispatch = useDispatch();
   const location = useLocation();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   console.log({ fromLocationExchange: location });
 
   /********************************************************************************************************************** */
@@ -39,14 +43,6 @@ export const ExchangeScreen3 = (props) => {
   /********************************************************************************************************************** */
 
   const { user } = useSelector((state) => state.user);
-  const createTransactionResponse = useSelector(
-    (state) => state.transaction?.createTransaction
-  );
-  console.log({ createTransactionResponse: createTransactionResponse });
-
-  const transactionRates = useSelector(
-    (state) => state.transaction?.getTransactionRate
-  );
 
   console.log({ transactionRates: transactionRates });
   const youSend = transactionRates ? transactionRates?.youSend : 0;
@@ -74,25 +70,39 @@ export const ExchangeScreen3 = (props) => {
   const [isConfirm, setIsConfirm] = useState(true);
   const [isSend, setIsSend] = useState(false);
 
+  const txData = useSelector(
+    (state) => state.transaction?.transactionByTxIdInternal
+  );
+
+  console.log({ newTxData: txData });
+
   useEffect(() => {
-    if (createTransactionResponse) {
-      setTxInfo(createTransactionResponse);
-      let txData = createTransactionResponse;
-      dispatch(getTransactionByTxId(txData?._id));
-      dispatch(getTransactionByTxIdInternal(createTransactionResponse));
-      navigate(`exchange/${txData?._id}`) // proceed to stage 3
-    }
+    dispatch(getTokenListExchange());
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [createTransactionResponse]);
+  }, []);
 
-  // useEffect(() => {
-  //   if (isSend) {
-  //     submitTransaction();
-  //     setIsSend(false);
-  //   }
+  async function newFunc() {
+    //================{new updates}===============================
+    localStorage.removeItem('fTokenExchange');
+    localStorage.removeItem('tTokenExchange');
+    localStorage.removeItem('fValueExchange');
+    localStorage.removeItem('transactionRatesExchange');
+    //================{new updates}===============================
 
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [isSend]);
+    localStorage.removeItem('telegram');
+    localStorage.removeItem('userAddress');
+    localStorage.removeItem('benderyAddress');
+    localStorage.removeItem('country');
+    localStorage.removeItem('cityData');
+    localStorage.removeItem('city');
+    localStorage.removeItem('paymentMethod');
+    localStorage.removeItem('txInfo');
+    localStorage.removeItem('percentageProgressExchange');
+    localStorage.removeItem('percentageProgressHome');
+    localStorage.removeItem('blockchainNetworkE');
+    localStorage.removeItem('provider');
+    dispatch(getTransactionByTxIdInternal(null));
+  }
 
   const submitTransaction = async () => {
     if (Number(fValue) < 0) {
@@ -118,8 +128,15 @@ export const ExchangeScreen3 = (props) => {
       tValue,
       amount,
     };
-
-    dispatch(createTransaction(userData));
+    const response = await createTransactionService(userData);
+    if (response?._id) {
+      newFunc();
+      dispatch(getTransactionByTxId(response?._id));
+      dispatch(getTransactionByTxIdInternal(response));
+      setTimeout(() => {
+        navigate(`/exchange`); // proceed to stage 3
+      }, 200);
+    }
   };
 
   useEffect(() => {
@@ -147,6 +164,12 @@ export const ExchangeScreen3 = (props) => {
                 setPercentageProgress={setPercentageProgress}
                 fTitle={fTitle}
                 tTitle={tTitle}
+                fToken={fToken}
+                tToken={tToken}
+                fValue={fValue}
+                userAddress={userAddress}
+                transactionRates={transactionRates}
+                loadingExchangeRate={loadingExchangeRate}
               />
               <Signup
                 setIsCheckout={setIsCheckout}
@@ -162,6 +185,12 @@ export const ExchangeScreen3 = (props) => {
                 setPercentageProgress={setPercentageProgress}
                 fTitle={fTitle}
                 tTitle={tTitle}
+                fToken={fToken}
+                tToken={tToken}
+                fValue={fValue}
+                userAddress={userAddress}
+                transactionRates={transactionRates}
+                loadingExchangeRate={loadingExchangeRate}
               />
               <Confirm submitTransaction={setIsSend} />
             </div>

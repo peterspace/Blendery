@@ -8,7 +8,7 @@ const CoinTrending = (props) => {
         className={`cursor-pointer flex flex-col font-light p-4 border border-indigo-600 border-b  ${
           mode === true
             ? 'bg-white hover:bg-gray-100 hover:outline hover:outline-lightslategray-300 hover:outline-[1px]'
-            : 'bg-bgDarker hover:bg-hoverDark hover:outline hover:outline-lightslategray-300 hover:outline-[1px]'
+            : 'bg-bgDarkMode hover:bg-hoverDark hover:outline hover:outline-lightslategray-300 hover:outline-[1px]'
         }`}
         onClick={() => setIdx(coin?.id)}
       >

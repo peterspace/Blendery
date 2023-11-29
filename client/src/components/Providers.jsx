@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
-import { PiLockSimpleOpenBold } from "react-icons/pi";
-import { IoCardOutline } from "react-icons/io5";
-import { MdOutlinePhoneIphone } from "react-icons/md";
+import { PiLockSimpleOpenBold } from 'react-icons/pi';
+import { IoCardOutline } from 'react-icons/io5';
+import { MdOutlinePhoneIphone } from 'react-icons/md';
 //FaArrowRight
 
-import { FaArrowRight } from "react-icons/fa";
+import { FaArrowRight } from 'react-icons/fa';
 // border-solid hover:border-2 hover:border-mediumspringgreen
 
 export const Providers = (props) => {
@@ -16,7 +16,7 @@ export const Providers = (props) => {
     <div
       className={`${
         selectedProvider == provider?.name
-          ? `border-2 border-solid border-mediumspringgreen`
+          ? `border-2 border-solid border-bgPrimary`
           : ``
       } cursor-pointer h-[86px] box-border flex justify-center rounded-lg bg-white shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] xs:w-[340px] md:w-[532px] p-4`}
       onClick={() => {
@@ -29,12 +29,12 @@ export const Providers = (props) => {
           {/* <div className={`${bgClass ? bgClass : 'bg-gray-100 rounded'}`}>
           <img src={logo} alt="" className="h-[25px] w-$ p-1" />
         </div> */}
-          {provider?.name === "Phone" && (
+          {provider?.name === 'Phone' && (
             <>
               <MdOutlinePhoneIphone size={20} />
             </>
           )}
-          {provider?.name === "Card" && (
+          {provider?.name === 'Card' && (
             <>
               <IoCardOutline size={20} />
             </>

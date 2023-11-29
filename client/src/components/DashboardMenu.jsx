@@ -98,7 +98,7 @@ export const HowToComponent = (props) => {
     <div
       className={`flex flex-col justify-center hover:rounded hover:shadow-lg w-[200px] p-1 hover:text-indigo-600 hover:bg-indigo-200 text-xs ${
         page === l?.page
-          ? 'text-mediumspringgreen text-base font-black inline-block'
+          ? 'text-bgPrimary text-base font-black inline-block'
           : 'text-black text-mini'
       } ${mode === true ? 'text-black' : 'text-gray-100'}
       `}
@@ -146,7 +146,7 @@ export const HowToComponent = (props) => {
           )}
         </div>
       </div>
-     
+
       <div className="flex flex-col ml-8">
         {show &&
           l?.subTitle &&
@@ -185,7 +185,7 @@ export const UserProfile = (props) => {
             <div className="cursor-pointer flex flex-col items-start">
               <div
                 className={`text-base font-sans font-medium leading-[24px] inline-block ${
-                  mode === true ? 'text-mediumspringgreen' : 'text-white'
+                  mode === true ? 'text-bgPrimary' : 'text-white'
                 }`}
               >
                 {l?.name}

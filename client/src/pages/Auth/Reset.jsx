@@ -1,37 +1,36 @@
-import React, { useState, useEffect } from "react";
-import { Link, Navigate, useParams } from "react-router-dom";
-import { AiFillApple, AiOutlineClose } from "react-icons/ai";
-import { resetPassword } from "../../services/apiService";
+import React, { useState, useEffect } from 'react';
+import { Link, Navigate, useParams } from 'react-router-dom';
+import { resetPassword } from '../../services/apiService';
 
-import { toast } from "react-toastify";
+import { toast } from 'react-toastify';
 
-import { useDispatch } from "react-redux";
-import Modal from "./Modal";
-import { useFormik } from "formik";
+import { useDispatch } from 'react-redux';
+import Modal from './Modal';
+import { useFormik } from 'formik';
 
 export const Reset = () => {
   const { resetToken } = useParams();
 
-  const [password, setPassword] = useState("");
-  const [password2, setPassword2] = useState("");
+  const [password, setPassword] = useState('');
+  const [password2, setPassword2] = useState('');
   const [redirect, setRedirect] = useState(false);
   const [redirectHome, setRedirectHome] = useState(false);
 
   const { values, handleChange, handleSubmit, touched, errors, resetForm } =
     useFormik({
       initialValues: {
-        password: "",
-        confirmPassword: "",
+        password: '',
+        confirmPassword: '',
       },
       validate: (values) => {
         const errors = {};
 
         if (!values.password) {
-          errors.password = "Password is required!";
+          errors.password = 'Password is required!';
         }
 
         if (!values.confirmPassword) {
-          errors.confirmPassword = "Confirm the password!";
+          errors.confirmPassword = 'Confirm the password!';
         }
 
         return errors;
@@ -45,10 +44,10 @@ export const Reset = () => {
 
   async function handleResetPassword(password, confirmPassword) {
     if (password.length < 6) {
-      return toast.error("Passwords must be up to 6 characters");
+      return toast.error('Passwords must be up to 6 characters');
     }
     if (password !== confirmPassword) {
-      return toast.error("Passwords do not match");
+      return toast.error('Passwords do not match');
     }
 
     const userData = {
@@ -73,12 +72,12 @@ export const Reset = () => {
 
   if (redirect) {
     // return <Navigate to={'/landingPage'} />;
-    return <Navigate to={"/auth"} />;
+    return <Navigate to={'/auth'} />;
   }
 
   if (redirectHome) {
     // return <Navigate to={'/landingPage'} />;
-    return <Navigate to={"/"} />;
+    return <Navigate to={'/'} />;
   }
 
   const login = (
@@ -146,7 +145,7 @@ export const Reset = () => {
             </div>
             <div className="flex flex-row justify-center items-center">
               <div
-                className="cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full"
+                className="cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full"
                 onClick={handleSubmit}
               >
                 Reset Password
@@ -164,7 +163,7 @@ export const Reset = () => {
         </div>
         <div className="flex flex-col justify-center items-center gap-[16px]">
           <div
-            className="cursor-pointer flex flex-row justify-center items-center bg-white hover:opacity-90 text-mediumspringgreen h-[49px] shrink-0 rounded w-full outline outline-mediumspringgreen outline-[1.5px]"
+            className="cursor-pointer flex flex-row justify-center items-center bg-white hover:opacity-90 text-bgPrimary h-[49px] shrink-0 rounded w-full outline outline-bgPrimary outline-[1.5px]"
             onClick={() => {
               setRedirect(true);
             }}
@@ -178,7 +177,7 @@ export const Reset = () => {
             Already have an account?
           </div>
           <div
-            className="cursor-pointer text-smi leading-[22px] text-mediumspringgreen hover:text-opacity-80 inline-block"
+            className="cursor-pointer text-smi leading-[22px] text-bgPrimary hover:text-opacity-80 inline-block"
             onClick={() => {
               setRedirect(true);
             }}

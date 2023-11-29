@@ -1,8 +1,4 @@
 import React, { useState } from 'react';
-import { RxCopy } from 'react-icons/rx';
-import { AiOutlineSearch } from 'react-icons/ai';
-import { MdQrCodeScanner } from 'react-icons/md';
-import { AiFillApple, AiOutlineClose } from 'react-icons/ai';
 
 export const TokenCardContainer = (props) => {
   const { token, setToken, setIsTokenPage, mode, service } = props;
@@ -96,7 +92,7 @@ export const TokenCard = (props) => {
         <div className="flex flex-row justify-between mt-[24px]">
           <div
             className={`mt-[24px] p-2 text-lg font-sans font-bold inline-block ${
-              mode === true ? 'text-mediumspringgreen' : 'text-white'
+              mode === true ? 'text-bgPrimary' : 'text-white'
             }`}
           >
             {'Select a token'}

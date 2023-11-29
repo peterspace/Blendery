@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 import { getTransactionRate } from '../../../redux/features/transaction/transactionSlice';
 
 import { BsCreditCard } from 'react-icons/bs';
@@ -11,6 +10,8 @@ import {
   getTokenExchangeRate,
   getTransactionRateInfo,
 } from '../../../services/apiService';
+import { getTokenListExchange } from '../../../redux/features/token/tokenSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 export const BuyCardScreen1 = (props) => {
   const {
@@ -33,8 +34,6 @@ export const BuyCardScreen1 = (props) => {
     setTxInfo,
     allTokensFrom,
     allTokensTo,
-    exchangeRate,
-    transactionRates,
     paymentMethod,
     setPaymentMethod,
     paymentOptions,
@@ -45,14 +44,21 @@ export const BuyCardScreen1 = (props) => {
     country,
     cityData,
     city,
-    tValue,
+    transactionRates,
+    loadingExchangeRate,
   } = props;
+
+  const dispatch = useDispatch();
 
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
   /*********************************************     LOCAL STATES    **************************************************** */
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
+  //======================={RATES and PRICES}========================================================
+  const tValue = transactionRates ? transactionRates?.tValueFormatted : 0;
+  const exchangeRate = transactionRates ? transactionRates?.exchangeRate : 0;
+
   const [isNotCountrySupported, setIsNotCountrySupported] = useState(false);
   //================{Cards}==================================================
   const [isFromTokenPage, setIsFromTokenPage] = useState(false);
@@ -61,6 +67,11 @@ export const BuyCardScreen1 = (props) => {
   const [filteredtTokens, setFilteredtTokens] = useState();
 
   //============================================{Token selection}==============================
+  useEffect(() => {
+    dispatch(getTokenListExchange());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     if (allTokensFrom) {
       filterFTokens();
@@ -146,7 +157,7 @@ export const BuyCardScreen1 = (props) => {
       {isFromTokenPage === false && isToTokenPage === false ? (
         <div className="flex flex-col gap-[24px]">
           <div className="flex flex-col w-[300px] md:w-[452px] gap-[8px]">
-            <div className="flex flex-row bg-whitesmoke-100 rounded justify-between h-[57px]">
+            <div className="flex flex-row bg-bgSecondary rounded justify-between h-[57px]">
               <div className="ml-2 flex flex-row gap-[8px] items-center w-[370px] md:w-[452px] mt-[13px]">
                 <div className="">
                   {paymentMethod === 'card' && (
@@ -226,13 +237,14 @@ export const BuyCardScreen1 = (props) => {
             ) : (
               <div className="flex flex-row justify-between">
                 <div className="h-3 py-2">
-                  1 {fToken?.symbol.toUpperCase()} ~ {exchangeRate}{' '}
+                  1 {fToken?.symbol.toUpperCase()} ~{' '}
+                  {loadingExchangeRate ? 'fetching rates' : exchangeRate}{' '}
                   {tToken?.symbol.toUpperCase()}
                 </div>
                 {/* <div className="h-3 py-2">{isToLoading
                           ? 'Fetching price...'
                           : `${`1 ${fToken?.symbol.toUpperCase()} = ${exchangeRate}  ${tToken?.symbol.toUpperCase()}`}`}</div> */}
-                <div className="rounded bg-whitesmoke-100 p-2">
+                <div className="rounded bg-bgSecondary p-2">
                   <img
                     className="w-3.5 h-3 overflow-hidden"
                     alt=""
@@ -289,7 +301,7 @@ export const BuyCardScreen1 = (props) => {
           </div>
           {paymentMethod === 'cash' ? (
             <div className="flex flex-col w-[300px] md:w-[452px] gap-[8px]">
-              <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between">
+              <div className="flex flex-row bg-bgSecondary rounded h-[62px] justify-between">
                 <div className="w-[300px] md:w-[452px]">
                   <div className="ml-2 mt-2 text-xs leading-[18px] text-darkslategray-200">
                     Country of residence
@@ -313,7 +325,7 @@ export const BuyCardScreen1 = (props) => {
                   </div>
                 </div>
               </div>
-              <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between">
+              <div className="flex flex-row bg-bgSecondary rounded h-[62px] justify-between">
                 <div className="w-[300px] md:w-[452px]">
                   <div className="ml-2 mt-2 text-xs leading-[18px] text-darkslategray-200">
                     City
@@ -340,7 +352,7 @@ export const BuyCardScreen1 = (props) => {
             </div>
           ) : (
             <div className="flex flex-col w-[300px] md:w-[452px] gap-[8px]">
-              <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between">
+              <div className="flex flex-row bg-bgSecondary rounded h-[62px] justify-between">
                 <div className="w-[300px] md:w-[452px]">
                   <div className="ml-2 mt-2 text-xs leading-[18px] text-darkslategray-200">
                     Country of residence
@@ -371,7 +383,7 @@ export const BuyCardScreen1 = (props) => {
             <>
               {country === 'Russia' ? (
                 <div
-                  className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded-md"
+                  className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded-md"
                   onClick={nextFunc}
                 >
                   {`${service} ${fToken?.symbol.toUpperCase()} now`}
@@ -387,7 +399,7 @@ export const BuyCardScreen1 = (props) => {
           ) : (
             <>
               <div
-                className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded-md"
+                className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded-md"
                 onClick={nextFunc}
               >
                 {`${service} ${fToken?.symbol.toUpperCase()} now`}

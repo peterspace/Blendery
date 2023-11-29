@@ -8,9 +8,12 @@ import {
   getTransactionByTxId,
   getTransactionByTxIdInternal,
 } from '../../../redux/features/transaction/transactionSlice';
+import { createTransactionService } from '../../../services/apiService';
+
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { getTokenListExchange } from '../../../redux/features/token/tokenSlice';
 
 export const BuyCardScreen3 = (props) => {
   const {
@@ -32,6 +35,8 @@ export const BuyCardScreen3 = (props) => {
     phone,
     country,
     city,
+    transactionRates,
+    loadingExchangeRate,
   } = props;
 
   const dispatch = useDispatch();
@@ -42,13 +47,9 @@ export const BuyCardScreen3 = (props) => {
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
   const { user } = useSelector((state) => state.user);
-  const createTransactionResponse = useSelector(
-    (state) => state.transaction?.createTransaction
-  );
+
   //======================={RATES and PRICES}========================================================
-  const transactionRates = useSelector(
-    (state) => state.transaction?.getTransactionRate
-  );
+
   console.log({ transactionRates: transactionRates });
   const youSend = transactionRates ? transactionRates?.youSend : 0;
   const youGet = transactionRates ? transactionRates?.youGet : 0;
@@ -68,7 +69,7 @@ export const BuyCardScreen3 = (props) => {
   console.log({ transactionRatesLoading: transactionRatesLoading });
   //===={To be added}========
   const amount = transactionRates ? transactionRates?.amount : 0;
- 
+
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
   /*********************************************     REACT STATES    **************************************************** */
@@ -79,15 +80,31 @@ export const BuyCardScreen3 = (props) => {
   const [isSend, setIsSend] = useState(false);
 
   useEffect(() => {
-    if (createTransactionResponse) {
-      setTxInfo(createTransactionResponse);
-      let txData = createTransactionResponse;
-      dispatch(getTransactionByTxId(txData?._id)); // fetch updated transaction every minute
-      dispatch(getTransactionByTxIdInternal(createTransactionResponse));
-      navigate(`buyCard/${txData?._id}`); // proceed to stage 3
-    }
+    dispatch(getTokenListExchange());
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [createTransactionResponse]);
+  }, []);
+  async function newFunc() {
+    //================{new updates}===============================
+    localStorage.removeItem('fTokenBuyCard');
+    localStorage.removeItem('tTokenBuyCard');
+    localStorage.removeItem('fValueBuyCard');
+    localStorage.removeItem('transactionRatesBuyCard');
+    //================{new updates}===============================
+
+    localStorage.removeItem('telegram');
+    localStorage.removeItem('userAddress');
+    localStorage.removeItem('benderyAddress');
+    localStorage.removeItem('country');
+    localStorage.removeItem('cityData');
+    localStorage.removeItem('city');
+    localStorage.removeItem('paymentMethod');
+    localStorage.removeItem('txInfo');
+    localStorage.removeItem('percentageProgressBuyCard');
+    localStorage.removeItem('percentageProgressHome');
+    localStorage.removeItem('blockchainNetworkE');
+    localStorage.removeItem('provider');
+    dispatch(getTransactionByTxIdInternal(null));
+  }
 
   const submitTransaction = async () => {
     if (Number(fValue) < 0) {
@@ -122,7 +139,15 @@ export const BuyCardScreen3 = (props) => {
       phone,
     };
 
-    dispatch(createTransaction(userData));
+    const response = await createTransactionService(userData);
+    if (response?._id) {
+      newFunc();
+      dispatch(getTransactionByTxId(response?._id));
+      dispatch(getTransactionByTxIdInternal(response));
+      setTimeout(() => {
+        navigate(`/buyCard`); // proceed to stage 3
+      }, 200);
+    }
   };
 
   useEffect(() => {
@@ -157,6 +182,12 @@ export const BuyCardScreen3 = (props) => {
                 bankName={bankName}
                 cardNumber={cardNumber}
                 phone={phone}
+                fToken={fToken}
+                tToken={tToken}
+                fValue={fValue}
+                userAddress={userAddress}
+                transactionRates={transactionRates}
+                loadingExchangeRate={loadingExchangeRate}
               />
               <Signup
                 setIsCheckout={setIsCheckout}
@@ -178,6 +209,12 @@ export const BuyCardScreen3 = (props) => {
                 bankName={bankName}
                 cardNumber={cardNumber}
                 phone={phone}
+                fToken={fToken}
+                tToken={tToken}
+                fValue={fValue}
+                userAddress={userAddress}
+                transactionRates={transactionRates}
+                loadingExchangeRate={loadingExchangeRate}
               />
               <Confirm submitTransaction={setIsSend} />
             </div>

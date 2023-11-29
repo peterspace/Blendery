@@ -59,10 +59,7 @@ export const Providers = (props) => {
 };
 
 export const SendFundCardSell = (props) => {
-  const {
-    txData,
-    setRefetchTxData,
-  } = props;
+  const { txData, setRefetchTxData } = props;
   const [blockChainData, setBlockChainData] = useState();
 
   //========{begin to monitor transaction after this click}=========================
@@ -134,7 +131,7 @@ export const SendFundCardSell = (props) => {
                 blockchain: {txData?.fToken?.chain}
               </div>
               <div className="flex flex-row gap-2 mt-2">
-                <div className=" cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]">
+                <div className=" cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]">
                   <div className="flex flex-row gap-2">
                     <RxCopy size={15} color="#ffffff" />
                     <div className="leading-[20px] inline-block">
@@ -157,7 +154,7 @@ export const SendFundCardSell = (props) => {
         </div>
         <div className="flex bg-lightslategray-300 md:w-[452px] w-[370px] h-px" />
         <div
-          className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded-md"
+          className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded-md"
           onClick={updateTransaction}
         >
           Paid

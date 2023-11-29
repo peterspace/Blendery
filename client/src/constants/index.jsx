@@ -20,41 +20,158 @@ import {
   // goerli,
 } from '../assets/networkOptions';
 
+// updated
+
+export const banksOptions = [
+  {
+    name: 'Sberbank',
+    nameRu: 'Sberbank',
+    image: `https://res.cloudinary.com/datkh2oxv/image/upload/v1701282316/blendery/banks/Sber.png`,
+  },
+  {
+    name: 'VTB Bank',
+    nameRu: 'VTB Bank',
+    image: `https://res.cloudinary.com/datkh2oxv/image/upload/v1701284628/blendery/banks/Vtb.png`,
+  },
+  {
+    name: 'Alfa Bank',
+    nameRu: 'Alfa Bank',
+    image: `https://res.cloudinary.com/datkh2oxv/image/upload/v1701282312/blendery/banks/AlfaBank.png`,
+  },
+
+  {
+    name: 'Tinkoff Bank',
+    nameRu: 'Tinkoff Bank',
+    image: `https://res.cloudinary.com/datkh2oxv/image/upload/v1701282317/blendery/banks/Tinkoff.png`,
+  },
+  {
+    name: 'Bank Saint-Petersburg',
+    nameRu: 'Bank Saint-Petersburg',
+    image: `https://res.cloudinary.com/datkh2oxv/image/upload/v1701282315/blendery/banks/BankSaintPetersburg.png`,
+  },
+  {
+    name: 'Sovcombank',
+    nameRu: 'Sovcombank',
+    image: `https://res.cloudinary.com/datkh2oxv/image/upload/v1701282316/blendery/banks/Sovcombank.png`,
+  },
+  {
+    name: 'Gazprombank',
+    nameRu: 'Gazprombank',
+    image: `https://res.cloudinary.com/datkh2oxv/image/upload/v1701282314/blendery/banks/Gazprombank.png`,
+  },
+  {
+    name: 'Rosbank',
+    nameRu: 'Rosbank',
+    image: `https://res.cloudinary.com/datkh2oxv/image/upload/v1701282315/blendery/banks/Rosbank.png`,
+  },
+  {
+    name: 'Raiffeisenbank',
+    nameRu: 'Raiffeisenbank',
+    image: `https://res.cloudinary.com/datkh2oxv/image/upload/v1701282315/blendery/banks/Raiffeisenbank.png`,
+  },
+  {
+    name: 'Absolut Bank',
+    nameRu: 'Absolut Bank',
+    image: `https://res.cloudinary.com/datkh2oxv/image/upload/v1701282312/blendery/banks/AbsolutBank.png`,
+  },
+  {
+    name: 'Bank Otkritie',
+    nameRu: 'Bank Otkritie',
+    image: `https://res.cloudinary.com/datkh2oxv/image/upload/v1701282317/blendery/banks/Otkritie.png`,
+  },
+  {
+    name: 'Citibank',
+    nameRu: 'Citibank',
+    image: `https://res.cloudinary.com/datkh2oxv/image/upload/v1701282313/blendery/banks/Citibank.png`,
+  },
+  {
+    name: 'MTS Bank',
+    nameRu: 'MTS Bank',
+    image: `https://res.cloudinary.com/datkh2oxv/image/upload/v1701282314/blendery/banks/MTSBank.png`,
+  },
+];
+
+export const cardsOptions = [
+  {
+    name: 'Mastercard',
+    image: `https://res.cloudinary.com/datkh2oxv/image/upload/v1701282314/blendery/banks/Mastercard.png`,
+    digits: 16,
+    spacing: 4,
+  },
+  {
+    name: 'Visa',
+    image: `https://res.cloudinary.com/datkh2oxv/image/upload/v1701282322/blendery/banks/visacard.png`,
+    digits: 16,
+    spacing: 4,
+  },
+  {
+    name: 'Mir',
+    image: `https://res.cloudinary.com/datkh2oxv/image/upload/v1701282313/blendery/banks/Mir.png`,
+    digits: 16,
+    spacing: 4,
+  },
+];
+
 export const networksOptions = [
   {
-    chainId: '1',
+    id: 1,
+    idPrice: 'ethereum',
     name: 'Ethereum',
     symbol: 'eth',
+    chainSymbol: 'ETH',
     balanceSymbol: 'ETH',
     image: ethereum,
+    decimals: 18,
+    address: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+    chainId: '1',
   },
   {
-    chainId: '56',
+    id: 56,
+    idPrice: 'bnb',
     name: 'BNB Chain',
     symbol: 'bnb',
+    chainSymbol: 'BNB',
     balanceSymbol: 'BNB',
     image: bsc,
+    decimals: 18,
+    address: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+    chainId: '56',
   },
   {
-    chainId: '137',
+    id: 137,
+    idPrice: 'matic-network',
     name: 'Polygon',
     symbol: 'matic',
+    chainSymbol: 'MATIC',
     balanceSymbol: 'MATIC',
     image: polygon,
+    decimals: 18,
+    address: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+    chainId: '137',
   },
   {
-    chainId: '10',
+    id: 10,
+    idPrice: 'optimism',
     name: 'Optimism',
     symbol: 'op',
+    chainSymbol: 'OP',
     balanceSymbol: 'ETH',
     image: optimism,
+    decimals: 18,
+    address: '0x4200000000000000000000000000000000000042',
+    chainId: '10',
   },
   {
-    chainId: '42161',
+    id: 42161,
+    idPrice: 'ethereum',
     name: 'Arbitrum',
     symbol: 'arbitrum',
+    chainSymbol: 'ARBITRUM',
     balanceSymbol: 'ETH',
     image: arbitrum,
+    decimals: 18,
+    address: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+    chainId: '42161',
   },
 ];
 export const walletOptions = [

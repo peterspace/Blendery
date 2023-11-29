@@ -2,6 +2,27 @@ import React, { useState, useEffect } from 'react';
 import { TokenCardNetworks } from './TokenCardNetworks';
 import { networksOptions } from '../constants';
 import { TokenCard } from './TokenCard';
+import { ConnectWalletCard } from './ConnectWalletCard';
+import { SlippageCard } from './SlippageCard';
+import { useDispatch, useSelector } from 'react-redux';
+import { IoMdSettings } from 'react-icons/io';
+import { TbLogout2 } from 'react-icons/tb';
+import {
+  useConnect,
+  useAccount,
+  useSwitchNetwork,
+  useSigner,
+  useBalance,
+  useDisconnect,
+} from 'wagmi';
+import { getTokensDefiByIdService } from '../services/apiService';
+import { getTokensDefiById } from '../redux/features/token/tokenSlice';
+import {
+  updateIsChangeChainId,
+  updateConnectedNetwork,
+  updateChain,
+} from '../redux/features/swap/swapSlice';
+
 //android small = w-[320px]/ 352px
 //iphone = w-[340px]/ 372px
 export const EstimatorDefi = (props) => {
@@ -20,19 +41,46 @@ export const EstimatorDefi = (props) => {
     allTokensTo,
     exchangeRate,
     transactionRates,
-    blockchainNetwork,
-    setBlockchainNetwork,
+    chain,
+    // setChain,
     setPercentageProgress,
+    //================={new}=================================================
+    isFromLoading,
+    fromBalance,
+    fromPrice,
+    toPrice,
+    isToLoading,
+    toBalance,
+    priceDeviation,
+    tValue,
+    fromBalancePercent,
   } = props;
   //======================={RATES and PRICES}========================================================
-  const tValue = transactionRates ? transactionRates?.tValueFormatted : 0;
+
+  const dispatch = useDispatch();
+  const { switchNetwork } = useSwitchNetwork();
+  const { isConnected } = useAccount();
+  const { disconnect } = useDisconnect();
+
   //================{CARDS}==================
   const [isNetworkPage, setIsNetworkPage] = useState(false);
   const [isFromTokenPage, setIsFromTokenPage] = useState(false);
   const [isToTokenPage, setIsToTokenPage] = useState(false);
   const [filteredfTokens, setFilteredfTokens] = useState();
   const [filteredtTokens, setFilteredtTokens] = useState();
-  const [isChainChange, setIsChainChange] = useState(false);
+  const [isWalletPage, setIsWalletPage] = useState(false);
+  const [isSlippagePage, setIsSlippagePage] = useState(false);
+  const [checkChain, setCheckChain] = useState();
+  console.log({ checkChain: checkChain });
+
+  const connectedNetworkSwitchL = useSelector(
+    (state) => state.swap?.connectedNetwork
+  );
+
+  /**
+   * slippage tolerance info box content (reference: changely)
+   * During the processing of a transaction, the exchange rate may change. If the price changes by more than this percentage, the transaction will revert
+   */
 
   //============================================{Token selection}==============================
   useEffect(() => {
@@ -83,26 +131,94 @@ export const EstimatorDefi = (props) => {
   }
   //====================================================================================
 
+  //====================================={Token Switchh}===============================================
+
+  function swapTokensPosition() {
+    let tmpToken = fToken;
+    setFromToken(tToken);
+    setToToken(tmpToken);
+  }
+
+  // whenever the user connects to a wallet e.g metamask or switches wallet while connected, reopen chainModal to update chain
+  useEffect(() => {
+    if (connectedNetworkSwitchL === true) {
+      setIsNetworkPage(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [connectedNetworkSwitchL]);
+
+  async function getConnectedChain() {
+    const response = await getTokensDefiByIdService(checkChain?.chainId);
+    if (response) {
+      dispatch(getTokensDefiById(response));
+    }
+
+    // window.location.reload(); // reconsider removing
+  }
+
+  useEffect(() => {
+    if (checkChain && isConnected) {
+      getConnectedChain();
+      dispatch(updateChain(checkChain));
+      switchNetwork(checkChain?.id);
+      dispatch(updateIsChangeChainId(true));
+      dispatch(updateConnectedNetwork(false));
+      localStorage.setItem('chainSwitch', JSON.stringify(true));
+      setIsNetworkPage(false);
+    }
+    if (checkChain && !isConnected) {
+      getConnectedChain();
+      dispatch(updateChain(checkChain));
+      dispatch(updateIsChangeChainId(true));
+      dispatch(updateConnectedNetwork(false));
+      localStorage.setItem('chainSwitch', JSON.stringify(true));
+      setIsNetworkPage(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [checkChain]);
+
   const estimator = (
     <div className="flex justify-center rounded-lg bg-white shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[320px] xs:w-[340px] md:w-[500px] p-4">
       {isNetworkPage === false &&
       isFromTokenPage === false &&
+      isWalletPage === false &&
       isToTokenPage === false ? (
         <div className="flex flex-col gap-[24px]">
           <div className="flex flex-col gap-[10px]">
             <div className="flex flex-row justify-between mt-[24px]">
               <div
-                className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] inline-block text-darkslategray-200 text-[24px]`}
+                className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block text-darkslategray-200 text-[24px]`}
               >
                 Calculate amount
               </div>
-              <div
-                className="cursor-pointer flex flex-row justify-center items-center bg-whitesmoke-100 hover:opacity-90 text-mediumspringgreen shrink-0 rounded px-6 py-3"
-                onClick={() => {
-                  setPercentageProgress(1);
-                }}
-              >
-                Back
+              <div className="flex flex-row">
+                <div
+                  className="cursor-pointer flex flex-row justify-center items-center hover:opacity-90 text-white rounded p-2"
+                  onClick={() => {
+                    setIsSlippagePage(true);
+                  }}
+                >
+                  <IoMdSettings size={24} color="#4f46e5" />
+                </div>
+                {isConnected && (
+                  <div
+                    className="cursor-pointer flex flex-row justify-center items-center hover:opacity-90 text-white rounded p-2"
+                    onClick={() => {
+                      disconnect();
+                    }}
+                  >
+                    <TbLogout2 size={24} color="#4f46e5" />
+                  </div>
+                )}
+
+                <div
+                  className="cursor-pointer flex flex-row justify-center items-center bg-bgSecondary hover:opacity-90 text-bgPrimary shrink-0 rounded px-6 py-3"
+                  onClick={() => {
+                    setPercentageProgress(1);
+                  }}
+                >
+                  Back
+                </div>
               </div>
             </div>
             <div className="flex bg-lightslategray-300 md:w-[452px] w-[300px] h-px" />
@@ -117,15 +233,15 @@ export const EstimatorDefi = (props) => {
                   <div className="flex justify-center items-center flex-shrink-0">
                     <img
                       className="w-[24px] h-$ shrink-0 overflow-hidden rounded-full"
-                      src={blockchainNetwork?.image}
-                      alt={blockchainNetwork.symbol}
+                      src={chain?.image}
+                      alt={chain.symbol}
                     />
                   </div>
                   <div className="flex flex-row gap-1">
                     <div
                       className={`text-base font-sans font-medium leading-[24px] inline-block text-black`}
                     >
-                      {blockchainNetwork.name}
+                      {chain.name}
                     </div>
                   </div>
                 </div>
@@ -140,44 +256,66 @@ export const EstimatorDefi = (props) => {
             </div>
 
             <div className="flex justify-center items-center rounded-lg shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] p-1 bg-gray-100 outline outline-lightslategray-300 outline-[1px]">
-              <div className="flex flex-row justify-between w-[300px] md:w-[452px] items-center p-1">
-                <div className="flex flex-col items-start h-[44px]">
-                  <div className="ml-2 mt-2 text-xs text-darkgray-200">
-                    {/* You send */}
-                    {fTitle}
-                  </div>
-                  <input
-                    type="text"
-                    className="ml-2 font-bold text-lg leading-[24px] text-darkslategray-200 inline-block w-[90%] outline-none bg-gray-100 placeholder-darkgray-100"
-                    placeholder="0.1"
-                    value={fValue}
-                    onChange={onFromValueChanged}
-                  />
-                </div>
-                <div className="flex flex-row items-start">
-                  <div className="flex items-center bg-whitesmoke-200 w-[121px] h-[44px] rounded-md">
-                    <div
-                      className="cursor-pointer flex flex-row justify-between w-[121px] ml-[12px]"
-                      onClick={() => setIsFromTokenPage(true)}
-                    >
-                      <div className="flex flex-row items-center gap-2">
-                        {/* <FaBitcoin size={20} color={'#f97316'} /> */}
-                        <img
-                          className="w-[40px] h-$ shrink-0 overflow-hidden rounded-full"
-                          alt={fToken?.name}
-                          src={fToken?.image}
-                        />
-                        <span className="font-bold text-[16px] text-darkslategray-200 inline-block">
-                          {/* BTC */}
-                          {fToken?.symbol.toUpperCase()}
-                        </span>
-                      </div>
-                      <img
-                        className="mr-2 top-[280px] w-[18px] h-[48px] overflow-hidden"
-                        alt=""
-                        src="/frame19.svg"
-                      />
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-row justify-between w-[300px] md:w-[452px] items-center p-1">
+                  <div className="flex flex-col items-start h-[44px]">
+                    <div className="ml-2 mt-2 text-xs text-darkgray-200">
+                      {/* You send */}
+                      {fTitle}
                     </div>
+                    <input
+                      type="text"
+                      className="ml-2 font-bold text-lg leading-[24px] text-darkslategray-200 inline-block w-[90%] outline-none bg-gray-100 placeholder-darkgray-100"
+                      placeholder="0.1"
+                      value={fValue}
+                      onChange={onFromValueChanged}
+                    />
+                  </div>
+                  <div className="flex flex-row items-start">
+                    <div className="flex items-center bg-whitesmoke-200 w-[121px] h-[44px] rounded-md mr-2">
+                      <div
+                        className="cursor-pointer flex flex-row justify-between w-[121px] ml-[12px]"
+                        onClick={() => setIsFromTokenPage(true)}
+                      >
+                        <div className="flex flex-row items-center gap-2">
+                          {/* <FaBitcoin size={20} color={'#f97316'} /> */}
+                          <img
+                            className="w-[40px] h-$ shrink-0 overflow-hidden rounded-full"
+                            alt={fToken?.name}
+                            src={fToken?.image}
+                          />
+                          <span className="font-bold text-[16px] text-darkslategray-200 inline-block">
+                            {/* BTC */}
+                            {fToken?.symbol.toUpperCase()}
+                          </span>
+                        </div>
+                        <img
+                          className="mr-2 top-[280px] w-[18px] h-[48px] overflow-hidden"
+                          alt=""
+                          src="/frame19.svg"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-row justify-between w-[300px] md:w-[452px] items-center p-1">
+                  <div className="ml-2 mt-2 text-xs text-darkgray-200">
+                    {/* fromBalance */}
+                    {isFromLoading
+                      ? ''
+                      : `Balance: ${fromBalance.toString() || ''}`}
+                  </div>
+                  <div className="ml-2 mt-2 text-xs text-darkgray-200 mr-2">
+                    {/* fromprice */}
+                    {isFromLoading
+                      ? ''
+                      : `~$${
+                          fValue
+                            ? new Intl.NumberFormat().format(
+                                Number(fValue) * Number(fromPrice)
+                              )
+                            : ''
+                        }`}
                   </div>
                 </div>
               </div>
@@ -191,7 +329,10 @@ export const EstimatorDefi = (props) => {
               {/* <div className="h-3 py-2">{isToLoading
                           ? 'Fetching price...'
                           : `${`1 ${fToken?.symbol.toUpperCase()} = ${exchangeRate}  ${tToken?.symbol.toUpperCase()}`}`}</div> */}
-              <div className="rounded bg-whitesmoke-100 p-2">
+              <div
+                className="cursor-pointer rounded bg-bgSecondary p-2"
+                onClick={swapTokensPosition}
+              >
                 <img
                   className="w-3.5 h-3 overflow-hidden"
                   alt=""
@@ -200,68 +341,115 @@ export const EstimatorDefi = (props) => {
               </div>
             </div>
             <div className="flex justify-center items-center rounded-lg shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] p-1 bg-gray-100 outline outline-lightslategray-300 outline-[1px]">
-              <div className="flex flex-row justify-between w-[300px] md:w-[452px] items-center p-1">
-                <div className="flex flex-col items-start h-[44px]">
-                  <div className="ml-2 mt-2 text-xs text-darkgray-200">
-                    {/* You send */}
-                    {tTitle}
-                  </div>
-                  <input
-                    type="text"
-                    className="ml-2 font-bold text-lg leading-[24px] text-darkslategray-200 inline-block w-[90%] outline-none bg-gray-100 placeholder-darkgray-100"
-                    placeholder="0.1"
-                    // value={`~ ${tValue}`}
-                    // value={`~ ${1.675}`}
-                    value={loading ? 'loading' : `~ ${tValue}`}
-                    disabled={true}
-                  />
-                </div>
-                <div className="flex flex-row items-start">
-                  <div className="flex items-center bg-whitesmoke-200 w-[121px] h-[44px] rounded-md">
-                    <div
-                      className="cursor-pointer flex flex-row justify-between w-[121px] ml-[12px]"
-                      onClick={() => setIsToTokenPage(true)}
-                    >
-                      <div className="flex flex-row items-center gap-2">
-                        {/* <FaEthereum size={20} color={'#3f3f46'} /> */}
-                        <img
-                          className="w-[40px] h-$ shrink-0 overflow-hidden rounded-full"
-                          alt={tToken?.name}
-                          src={tToken?.image}
-                        />
-                        <span className="font-bold text-[16px] text-darkslategray-200 inline-block">
-                          {/* ETH */}
-                          {tToken?.symbol.toUpperCase()}
-                        </span>
-                      </div>
-                      <img
-                        className="mr-2 top-[280px] w-[18px] h-[48px] overflow-hidden"
-                        alt=""
-                        src="/frame19.svg"
-                      />
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-row justify-between w-[300px] md:w-[452px] items-center p-1">
+                  <div className="flex flex-col items-start h-[44px]">
+                    <div className="ml-2 mt-2 text-xs text-darkgray-200">
+                      {/* You send */}
+                      {tTitle}
                     </div>
+                    <input
+                      type="text"
+                      className="ml-2 font-bold text-lg leading-[24px] text-darkslategray-200 inline-block w-[90%] outline-none bg-gray-100 placeholder-darkgray-100"
+                      placeholder="0.1"
+                      // value={`~ ${tValue}`}
+                      // value={`~ ${1.675}`}
+                      value={loading ? 'loading' : `~ ${tValue}`}
+                      disabled={true}
+                    />
+                  </div>
+                  <div className="flex flex-row items-start">
+                    <div className="flex items-center bg-whitesmoke-200 w-[121px] h-[44px] rounded-md mr-2">
+                      <div
+                        className="cursor-pointer flex flex-row justify-between w-[121px] ml-[12px]"
+                        onClick={() => setIsToTokenPage(true)}
+                      >
+                        <div className="flex flex-row items-center gap-2">
+                          {/* <FaEthereum size={20} color={'#3f3f46'} /> */}
+                          <img
+                            className="w-[40px] h-$ shrink-0 overflow-hidden rounded-full"
+                            alt={tToken?.name}
+                            src={tToken?.image}
+                          />
+                          <span className="font-bold text-[16px] text-darkslategray-200 inline-block">
+                            {/* ETH */}
+                            {tToken?.symbol.toUpperCase()}
+                          </span>
+                        </div>
+                        <img
+                          className="mr-2 top-[280px] w-[18px] h-[48px] overflow-hidden"
+                          alt=""
+                          src="/frame19.svg"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-row justify-between w-[300px] md:w-[452px] items-center p-1">
+                  <div className="ml-2 mt-2 text-xs text-darkgray-200">
+                    {/* fromBalance */}
+                    {isToLoading
+                      ? ''
+                      : `Balance: ${toBalance.toString() || ''}`}
+                  </div>
+                  <div className="ml-2 mt-2 text-xs text-darkgray-200 mr-2">
+                    {/* fromprice */}
+                    {isToLoading
+                      ? ''
+                      : `~$${
+                          tValue
+                            ? new Intl.NumberFormat().format(
+                                Number(tValue) * Number(toPrice)
+                              )
+                            : ''
+                        } (-${priceDeviation ? priceDeviation : ''}%)`}
                   </div>
                 </div>
               </div>
             </div>
           </div>
+          {/* Control Logic for connect and swap */}
+          {!isConnected && (
+            <div
+              className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded-md"
+              onClick={() => {
+                setIsWalletPage(true);
+              }}
+            >
+              Connect Wallet
+            </div>
+          )}
+          {isConnected && (
+            <div
+              className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded-md"
+              onClick={() => {
+                setPercentageProgress(3);
+              }}
+            >
+              Next
+            </div>
+          )}
         </div>
       ) : null}
       <>
         {/* =============================={FROM TOKEN COMPONENT: PART THREE}========================== */}
         {isNetworkPage === true &&
         isFromTokenPage === false &&
+        isWalletPage === false &&
+        isSlippagePage === false &&
         isToTokenPage === false ? (
           <TokenCardNetworks
             setIsTokenPage={setIsNetworkPage}
-            setToken={setBlockchainNetwork}
+            // setToken={setChain}
+            setToken={setCheckChain}
             allTokens={networksOptions}
             service={service}
-            setIsChainChange={setIsChainChange}
           />
         ) : null}
         {isNetworkPage === false &&
         isFromTokenPage === true &&
+        isWalletPage === false &&
+        isSlippagePage === false &&
         isToTokenPage === false ? (
           <TokenCard
             setIsTokenPage={setIsFromTokenPage}
@@ -272,10 +460,11 @@ export const EstimatorDefi = (props) => {
             service={service}
           />
         ) : null}
-
         {/* ===================={To TOKEN COMPONENT: PART THREE}=================================== */}
         {isNetworkPage === false &&
         isFromTokenPage === false &&
+        isWalletPage === false &&
+        isSlippagePage === false &&
         isToTokenPage === true ? (
           <TokenCard
             setIsTokenPage={setIsToTokenPage}
@@ -285,6 +474,20 @@ export const EstimatorDefi = (props) => {
             allTokens={allTokensTo}
             service={service}
           />
+        ) : null}
+        {isNetworkPage === false &&
+        isFromTokenPage === false &&
+        isWalletPage === true &&
+        isSlippagePage === false &&
+        isToTokenPage === false ? (
+          <ConnectWalletCard setIsTokenPage={setIsWalletPage} />
+        ) : null}
+        {isNetworkPage === false &&
+        isFromTokenPage === false &&
+        isWalletPage === false &&
+        isSlippagePage === true &&
+        isToTokenPage === false ? (
+          <SlippageCard setIsTokenPage={setIsSlippagePage} />
         ) : null}
       </>
     </div>

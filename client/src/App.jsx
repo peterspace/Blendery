@@ -17,10 +17,7 @@ import { Dashboard } from './pages/Dashboard/Dashboard';
 import { Auth } from './pages/auth/Auth';
 import { Reset } from './pages/auth/Reset';
 import { Otp } from './pages/auth/Otp';
-import { TestCardPayments } from './components/TestCardPayments';
-import { AdminTransactionsPage } from './pages/Dashboard/AdminTransactionsPage';
 import { getTransactionByTxIdInternal } from './redux/features/transaction/transactionSlice';
-
 axios.defaults.withCredentials = true;
 
 function App() {
@@ -43,9 +40,12 @@ function App() {
     ? JSON.parse(localStorage.getItem('isLoggedIn'))
     : false;
 
+  // const modeL = localStorage.getItem('mode')
+  //   ? JSON.parse(localStorage.getItem('mode'))
+  //   : false;
   const modeL = localStorage.getItem('mode')
     ? JSON.parse(localStorage.getItem('mode'))
-    : false;
+    : true;
 
   const [mode, setMode] = useState(modeL);
   const serviceL = localStorage.getItem('service')
@@ -77,13 +77,12 @@ function App() {
   const { data } = useQuery(
     ['GET_ONE_USER_TRANSACTION'],
     async () => {
-      if (!txData?._id) {
-        return;
+      if (txData?._id) {
+        const { data } = await axios.get(
+          `${BACKEND_URL}/transaction/getTransactionByTxId/${txData?._id}`
+        );
+        return data;
       }
-      const { data } = await axios.get(
-        `${BACKEND_URL}/transaction/getTransactionByTxId/${txData?._id}`
-      );
-      return data;
     },
     {
       refetchInterval: 3000, // every 3 seconds
@@ -215,158 +214,163 @@ function App() {
 
   return (
     <div
-      className={`relative w-full h-screen overflow-auto text-left text-sm text-gray-400 font-montserrat ${
-        mode === true ? 'bg-white' : 'bg-bgDarker'
+      className={`flex flex-col justify-between w-full h-screen text-left text-sm text-gray-400 font-montserrat ${
+        mode === true ? 'bg-white' : 'bg-bgDarkMode'
       }`}
     >
       {' '}
       <BrowserRouter>
         <ToastContainer />
-        <Header mode={mode} setMode={setMode} user={user} />
-        <Routes>
-          <Route path="/adminTx" element={<AdminTransactionsPage />} />
+        <div className="h-[50px]">
+          <Header mode={mode} setMode={setMode} user={user} />
+        </div>
+        <div
+          className={`relative overflow-auto ${
+            mode === true ? 'bg-white' : 'bg-bgDarkMode'
+          }`}
+        >
+          <Routes>
+            <Route path="/resetpassword/:resetToken" element={<Reset />} />
+            <Route
+              path="/otp"
+              element={<Otp setUser={setUser} setIsLoggedIn={setIsLoggedIn} />}
+            />
+            <Route
+              path="/otp/:authId"
+              element={<Otp setUser={setUser} setIsLoggedIn={setIsLoggedIn} />}
+            />
+            <Route
+              path="/auth/success/:authId"
+              element={<Auth setUser={setUser} setIsLoggedIn={setIsLoggedIn} />}
+            />
+            <Route
+              path="/auth/failure/:message"
+              element={<Auth setUser={setUser} setIsLoggedIn={setIsLoggedIn} />}
+            />
+            <Route
+              path="/auth"
+              element={<Auth setUser={setUser} setIsLoggedIn={setIsLoggedIn} />}
+            />
+            <Route
+              path="/dashboard"
+              element={
+                <Dashboard
+                  mode={mode}
+                  setMode={setMode}
+                  user={user}
+                  service={service}
+                  setService={setService}
+                  setSubService={setSubService}
+                  txData={txData}
+                  setTxData={setTxData}
+                  setTxInfo={setTxInfo}
+                />
+              }
+            />
 
-          <Route path="/testCardPayments" element={<TestCardPayments />} />
-          <Route path="/testCardPayments/:id" element={<TestCardPayments />} />
+            <Route path="/coins" element={<CryptoHome />} />
+            <Route path="/coin/:id" element={<CryptoDetail />} />
+            <Route path="/logomarkets" element={<LogoMarkets />} />
+            {/* =================={using app container as home}======================= */}
+            <Route
+              path="/"
+              element={
+                <AppContainer
+                  mode={mode}
+                  setMode={setMode}
+                  user={user}
+                  service={service}
+                  setService={setService}
+                  subService={subService}
+                  setSubService={setSubService}
+                  setTxInfo={setTxInfo}
+                  txInfo={txInfo}
+                />
+              }
+            />
 
-          <Route path="/resetpassword/:resetToken" element={<Reset />} />
-          <Route
-            path="/otp"
-            element={<Otp setUser={setUser} setIsLoggedIn={setIsLoggedIn} />}
-          />
-          <Route
-            path="/otp/:authId"
-            element={<Otp setUser={setUser} setIsLoggedIn={setIsLoggedIn} />}
-          />
-          <Route
-            path="/auth/success/:authId"
-            element={<Auth setUser={setUser} setIsLoggedIn={setIsLoggedIn} />}
-          />
-          <Route
-            path="/auth/failure/:message"
-            element={<Auth setUser={setUser} setIsLoggedIn={setIsLoggedIn} />}
-          />
-          <Route
-            path="/auth"
-            element={<Auth setUser={setUser} setIsLoggedIn={setIsLoggedIn} />}
-          />
-          <Route
-            path="/dashboard"
-            element={
-              <Dashboard
-                mode={mode}
-                user={user}
-                service={service}
-                setService={setService}
-                subService={subService}
-                setSubService={setSubService}
-                setTxInfo={setTxInfo}
-                txInfo={txInfo}
-              />
-            }
-          />
-
-          <Route path="/coins" element={<CryptoHome />} />
-          <Route path="/coin/:id" element={<CryptoDetail />} />
-          <Route path="/logomarkets" element={<LogoMarkets />} />
-          {/* =================={using app container as home}======================= */}
-          <Route
-            path="/"
-            element={
-              <AppContainer
-                mode={mode}
-                user={user}
-                service={service}
-                setService={setService}
-                subService={subService}
-                setSubService={setSubService}
-                setTxInfo={setTxInfo}
-                txInfo={txInfo}
-              />
-            }
-          />
-
-          <Route path="/exchangePair" element={<ExchangePair />} />
-          <Route path="/transactionDetail" element={<TransactionDetail />} />
-          <Route
-            path="/buyCard/:id"
-            element={
-              <BuyCard
-                mode={mode}
-                user={user}
-                service={service}
-                subService={subService}
-                txInfo={txInfo}
-                setTxInfo={setTxInfo}
-              />
-            }
-          />
-          <Route
-            path="/buyCash/:id"
-            element={
-              <BuyCash
-                mode={mode}
-                user={user}
-                service={service}
-                subService={subService}
-                txInfo={txInfo}
-                setTxInfo={setTxInfo}
-              />
-            }
-          />
-          <Route
-            path="/sellCard/:id"
-            element={
-              <SellCard
-                mode={mode}
-                user={user}
-                service={service}
-                subService={subService}
-                txInfo={txInfo}
-                setTxInfo={setTxInfo}
-              />
-            }
-          />
-          <Route
-            path="/sellCash/:id"
-            element={
-              <SellCash
-                mode={mode}
-                user={user}
-                service={service}
-                subService={subService}
-                txInfo={txInfo}
-                setTxInfo={setTxInfo}
-              />
-            }
-          />
-          <Route
-            path="/defi/:id"
-            element={
-              <DeFi
-                mode={mode}
-                user={user}
-                service={service}
-                subService={subService}
-                txInfo={txInfo}
-                setTxInfo={setTxInfo}
-              />
-            }
-          />
-          <Route
-            path="/exchange/:id"
-            element={
-              <Exchange
-                mode={mode}
-                user={user}
-                service={service}
-                subService={subService}
-                txInfo={txInfo}
-                setTxInfo={setTxInfo}
-              />
-            }
-          />
-        </Routes>
+            <Route path="/exchangePair" element={<ExchangePair />} />
+            <Route path="/transactionDetail" element={<TransactionDetail />} />
+            <Route
+              path="/buyCard"
+              element={
+                <BuyCard
+                  mode={mode}
+                  user={user}
+                  service={service}
+                  subService={subService}
+                  txInfo={txInfo}
+                  setTxInfo={setTxInfo}
+                />
+              }
+            />
+            <Route
+              path="/buyCash"
+              element={
+                <BuyCash
+                  mode={mode}
+                  user={user}
+                  service={service}
+                  subService={subService}
+                  txInfo={txInfo}
+                  setTxInfo={setTxInfo}
+                />
+              }
+            />
+            <Route
+              path="/sellCard"
+              element={
+                <SellCard
+                  mode={mode}
+                  user={user}
+                  service={service}
+                  subService={subService}
+                  txInfo={txInfo}
+                  setTxInfo={setTxInfo}
+                />
+              }
+            />
+            <Route
+              path="/sellCash"
+              element={
+                <SellCash
+                  mode={mode}
+                  user={user}
+                  service={service}
+                  subService={subService}
+                  txInfo={txInfo}
+                  setTxInfo={setTxInfo}
+                />
+              }
+            />
+            <Route
+              path="/defi"
+              element={
+                <DeFi
+                  mode={mode}
+                  user={user}
+                  service={service}
+                  subService={subService}
+                  txInfo={txInfo}
+                  setTxInfo={setTxInfo}
+                />
+              }
+            />
+            <Route
+              path="/exchange"
+              element={
+                <Exchange
+                  mode={mode}
+                  user={user}
+                  service={service}
+                  subService={subService}
+                  txInfo={txInfo}
+                  setTxInfo={setTxInfo}
+                />
+              }
+            />
+          </Routes>
+        </div>
       </BrowserRouter>
     </div>
   );

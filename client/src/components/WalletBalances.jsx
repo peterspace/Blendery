@@ -53,75 +53,6 @@ const menu = [
   },
 ];
 
-export const UserProfile1 = (props) => {
-  const { l, setIdx } = props;
-
-  const [show, setShow] = useState(false);
-
-  const newCard = (
-    <div
-      onClick={() => setIdx(l.id)}
-      className="flex justify-center rounded-lg shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[280px] p-4 bg-gray-100 outline-lightslategray-300 outline-[1px]"
-    >
-      <div className="flex flex-row justify-between w-[280px]">
-        <div className="flex flex-row items-center gap-2">
-          <div className="flex justify-center items-center flex-shrink-0">
-            {/* {l.symbol === 'BTC' && <FaBitcoin size={40} color={'#f97316'} />} */}
-            {l.symbol === 'BTC' && (
-              <img
-                className="w-[40px] h-$ shrink-0 overflow-hidden rounded-full"
-                alt={l?.name}
-                src={l?.logoUrl}
-              />
-            )}
-            {l.symbol === 'ETH' && (
-              <img
-                className="w-[40px] h-$ shrink-0 overflow-hidden rounded-full"
-                alt={l?.name}
-                src={l?.logoUrl}
-              />
-            )}
-            {l.symbol === 'TRX' && (
-              <img
-                className="w-[40px] h-$ shrink-0 overflow-hidden rounded-full"
-                alt={l?.name}
-                src={l?.logoUrl}
-              />
-            )}
-          </div>
-
-          <div className="flex flex-col">
-            <div className="cursor-pointer flex flex-col items-start">
-              <div className="text-base font-sans font-medium leading-[24px] inline-block">
-                {l?.name}
-              </div>
-              <div className="text-[12px] text-gray-200 font-sans font-medium leading-[24px] inline-block">
-                {l?.symbol}
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-col">
-          <div className="cursor-pointer flex flex-col items-end">
-            {l.status ? (
-              <div className="text-base text-green-600 font-sans font-medium leading-[24px] inline-block">
-                {l?.amount} {l.symbol}
-              </div>
-            ) : (
-              <div className="text-base font-sans font-medium leading-[24px] inline-block">
-                {l?.amount} {l.symbol}
-              </div>
-            )}
-            <div className="text-[8px] text-gray-200 font-sans font-medium leading-[24px] inline-block">
-              {l?.date}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-  return <>{newCard}</>;
-};
 export const UserProfile = (props) => {
   const { l, setIdx, mode } = props;
 
@@ -182,8 +113,8 @@ export const UserProfile = (props) => {
 export const WalletBalances = (props) => {
   const { setIdx, mode } = props;
   const newCard = (
-    <div className="cursor-pointer flex flex-col gap-[16px] rounded-lg p-4">
-      <div className="flex flex-col 2xl:flex-row gap-[16px]">
+    <div className="cursor-pointer flex-col md:flex-row rounded-lg p-4 w-full">
+      <div className="flex flex-col md:flex-row justify-between w-full">
         <UserProfile l={menu[0]} setIdx={setIdx} mode={mode} />
         <UserProfile l={menu[1]} setIdx={setIdx} mode={mode} />
         <UserProfile l={menu[2]} setIdx={setIdx} mode={mode} />

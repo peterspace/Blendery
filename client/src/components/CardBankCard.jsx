@@ -23,9 +23,9 @@ export const CardBankCard = (props) => {
             <div className="flex flex-col gap-[10px]">
               <div className="flex flex-row gap-4 mt-2">
                 <div
-                  className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] inline-block ${
+                  className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block ${
                     isExchange
-                      ? 'text-mediumspringgreen text-base font-black'
+                      ? 'text-bgPrimary text-base font-black'
                       : 'text-darkgray-200 text-mini'
                   }`}
                   onClick={() => {
@@ -39,9 +39,9 @@ export const CardBankCard = (props) => {
                   Exchange
                 </div>
                 <div
-                  className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] inline-block ${
+                  className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block ${
                     isBuy
-                      ? 'text-mediumspringgreen text-base font-black'
+                      ? 'text-bgPrimary text-base font-black'
                       : 'text-darkgray-200 text-mini'
                   }`}
                   onClick={() => {
@@ -55,9 +55,9 @@ export const CardBankCard = (props) => {
                   Buy
                 </div>
                 <div
-                  className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] inline-block ${
+                  className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block ${
                     isSell
-                      ? 'text-mediumspringgreen text-base font-black'
+                      ? 'text-bgPrimary text-base font-black'
                       : 'text-darkgray-200 text-mini'
                   }`}
                   onClick={() => {
@@ -71,9 +71,9 @@ export const CardBankCard = (props) => {
                   Sell
                 </div>
                 <div
-                  className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] inline-block ${
+                  className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block ${
                     isCard
-                      ? 'text-mediumspringgreen text-base font-black'
+                      ? 'text-bgPrimary text-base font-black'
                       : 'text-darkgray-200 text-mini'
                   }`}
                   onClick={() => {
@@ -87,9 +87,9 @@ export const CardBankCard = (props) => {
                   Card
                 </div>
                 <div
-                  className={`cursor-pointer hover:text-mediumspringgreen leading-[24px] inline-block ${
+                  className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block ${
                     isDefi
-                      ? 'text-mediumspringgreen text-base font-black'
+                      ? 'text-bgPrimary text-base font-black'
                       : 'text-darkgray-200 text-mini'
                   }`}
                   onClick={() => {
@@ -108,35 +108,35 @@ export const CardBankCard = (props) => {
               )}
               {isExchange && (
                 <div className="flex flex-row">
-                  <div className="flex bg-mediumspringgreen w-[80px] h-px z-10" />
+                  <div className="flex bg-bgPrimary w-[80px] h-px z-10" />
                   <div className="flex bg-lightslategray-300 w-[282px] md:w-[372px] h-px z-10" />
                 </div>
               )}
               {isBuy && (
                 <div className="flex flex-row">
                   <div className="flex bg-lightslategray-300 w-[85px] h-px z-10" />
-                  <div className="flex bg-mediumspringgreen w-[32px] h-px" />
+                  <div className="flex bg-bgPrimary w-[32px] h-px" />
                   <div className="flex bg-lightslategray-300 w-[253px] md:w-[335px] h-px z-10" />
                 </div>
               )}
               {isSell && (
                 <div className="flex flex-row">
                   <div className="flex bg-lightslategray-300 w-[135px] h-px z-10" />
-                  <div className="flex bg-mediumspringgreen w-[28px] h-px" />
+                  <div className="flex bg-bgPrimary w-[28px] h-px" />
                   <div className="flex bg-lightslategray-300 w-[207px] md:w-[289px] h-px z-10" />
                 </div>
               )}
               {isCard && (
                 <div className="flex flex-row">
                   <div className="flex bg-lightslategray-300 w-[175px] h-px z-10" />
-                  <div className="flex bg-mediumspringgreen w-[42px] h-px" />
+                  <div className="flex bg-bgPrimary w-[42px] h-px" />
                   <div className="flex bg-lightslategray-300 w-[153px] md:w-[235px] h-px z-10" />
                 </div>
               )}
               {isDefi && (
                 <div className="flex flex-row">
                   <div className="flex bg-lightslategray-300 w-[225px] h-px z-10" />
-                  <div className="flex bg-mediumspringgreen w-[42px] h-px" />
+                  <div className="flex bg-bgPrimary w-[42px] h-px" />
                   <div className="flex bg-lightslategray-300 w-[103px] md:w-[185px] h-px z-10" />
                 </div>
               )}
@@ -156,7 +156,7 @@ export const CardBankCard = (props) => {
                 </div>
               </div>
             </div>
-            <div className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded">
+            <div className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded">
               Buy crypto
             </div>
           </div>

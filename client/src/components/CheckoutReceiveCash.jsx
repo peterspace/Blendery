@@ -1,24 +1,23 @@
 import React, { useState } from 'react';
-import { RxCopy } from 'react-icons/rx';
-import { RiFileWarningFill } from 'react-icons/ri';
-import { useDispatch, useSelector } from 'react-redux';
 
 export const CheckoutReceiveCash = (props) => {
   const {
     setPercentageProgress,
     fTitle,
     tTitle,
+    fToken,
+    tToken,
+    fValue,
+    userAddress,
+    transactionRates,
+    loadingExchangeRate,
   } = props;
 
-     /********************************************************************************************************************** */
+  /********************************************************************************************************************** */
   /********************************************************************************************************************** */
   /*********************************************     REDUX STATES    **************************************************** */
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
-
-  const transactionRates = useSelector(
-    (state) => state.transaction?.getTransactionRate
-  );
   const youSend = transactionRates ? transactionRates?.youSend : 0;
   const youGet = transactionRates ? transactionRates?.youGet : 0;
   const processingFee = transactionRates ? transactionRates?.processingFee : 0;
@@ -35,21 +34,6 @@ export const CheckoutReceiveCash = (props) => {
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
 
-  const fToken = localStorage.getItem('fTokenE')
-    ? JSON.parse(localStorage.getItem('fTokenE'))
-    : null;
-
-  const tToken = localStorage.getItem('tTokenE')
-    ? JSON.parse(localStorage.getItem('tTokenE'))
-    : null;
-  
-  const fValue = localStorage.getItem('fValueE')
-    ? JSON.parse(localStorage.getItem('fValueE'))
-    : '1';
-    const userAddress = localStorage.getItem('userAddress')
-    ? JSON.parse(localStorage.getItem('userAddress'))
-    : null;
-
   const checkout = (
     <div className="flex justify-center rounded-lg bg-white shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[320px] xs:w-[340px] md:w-[500px] p-4">
       <div className="flex flex-col gap-[24px]">
@@ -59,7 +43,7 @@ export const CheckoutReceiveCash = (props) => {
               Checkout
             </div>
             <div
-              className="cursor-pointer flex flex-row justify-center items-center bg-whitesmoke-100 hover:opacity-90 text-mediumspringgreen shrink-0 rounded px-6 py-3"
+              className="cursor-pointer flex flex-row justify-center items-center bg-bgSecondary hover:opacity-90 text-bgPrimary shrink-0 rounded px-6 py-3"
               onClick={() => {
                 setPercentageProgress(2);
               }}
@@ -160,7 +144,8 @@ export const CheckoutReceiveCash = (props) => {
                 Exchange rate
               </div>
               <div className="text-base leading-[24px] text-black inline-block w-[177px]">
-                {1} {fToken?.symbol.toUpperCase()} ~ {exchangeRate} {tToken?.symbol.toUpperCase()}
+                {1} {fToken?.symbol.toUpperCase()} ~ {exchangeRate}{' '}
+                {tToken?.symbol.toUpperCase()}
               </div>
             </div>
           </div>

@@ -8,7 +8,7 @@ export const Confirm = (props) => {
       <div className="flex flex-col gap-[24px]">
         <div className="flex flex-row justify-center items-center md:w-[452px] w-[300px]">
           <div
-            className="cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full"
+            className="cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full"
             onClick={() => {
               submitTransaction(true);
             }}

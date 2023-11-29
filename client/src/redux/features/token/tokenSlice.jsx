@@ -76,11 +76,22 @@ export const getTokenListDefi = createAsyncThunk(
   }
 );
 
+// export const getTokensDefiById = createAsyncThunk(
+//   'token/getTokensDefiById',
+//   async (chainId, thunkAPI) => {
+//     try {
+//       return await tokenService.getTokensDefiById(chainId);
+//     } catch (error) {
+//       return thunkAPI.rejectWithValue(error);
+//     }
+//   }
+// );
+
 export const getTokensDefiById = createAsyncThunk(
   'token/getTokensDefiById',
-  async (chainId, thunkAPI) => {
+  async (userData, thunkAPI) => {
     try {
-      return await tokenService.getTokensDefiById(chainId);
+      return await tokenService.getTokensDefiById(userData);
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
     }

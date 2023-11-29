@@ -25,8 +25,6 @@ export const HowToComponent = (props) => {
               alt=""
               src="/frame19.svg"
               // onClick={() => setShow(true)}
-              
-              
             />
           </div>
           {show && (
@@ -43,7 +41,7 @@ export const FaqCard = (props) => {
 
   const newCard = (
     <div className="flex flex-col gap-[16px]">
-      <div className="text-lg font-sans font-bold text-mediumspringgreen inline-block">
+      <div className="text-lg font-sans font-bold text-bgPrimary inline-block">
         {title}
       </div>
       <div className="flex flex-col gap-[16px]">
@@ -53,11 +51,12 @@ export const FaqCard = (props) => {
           </div>
         ))} */}
 
-        {data && data?.map((f, idx) => (
-          <div className="" key={idx}>
-            <HowToComponent l={f} />
-          </div>
-        ))}
+        {data &&
+          data?.map((f, idx) => (
+            <div className="" key={idx}>
+              <HowToComponent l={f} />
+            </div>
+          ))}
       </div>
     </div>
   );

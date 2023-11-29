@@ -1,31 +1,54 @@
-import React, { useState, useEffect } from 'react';
-import { Link, Navigate, useParams } from 'react-router-dom';
-import { AiFillApple, AiOutlineClose } from 'react-icons/ai';
-import { resetPassword } from '../../services/apiService';
+import React, { useState, useEffect } from "react";
+import { Link, Navigate, useParams } from "react-router-dom";
+import { AiFillApple, AiOutlineClose } from "react-icons/ai";
+import { resetPassword } from "../../services/apiService";
 
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 
-import { useDispatch } from 'react-redux';
-import Modal from './Modal';
+import { useDispatch } from "react-redux";
+import Modal from "./Modal";
+import { useFormik } from "formik";
 
 export const Reset = () => {
   const { resetToken } = useParams();
 
-  const [password, setPassword] = useState('');
-  const [password2, setPassword2] = useState('');
+  const [password, setPassword] = useState("");
+  const [password2, setPassword2] = useState("");
   const [redirect, setRedirect] = useState(false);
   const [redirectHome, setRedirectHome] = useState(false);
 
+  const { values, handleChange, handleSubmit, touched, errors, resetForm } =
+    useFormik({
+      initialValues: {
+        password: "",
+        confirmPassword: "",
+      },
+      validate: (values) => {
+        const errors = {};
+
+        if (!values.password) {
+          errors.password = "Password is required!";
+        }
+
+        if (!values.confirmPassword) {
+          errors.confirmPassword = "Confirm the password!";
+        }
+
+        return errors;
+      },
+      onSubmit: ({ password, confirmPassword }) => {
+        handleResetPassword(password, confirmPassword);
+      },
+    });
+
   const dispatch = useDispatch();
 
-  async function ResetSubmit(ev) {
-    ev.preventDefault();
-
+  async function handleResetPassword(password, confirmPassword) {
     if (password.length < 6) {
-      return toast.error('Passwords must be up to 6 characters');
+      return toast.error("Passwords must be up to 6 characters");
     }
-    if (password !== password2) {
-      return toast.error('Passwords do not match');
+    if (password !== confirmPassword) {
+      return toast.error("Passwords do not match");
     }
 
     const userData = {
@@ -50,12 +73,12 @@ export const Reset = () => {
 
   if (redirect) {
     // return <Navigate to={'/landingPage'} />;
-    return <Navigate to={'/auth'} />;
+    return <Navigate to={"/auth"} />;
   }
 
   if (redirectHome) {
     // return <Navigate to={'/landingPage'} />;
-    return <Navigate to={'/'} />;
+    return <Navigate to={"/"} />;
   }
 
   const login = (
@@ -85,34 +108,52 @@ export const Reset = () => {
 
           <div className="flex bg-lightslategray-300 md:w-[452px] w-[370px] h-px" />
         </div>
-        <div className="flex flex-col gap-[8px]">
-          <div className="flex flex-row h-[48px] bg-whitesmoke-100 rounded outline outline-lightslategray-300 outline-[1px]">
-            <input
-              type="password"
-              className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 placeholder-darkgray-100 inline-block w-full outline-none bg-gray-100"
-              placeholder="New Password"
-              value={password}
-              onChange={(ev) => setPassword(ev.target.value)}
-            />
-          </div>
-          <div className="flex flex-row h-[48px] bg-whitesmoke-100 rounded outline outline-lightslategray-300 outline-[1px]">
-            <input
-              type="password"
-              className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 placeholder-darkgray-100 inline-block w-full outline-none bg-gray-100"
-              placeholder="Confirm New Password"
-              value={password2}
-              onChange={(ev) => setPassword2(ev.target.value)}
-            />
-          </div>
-          <div className="flex flex-row justify-center items-center">
-            <div
-              className="cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full"
-              onClick={ResetSubmit}
-            >
-              Reset Password
+        <form onSubmit={handleSubmit}>
+          <div className="flex flex-col gap-[8px]">
+            <div className="flex flex-col mb-4 h-[48px] bg-whitesmoke-100 rounded outline outline-lightslategray-300 outline-[1px]">
+              <input
+                id="password"
+                name="password"
+                type="password"
+                className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 placeholder-darkgray-100 inline-block w-full outline-none bg-gray-100"
+                placeholder="New Password"
+                value={values.password}
+                onChange={handleChange}
+              />
+              <div>
+                {touched.password && errors.password ? (
+                  <div className="mt-6 text-[#ef4444]">{errors.password}</div>
+                ) : null}
+              </div>
+            </div>
+            <div className="flex flex-col mb-4 h-[48px] bg-whitesmoke-100 rounded outline outline-lightslategray-300 outline-[1px]">
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 placeholder-darkgray-100 inline-block w-full outline-none bg-gray-100"
+                placeholder="Confirm New Password"
+                value={values.confirmPassword}
+                onChange={handleChange}
+              />
+              <div>
+                {touched.confirmPassword && errors.confirmPassword ? (
+                  <div className="mt-6 text-[#ef4444]">
+                    {errors.confirmPassword}
+                  </div>
+                ) : null}
+              </div>
+            </div>
+            <div className="flex flex-row justify-center items-center">
+              <div
+                className="cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full"
+                onClick={handleSubmit}
+              >
+                Reset Password
+              </div>
             </div>
           </div>
-        </div>
+        </form>
 
         <div className="flex flex-row gap-2 items-center justify-center">
           <div className="flex bg-lightslategray-300 w-[150px] h-px" />

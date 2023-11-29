@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { FcGoogle } from 'react-icons/fc';
-import { FaFacebookSquare } from 'react-icons/fa';
-import { AiFillApple, AiOutlineClose } from 'react-icons/ai';
+import React, { useEffect, useState } from "react";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import { FcGoogle } from "react-icons/fc";
+import { FaFacebookSquare } from "react-icons/fa";
+import { AiFillApple, AiOutlineClose } from "react-icons/ai";
 
 import {
   registerUser,
@@ -14,69 +14,99 @@ import {
   authenticateUserGoogle,
   successUserGoogle,
   errorUserGoogle,
-} from '../../services/apiService';
+} from "../../services/apiService";
 
-import { registerSocial } from '../../services/apiService';
+import { registerSocial } from "../../services/apiService";
 
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 
-import { useDispatch } from 'react-redux';
+import { useDispatch } from "react-redux";
+import { useFormik } from "formik";
 
 export const Register = (props) => {
-  const { setIsLogin, setIsRegister, setIsForgot, redirectS, setRedirectHome } = props;
+  const { setIsLogin, setIsRegister, setIsForgot, redirectS, setRedirectHome } =
+    props;
   const navigate = useNavigate();
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [redirect, setRedirect] = useState(false);
-  const [isregisterCompleted, setIsregisterCompleted] = useState(false);
-  const [newData, setNewData] = useState('');
-  console.log({ newData: newData });
-
-  const [emailResponse, setEmailResponse] = useState();
-  console.log({ emailResponse: emailResponse });
 
   const [isLocal, setIsLocal] = useState(false);
   const [isFacebook, setIsFacebook] = useState(false);
   const [isGoogle, setIsGoogle] = useState(false);
   // const [redirectHome, setRedirectHome] = useState(false);
 
+  const { values, handleChange, handleSubmit, touched, errors, resetForm } =
+    useFormik({
+      initialValues: {
+        name: "",
+        email: "",
+        password: "",
+        isTermsAgreed: false,
+        isSubscriptionChecked: false,
+      },
+      validate: (values) => {
+        const errors = {};
+
+        if (!values.name) {
+          errors.name = "Full name is required!";
+        }
+
+        if (!values.email) {
+          errors.email = "Email address is required!";
+        }
+
+        if (!values.password) {
+          errors.password = "Password is required!";
+        }
+
+        if (!values.isTermsAgreed) {
+          errors.isTermsAgreed =
+            "Please indicate that you have read and agree to the Terms";
+        }
+
+        return errors;
+      },
+      onSubmit: ({
+        name,
+        email,
+        password,
+        isTermsAgreed,
+        isSubscriptionChecked,
+      }) => {
+        handleSignUp(name, email, password);
+      },
+    });
+
   const dispatch = useDispatch();
 
-  async function SubmitSignup(ev) {
-    ev.preventDefault();
-
-    if (!name || !email || !password) {
-      return toast.error('All fields are required');
-    }
+  async function handleSignUp(name, email, password) {
     if (password.length < 6) {
-      return toast.error('Passwords must be up to 6 characters');
+      return toast.error("Passwords must be up to 6 characters");
     }
     if (!validateEmail(email)) {
-      return toast.error('Please enter a valid email');
+      return toast.error("Please enter a valid email");
     }
 
+    // TODO: Subscription true/false have to be added
     const userData = {
       name,
       email,
       password,
-      role: 'User',
+      role: "User",
     };
 
     try {
       const data = await registerUser(userData);
-      console.log(data);
       if (data) {
         // localStorage.setItem('isLoggedIn', JSON.stringify(true));
-        localStorage.setItem('user', JSON.stringify(data));
+        localStorage.setItem("user", JSON.stringify(data));
         setTimeout(() => {
           setRedirect(true);
         }, 2000);
       }
     } catch (e) {
-      alert('Registration failed. Please try again later');
+      alert("Registration failed. Please try again later");
     }
   }
 
@@ -102,18 +132,17 @@ export const Register = (props) => {
 
   useEffect(() => {
     if (redirect) {
-      navigate('/auth');
+      navigate("/");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [redirect]);
 
   useEffect(() => {
     if (redirectS) {
-      navigate('/auth');
+      navigate("/auth");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [redirectS]);
-
 
   const signup = (
     <div className="flex justify-center rounded-lg bg-white shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[375px] md:w-[500px] p-4">
@@ -147,75 +176,109 @@ export const Register = (props) => {
 
           <div className="flex bg-lightslategray-300 md:w-[452px] w-[370px] h-px" />
         </div>
-        <div
-          className="flex flex-col gap-[8px]"
-        >
-          <div className="flex flex-row h-[48px] bg-whitesmoke-100 rounded outline outline-lightslategray-300 outline-[1px]">
-            <input
-              className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 placeholder-darkgray-100 inline-block w-full outline-none bg-gray-100"
-              type="text"
-              placeholder="John Doe"
-              value={name}
-              onChange={(ev) => setName(ev.target.value)}
-            />
-          </div>
-          <div className="flex flex-row h-[48px] bg-whitesmoke-100 rounded outline outline-lightslategray-300 outline-[1px]">
-            <input
-              className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 placeholder-darkgray-100 inline-block w-full outline-none bg-gray-100"
-              type="email"
-              placeholder="your@email.com"
-              value={email}
-              onChange={(ev) => setEmail(ev.target.value)}
-            />
-          </div>
-          <div className="flex flex-row h-[48px] bg-whitesmoke-100 rounded outline outline-lightslategray-300 outline-[1px]">
-            <input
-              className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 placeholder-darkgray-100 inline-block w-full outline-none bg-gray-100"
-              type="password"
-              placeholder="password"
-              value={password}
-              onChange={(ev) => setPassword(ev.target.value)}
-            />
-          </div>
-          <div className="flex flex-col gap-1">
-            <div className="flex flex-row gap-2">
+        <form onSubmit={handleSubmit}>
+          <div className="flex flex-col gap-[8px]">
+            <div className="flex flex-col mb-4 h-[48px] bg-whitesmoke-100 rounded outline outline-lightslategray-300 outline-[1px]">
               <input
-                type="checkbox"
-                className="outline-none bg-whitesmoke-100 accent-mediumspringgreen focus:accent-mediumspringgreen/30"
+                id="name"
+                name="name"
+                className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 placeholder-darkgray-100 inline-block w-full outline-none bg-gray-100"
+                type="text"
+                placeholder="Full name"
+                value={values.name}
+                onChange={handleChange}
               />
+              <div>
+                {touched.name && errors.name ? (
+                  <div className="mt-6 text-[#ef4444]">{errors.name}</div>
+                ) : null}
+              </div>
+            </div>
+            <div className="flex flex-col mb-4 h-[48px] bg-whitesmoke-100 rounded outline outline-lightslategray-300 outline-[1px]">
+              <input
+                id="email"
+                name="email"
+                className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 placeholder-darkgray-100 inline-block w-full outline-none bg-gray-100"
+                type="email"
+                placeholder="Email"
+                value={values.email}
+                onChange={handleChange}
+              />
+              <div>
+                {touched.email && errors.email ? (
+                  <div className="mt-6 text-[#ef4444]">{errors.email}</div>
+                ) : null}
+              </div>
+            </div>
+            <div className="flex flex-col mb-4 h-[48px] bg-whitesmoke-100 rounded outline outline-lightslategray-300 outline-[1px]">
+              <input
+                id="password"
+                name="password"
+                className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 placeholder-darkgray-100 inline-block w-full outline-none bg-gray-100"
+                type="password"
+                placeholder="Password"
+                value={values.password}
+                onChange={handleChange}
+              />
+              <div>
+                {touched.password && errors.password ? (
+                  <div className="mt-6 text-[#ef4444]">{errors.password}</div>
+                ) : null}
+              </div>
+            </div>
+            <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1">
+                <div className="flex flex-row gap-2">
+                  <input
+                    id="isTermsAgreed"
+                    name="isTermsAgreed"
+                    type="checkbox"
+                    value={values.isTermsAgreed}
+                    onChange={handleChange}
+                    className="outline-none bg-whitesmoke-100 accent-mediumspringgreen focus:accent-mediumspringgreen/30"
+                  />
 
-              <div className="flex flex-row gap-1 text-xs md:text-smi">
-                <div className="leading-[20px] text-darkslategray-200 inline-block">
-                  <span>{`I agree to the `}</span>
-                  <span
-                    className="text-mediumspringgreen"
-                    onClick={''}
-                  >{`terms and conditions`}</span>
+                  <div className="flex flex-row gap-1 text-xs md:text-smi">
+                    <div className="leading-[20px] text-darkslategray-200 inline-block">
+                      I agree with Terms of Use, Privacy Policy and AML/KYC
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-row gap-1">
+                  {touched.isTermsAgreed && errors.isTermsAgreed ? (
+                    <div className="mt-1 leading-[20px] inline-block text-[#ef4444]">
+                      {errors.isTermsAgreed}
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+              <div className="flex flex-row gap-2">
+                <input
+                  id="isSubscriptionChecked"
+                  name="isSubscriptionChecked"
+                  value={values.isSubscriptionChecked}
+                  onChange={handleChange}
+                  type="checkbox"
+                  className="outline-none bg-whitesmoke-100 accent-mediumspringgreen focus:accent-mediumspringgreen/30"
+                />
+
+                <div className="flex flex-row gap-1 text-xs md:text-smi">
+                  <div className="leading-[20px] text-darkslategray-200 inline-block">
+                    Send me promos, market news and product updates
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="flex flex-row gap-2">
-              <input
-                type="checkbox"
-                className="outline-none bg-whitesmoke-100 accent-mediumspringgreen focus:accent-mediumspringgreen/30"
-              />
-
-              <div className="flex flex-row gap-1 text-xs md:text-smi">
-                <div className="leading-[20px] text-darkslategray-200 inline-block">
-                  Send me promos, market news and product updates
-                </div>
+            <div className="flex flex-row justify-center items-center">
+              <div
+                className="cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full"
+                onClick={handleSubmit}
+              >
+                Create account
               </div>
             </div>
           </div>
-          <div className="flex flex-row justify-center items-center">
-            <div
-              className="cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full"
-              onClick={SubmitSignup}
-            >
-              Create account
-            </div>
-          </div>
-        </div>
+        </form>
 
         <div className="flex flex-row gap-2 items-center justify-center">
           <div className="flex bg-lightslategray-300 w-[150px] h-px" />

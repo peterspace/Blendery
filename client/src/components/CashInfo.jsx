@@ -130,7 +130,6 @@ export const CashInfo = (props) => {
                   placeholder="@jason"
                   value={values.telegram}
                   onChange={handleChange}
-                  // onChange={(ev) => setTelegram(ev.target.value)}
                 />
                 <div>
                   {touched.telegram && errors.telegram ? (

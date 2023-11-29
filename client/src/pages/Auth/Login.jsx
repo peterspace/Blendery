@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import queryString from 'query-string';
-import { FcGoogle } from 'react-icons/fc';
-import { FaFacebookSquare } from 'react-icons/fa';
-import { AiFillApple, AiOutlineClose } from 'react-icons/ai';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import queryString from "query-string";
+import { FcGoogle } from "react-icons/fc";
+import { FaFacebookSquare } from "react-icons/fa";
+import { AiFillApple, AiOutlineClose } from "react-icons/ai";
 import {
   loginUser,
   validateEmail,
@@ -13,14 +13,15 @@ import {
   authenticateUserGoogle,
   successUserGoogle,
   errorUserGoogle,
-} from '../../services/apiService';
+} from "../../services/apiService";
 
-import { loginSocial } from '../../services/apiService';
+import { loginSocial } from "../../services/apiService";
 
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 
-import { useDispatch } from 'react-redux';
-import { LoginUser } from '../../redux/features/user/userSlice';
+import { useDispatch } from "react-redux";
+import { LoginUser } from "../../redux/features/user/userSlice";
+import { useFormik } from "formik";
 
 export const Login = (props) => {
   const {
@@ -38,28 +39,44 @@ export const Login = (props) => {
   const dispatch = useDispatch();
 
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [redirect, setRedirect] = useState(false);
   const [isLocal, setIsLocal] = useState(false);
   const [isFacebook, setIsFacebook] = useState(false);
   const [isGoogle, setIsGoogle] = useState(false);
   // const [redirectHome, setRedirectHome] = useState(false);
 
+  const { values, handleChange, handleSubmit, touched, errors, resetForm } =
+    useFormik({
+      initialValues: {
+        email: "",
+        password: "",
+      },
+      validate: (values) => {
+        const errors = {};
 
+        if (!values.email) {
+          errors.email = "Email address is required!";
+        }
 
-  // async function LoginSubmit() {
-  async function LoginSubmit(ev) {
-    ev.preventDefault();
+        if (!values.password) {
+          errors.password = "Password is required!";
+        }
+
+        return errors;
+      },
+      onSubmit: ({ email, password }) => {
+        handleLogin(email, password);
+      },
+    });
+
+  async function handleLogin(email, password) {
     let userData;
 
     if (isLocal) {
-      if (!email || !password) {
-        return toast.error('All fields are required');
-      }
-
       if (!validateEmail(email)) {
-        return toast.error('Please enter a valid email');
+        return toast.error("Please enter a valid email");
       }
 
       userData = {
@@ -73,8 +90,8 @@ export const Login = (props) => {
       console.log({ userData: data });
       if (data) {
         dispatch(LoginUser(data));
-        localStorage.setItem('isLoggedIn', JSON.stringify(true));
-        localStorage.setItem('user', JSON.stringify(data));
+        localStorage.setItem("isLoggedIn", JSON.stringify(true));
+        localStorage.setItem("user", JSON.stringify(data));
         // setUser(data);
         setIsLoggedIn(true);
         setTimeout(() => {
@@ -84,7 +101,7 @@ export const Login = (props) => {
         // window.location.reload(); // relaod to update changes m,ade by localStoarge
       }
     } catch (e) {
-      alert('Login failed');
+      alert("Login failed");
     }
   }
 
@@ -134,7 +151,7 @@ export const Login = (props) => {
   // }, [redirectHome]);
 
   const handleSuccessLogin = () => {
-    console.log("loggedIn sucessfull")
+    console.log("loggedIn sucessfull");
     // navigate('/dashboard');
   };
 
@@ -178,41 +195,57 @@ export const Login = (props) => {
 
           <div className="flex bg-lightslategray-300 md:w-[452px] w-[370px] h-px" />
         </div>
-        <div
-          className="flex flex-col gap-[8px]"
-          onClick={() => {
-            setIsLocal(true);
-            setIsFacebook(false);
-            setIsGoogle(false);
-          }}
-        >
-          <div className="flex flex-row h-[48px] bg-whitesmoke-100 rounded outline outline-lightslategray-300 outline-[1px]">
-            <input
-              type="email"
-              className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 placeholder-darkgray-100 inline-block w-full outline-none bg-gray-100"
-              placeholder="your@email.com"
-              value={email}
-              onChange={(ev) => setEmail(ev.target.value)}
-            />
-          </div>
-          <div className="flex flex-row h-[48px] bg-whitesmoke-100 rounded outline outline-lightslategray-300 outline-[1px]">
-            <input
-              type="password"
-              className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 placeholder-darkgray-100 inline-block w-full outline-none bg-gray-100"
-              placeholder="password"
-              value={password}
-              onChange={(ev) => setPassword(ev.target.value)}
-            />
-          </div>
-          <div className="flex flex-row justify-center items-center">
-            <div
-              className="cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full"
-              onClick={LoginSubmit}
-            >
-              Login
+        <form onSubmit={handleSubmit}>
+          <div
+            className="flex flex-col gap-[8px]"
+            onClick={() => {
+              setIsLocal(true);
+              setIsFacebook(false);
+              setIsGoogle(false);
+            }}
+          >
+            <div className="flex flex-col mb-6 h-[48px] bg-whitesmoke-100 rounded outline outline-lightslategray-300 outline-[1px]">
+              <input
+                id="email"
+                name="email"
+                type="email"
+                className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 placeholder-darkgray-100 inline-block w-full outline-none bg-gray-100"
+                placeholder="Email"
+                value={values.email}
+                onChange={handleChange}
+              />
+              <div>
+                {touched.email && errors.email ? (
+                  <div className="mt-6 text-[#ef4444]">{errors.email}</div>
+                ) : null}
+              </div>
+            </div>
+            <div className="flex flex-col mb-6 h-[48px] bg-whitesmoke-100 rounded outline outline-lightslategray-300 outline-[1px]">
+              <input
+                id="password"
+                name="password"
+                type="password"
+                className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 placeholder-darkgray-100 inline-block w-full outline-none bg-gray-100"
+                placeholder="Password"
+                value={values.password}
+                onChange={handleChange}
+              />
+              <div>
+                {touched.password && errors.password ? (
+                  <div className="mt-6 text-[#ef4444]">{errors.password}</div>
+                ) : null}
+              </div>
+            </div>
+            <div className="flex flex-row justify-center items-center">
+              <div
+                className="cursor-pointer flex flex-row justify-center items-center bg-mediumspringgreen hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full"
+                onClick={handleSubmit}
+              >
+                Login
+              </div>
             </div>
           </div>
-        </div>
+        </form>
 
         <div className="flex flex-row gap-2 items-center justify-center">
           <div className="flex bg-lightslategray-300 w-[150px] h-px" />

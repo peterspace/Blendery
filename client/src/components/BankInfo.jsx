@@ -1,81 +1,107 @@
-import { useEffect } from 'react';
-import { useFormik } from 'formik';
+import { useEffect, useState } from "react";
+import { useFormik } from "formik";
 
-import { MdQrCodeScanner } from 'react-icons/md';
+import { MdQrCodeScanner } from "react-icons/md";
+import BanksDropdown from "./BanksDropdown";
+import { useCardPaymentSystemIcon } from "../hooks/useCardDetector";
 
 export const BankInfo = (props) => {
   const {
     setPercentageProgress,
-    userAddress,
     setUserAddress,
     service,
     fValue,
     fToken,
     provider,
-    fullName,
     setFullName,
-    bankName,
     setBankName,
-    cardNumber,
     setCardNumber,
-    phone,
     setPhone,
   } = props;
 
-  const { values, handleChange, handleSubmit, touched, errors, resetForm } =
-    useFormik({
-      initialValues: {
-        receiverAddress: '',
-        name: '',
-        phoneNumber: '',
-        bankName: '',
-        cardNumber: '',
-        isTermsChecked: false,
-      },
-      validate: (values) => {
-        const errors = {};
+  const {
+    values,
+    handleChange,
+    handleSubmit,
+    touched,
+    errors,
+    resetForm,
+    setFieldValue,
+  } = useFormik({
+    initialValues: {
+      receiverAddress: "",
+      name: "",
+      phoneNumber: "",
+      bankName: "",
+      cardNumber: "",
+      isTermsChecked: false,
+    },
+    validate: (values) => {
+      const errors = {};
 
-        if (!values.receiverAddress) {
-          errors.receiverAddress = 'Receiver address is required!';
-        }
+      if (!values.receiverAddress) {
+        errors.receiverAddress = "Receiver address is required!";
+      }
 
-        if (!values.name) {
-          errors.name = 'Name is required!';
-        }
+      if (!values.name) {
+        errors.name = "Name is required!";
+      }
 
-        if (provider?.name === 'Phone' && !values.phoneNumber) {
-          errors.phoneNumber = 'Phone number is required!';
-        }
+      if (provider?.name === "Phone" && !values.phoneNumber) {
+        errors.phoneNumber = "Phone number is required!";
+      }
 
-        if (provider?.name === 'Phone' && !values.bankName) {
-          errors.bankName = 'Bank name is required!';
-        }
+      if (provider?.name === "Phone" && !values.bankName) {
+        errors.bankName = "Bank name is required!";
+      }
 
-        if (provider?.name === 'Card' && !values.cardNumber) {
-          errors.cardNumber = 'Card number is required!';
-        }
+      if (provider?.name === "Card" && !values.cardNumber) {
+        errors.cardNumber = "Card number is required!";
+      }
 
-        if (!values.isTermsChecked) {
-          errors.isTermsChecked =
-            'Please indicate that you have read and agree to the Terms and Conditions and Privacy Policy';
-        }
+      if (!values.isTermsChecked) {
+        errors.isTermsChecked =
+          "Please indicate that you have read and agree to the Terms and Conditions and Privacy Policy";
+      }
 
-        return errors;
-      },
-      onSubmit: (values) => {
-        setUserAddress(values.receiverAddress);
-        setFullName(values.name);
-        setPhone(values.phoneNumber);
-        setBankName(values.bankName);
-        setCardNumber(values.cardNumber);
+      return errors;
+    },
+    onSubmit: (values) => {
+      setUserAddress(values.receiverAddress);
+      setFullName(values.name);
+      setPhone(values.phoneNumber);
+      setBankName(values.bankName);
+      setCardNumber(values.cardNumber);
 
-        setPercentageProgress(3);
-      },
-    });
+      setPercentageProgress(3);
+    },
+  });
+
+  const paymentSystemIcon = useCardPaymentSystemIcon(values.cardNumber);
+
+  // const { paymentSystemIcon, setPaymentSystemIcon } = useState(null);
+
+  // useEffect(() => {
+
+  // }, [values.cardNumber])
 
   useEffect(() => {
     resetForm();
   }, [provider]);
+
+  const handleBankSelect = (selectedBank) => {
+    setFieldValue("bankName", selectedBank);
+  };
+
+  const handleCardNumberChange = (event) => {
+    const { name, value } = event.target;
+    const formattedValue = value.replace(/\D/g, "");
+
+    if (formattedValue.length > 16) {
+      return;
+    }
+    setFieldValue(name, formattedValue);
+  };
 
   const bankInfo = (
     <form onSubmit={handleSubmit}>
@@ -91,8 +117,16 @@ export const BankInfo = (props) => {
             </div>
             <div className="flex bg-lightslategray-300 md:w-[452px] w-[320px] xs:w-[340px] h-px" />
           </div>
-          {provider?.name === 'Phone' && (
+          {provider?.name === "Phone" && (
             <>
+              <div>
+                <BanksDropdown handleBankSelect={handleBankSelect} />
+                <div>
+                  {touched.bankName && errors.bankName ? (
+                    <div className="text-[#ef4444]">{errors.bankName}</div>
+                  ) : null}
+                </div>
+              </div>
               <div className="flex flex-col w-[320px] xs:w-[340px] md:w-[452px] gap-[8px]">
                 <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between mb-5">
                   <div className="md:w-[452px] w-[320px] xs:w-[340px]">
@@ -170,32 +204,6 @@ export const BankInfo = (props) => {
                     <MdQrCodeScanner size={15} />
                   </div>
                 </div>
-                <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between mb-5">
-                  <div className="md:w-[452px] w-[320px] xs:w-[340px]">
-                    <div className="ml-2 mt-2 text-xs leading-[18px] text-darkslategray-200">
-                      Bank
-                    </div>
-                    <input
-                      id="bankName"
-                      name="bankName"
-                      type="text"
-                      className="ml-2 text-[12px] md:text-[16px] leading-[24px] text-darkslategray-200 inline-block w-[90%] outline-none bg-whitesmoke-100 placeholder-darkgray-100"
-                      placeholder="Bank Name"
-                      value={values.bankName}
-                      onChange={handleChange}
-                    />
-                    <div>
-                      {touched.bankName && errors.bankName ? (
-                        <div className="mt-4 text-[#ef4444]">
-                          {errors.bankName}
-                        </div>
-                      ) : null}
-                    </div>
-                  </div>
-                  <div className="cursor-pointer mr-2 flex justify-center items-center w-[18px] h-[64px] overflow-hidden">
-                    <MdQrCodeScanner size={15} />
-                  </div>
-                </div>
                 <div className="flex flex-col gap-1">
                   <div className="flex flex-row gap-2">
                     <input
@@ -224,7 +232,7 @@ export const BankInfo = (props) => {
               </div>
             </>
           )}
-          {provider?.name === 'Card' && (
+          {provider?.name === "Card" && (
             <>
               <div className="flex flex-col w-[320px] xs:w-[340px] md:w-[452px] gap-[8px]">
                 <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between mb-5">
@@ -287,9 +295,9 @@ export const BankInfo = (props) => {
                       name="cardNumber"
                       type="text"
                       className="ml-2 text-[12px] md:text-[16px] leading-[24px] text-darkslategray-200 inline-block w-[90%] outline-none bg-whitesmoke-100 placeholder-darkgray-100"
-                      placeholder="4242 4242 4242 4242"
+                      placeholder="Card Number"
                       value={values.cardNumber}
-                      onChange={handleChange}
+                      onChange={handleCardNumberChange}
                     />
                     <div>
                       {touched.cardNumber && errors.cardNumber ? (
@@ -299,8 +307,10 @@ export const BankInfo = (props) => {
                       ) : null}
                     </div>
                   </div>
-                  <div className="cursor-pointer mr-2 flex justify-center items-center w-[18px] h-[64px] overflow-hidden">
-                    <MdQrCodeScanner size={15} />
+                  <div className="cursor-pointer mr-2 flex justify-center items-center w-[36px] h-[64px] overflow-hidden">
+                    {paymentSystemIcon && (
+                      <img src={paymentSystemIcon} alt="Payment system" />
+                    )}
                   </div>
                 </div>
                 <div className="flex flex-col gap-1">

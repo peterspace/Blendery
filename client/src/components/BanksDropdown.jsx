@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { FiSearch } from "react-icons/fi";
 
 import { banksOptions } from "../constants";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
 const BanksDropdown = ({ handleBankSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -49,23 +50,41 @@ const BanksDropdown = ({ handleBankSelect }) => {
           className="inline-flex mt-0 justify-between items-center text-xs leading-[18px] text-[#B4B4B4] w-[320px] xs:w-[340px] md:w-[452px] h-[62px] gap-[8px] bg-whitesmoke-100 shadow-none active:bg-whitesmoke-100 active:shadow-none mx-0 px-4"
           onClick={handleToggleDropdown}
         >
-          <span className="flex items-center">
+          <div className="flex w-full justify-between items-center">
             {selectedBank ? (
               <>
-                <img
-                  src={selectedBank?.image}
-                  alt="Bank Logo"
-                  className="w-12 mr-2"
-                />
+                <div className="flex items-center">
+                  <img
+                    src={selectedBank?.image}
+                    alt="Bank Logo"
+                    className="w-16 mr-6"
+                  />
 
-                <span className="text-black font-normal text-[16px]">
-                  {selectedBank?.name}
-                </span>
+                  <div className="text-black font-normal text-[16px]">
+                    {selectedBank?.name}
+                  </div>
+                </div>
+                <div className="flex h-full items-center">
+                  {isOpen ? (
+                    <FaChevronUp size={16} />
+                  ) : (
+                    <FaChevronDown size={16} />
+                  )}
+                </div>
               </>
             ) : (
-              <span>{"Select a Bank"}</span>
+              <div className="flex w-full items-center justify-between">
+                <span className="text-darkslategray-200">
+                  {"Select a Bank"}
+                </span>
+                {isOpen ? (
+                  <FaChevronUp size={16} />
+                ) : (
+                  <FaChevronDown size={16} />
+                )}
+              </div>
             )}
-          </span>
+          </div>
         </button>
       </div>
       {isOpen && (
@@ -92,7 +111,7 @@ const BanksDropdown = ({ handleBankSelect }) => {
                 onClick={() => handleSelectBank(bank)}
               >
                 <div className="flex items-center">
-                  <img src={bank.image} alt="Bank Logo" className="w-12 mr-2" />
+                  <img src={bank.image} alt="Bank Logo" className="w-16 mr-6" />
                   <span>{bank.name}</span>
                 </div>
               </div>

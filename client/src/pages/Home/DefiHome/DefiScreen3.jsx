@@ -13,6 +13,10 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { getTokensDefiByIdService } from '../../../services/apiService';
+import { getTokensDefiById } from '../../../redux/features/swap/swapSlice';
+
+import { createTransactionService } from '../../../services/apiService';
 
 export const DefiScreen3 = (props) => {
   const {
@@ -27,11 +31,11 @@ export const DefiScreen3 = (props) => {
     service,
     subService,
     setTxInfo,
-    tValue,
     setIsSwapping,
     estimatedGas,
-    exchangeRate,
+    transactionRates,
     chain,
+    chainId,
     swappingData,
     isValidTransaction,
     setIsSendTransaction,
@@ -39,7 +43,6 @@ export const DefiScreen3 = (props) => {
   } = props;
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
@@ -49,13 +52,9 @@ export const DefiScreen3 = (props) => {
 
   const { user } = useSelector((state) => state.user);
 
-  const createTransactionResponse = useSelector(
-    (state) => state.transaction?.createTransaction
-  );
-
-  const transactionRates = useSelector(
-    (state) => state.transaction?.getTransactionRate
-  );
+   //======================={RATES and PRICES}========================================================
+   const tValue = transactionRates ? transactionRates?.tValueFormatted : 0;
+   const exchangeRate = transactionRates ? transactionRates?.exchangeRate : 0;
   const youSend = transactionRates ? transactionRates?.youSend : 0;
   const youGet = transactionRates ? transactionRates?.youGet : 0;
   const processingFee = transactionRates ? transactionRates?.processingFee : 0;
@@ -94,15 +93,42 @@ export const DefiScreen3 = (props) => {
   const [isSend, setIsSend] = useState(false);
 
   useEffect(() => {
-    if (createTransactionResponse) {
-      setTxInfo(createTransactionResponse);
-      let txData = createTransactionResponse;
-      dispatch(getTransactionByTxId(txData?._id)); // fetch updated transaction every minute
-      dispatch(getTransactionByTxIdInternal(createTransactionResponse));
-      // navigate(`defi/${txData?._id}`); // proceed to stage 3 // Navigate to Completion (step 5 and status: Completed) and display swap information
-    }
+    getConnectedChain();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [createTransactionResponse]);
+  }, []);
+
+  async function getConnectedChain() {
+    const response = await getTokensDefiByIdService(chainId);
+    if (response) {
+      dispatch(getTokensDefiById(response));
+    }
+
+    // window.location.reload(); // reconsider removing
+  }
+
+  async function newFunc() {
+    //================{new updates}===============================
+    localStorage.removeItem('fTokenDefi');
+    localStorage.removeItem('tTokenDefi');
+    localStorage.removeItem('fValueDefi');
+    localStorage.removeItem('transactionRatesDefi');
+    //================{new updates}===============================
+
+    localStorage.removeItem('telegram');
+    localStorage.removeItem('userAddress');
+    localStorage.removeItem('benderyAddress');
+    localStorage.removeItem('country');
+    localStorage.removeItem('cityData');
+    localStorage.removeItem('city');
+    localStorage.removeItem('paymentMethod');
+    localStorage.removeItem('txInfo');
+    localStorage.removeItem('percentageProgressDefi');
+    localStorage.removeItem('percentageProgressHome');
+    localStorage.removeItem('ChainDefi');
+    localStorage.removeItem('provider');
+    dispatch(getTransactionByTxIdInternal(null));
+  }
+
 
   //========={if the swap is sucessful, store swap information in the database for user's history}
   useEffect(() => {
@@ -162,7 +188,13 @@ export const DefiScreen3 = (props) => {
       tx: swappingData?.tx, // transaction data
     };
 
-    dispatch(createTransaction(userData));
+    const response = await createTransactionService(userData);
+    if (response?._id) {
+      // newFunc(); // check
+      // setTxInfo(response);//check
+      dispatch(getTransactionByTxId(response?._id));
+      dispatch(getTransactionByTxIdInternal(response));
+    }
   };
 
   // tx: {
@@ -230,7 +262,6 @@ export const DefiScreen3 = (props) => {
                 fValue={fValue}
                 tValue={tValue}
                 exchangeRate={exchangeRate}
-
               />
               <ConfirmSwap
                 submitTransaction={setIsSwapping}

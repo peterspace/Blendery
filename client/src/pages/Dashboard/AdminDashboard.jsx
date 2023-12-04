@@ -56,7 +56,6 @@ const menu = [
   },
 ];
 
-
 export const AdminDashboard = (props) => {
   const { mode, user, setTxInfo, setMode } = props;
 
@@ -262,7 +261,7 @@ export const AdminDashboard = (props) => {
   //====================================================================================================
 
   return (
-    <div className="flex">
+    <div className="flex gap-[64px]">
       <DashboardMenuAdmin
         setPage={setPage}
         mode={mode}
@@ -270,8 +269,7 @@ export const AdminDashboard = (props) => {
         page={page}
       />
       {!isUpdating && (
-        <div className="flex flex-1 p-7">
-
+        <div className="container mx-auto p-1">
           {page === 'Exchange' && allExchangeTransactionsAdmin && (
             <AdminRecord
               columns={ColumnsAdminRecords}
@@ -323,18 +321,8 @@ export const AdminDashboard = (props) => {
         </div>
       )}
 
-      {/* {isUpdating && txData && !refetchTxData && (
-        <section className={`flex mt-8 flex-col gap-[8px]`}>
-          <CardUpdateInfo
-            mode={mode}
-            setisUpdating={setisUpdating}
-            setRefetchTxData={setRefetchTxData}
-          />
-        </section>
-      )} */}
-
       {isUpdating && txData && (
-        <section className={`flex mt-8 flex-col gap-[8px]`}>
+        <section className={`container mx-auto p-2`}>
           <CardUpdateInfo mode={mode} setRefetchTxData={setRefetchTxData} />
         </section>
       )}

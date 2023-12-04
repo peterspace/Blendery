@@ -1,22 +1,22 @@
-const Global = require("../models/Global.js");
-const Rates = require("../models/Rates.js");
-const Trending = require("../models/Trending.js");
-const Token = require("../models/Token.js");
-const TokenPairs = require("../models/TokenPairs.js");
-const TokenList = require("../models/TokenList.js");
-const TokenListDefi = require("../models/TokenListDefi.js");
-const TokenListFiat = require("../models/TokenListFiat.js");
-const TokenListBuy = require("../models/TokenListBuy.js");
-const TokenListSell = require("../models/TokenListSell.js");
-const TokenListExchange = require("../models/TokenListExchange.js");
-const TokenListPrice = require("../models/TokenListPrice.js");
-const TokenListStore = require("../models/TokenListStore.js");
+const Global = require('../models/Global.js');
+const Rates = require('../models/Rates.js');
+const Trending = require('../models/Trending.js');
+const Token = require('../models/Token.js');
+const TokenPairs = require('../models/TokenPairs.js');
+const TokenList = require('../models/TokenList.js');
+const TokenListDefi = require('../models/TokenListDefi.js');
+const TokenListFiat = require('../models/TokenListFiat.js');
+const TokenListBuy = require('../models/TokenListBuy.js');
+const TokenListSell = require('../models/TokenListSell.js');
+const TokenListExchange = require('../models/TokenListExchange.js');
+const TokenListPrice = require('../models/TokenListPrice.js');
+const TokenListStore = require('../models/TokenListStore.js');
 
-const Charts = require("../models/Charts.js");
-const axios = require("axios");
+const Charts = require('../models/Charts.js');
+const axios = require('axios');
 //=================={ethers library}===============================================
-const asyncHandler = require("express-async-handler");
-const fs = require("fs");
+const asyncHandler = require('express-async-handler');
+const fs = require('fs');
 //==================FS SYNC}===============================================
 
 const writeNewFile = async (filePath, data) => {
@@ -99,40 +99,40 @@ const updatePricesDefi = async (token) => {
   if (tokenExist) {
     let chain;
 
-    if (tokenExist?.symbol === "btc") {
-      chain = "Bitcoin";
+    if (tokenExist?.symbol === 'btc') {
+      chain = 'Bitcoin';
     }
-    if (tokenExist?.symbol === "trx") {
-      chain = "Tron";
+    if (tokenExist?.symbol === 'trx') {
+      chain = 'Tron';
     }
 
-    if (tokenExist?.symbol === "usdt" && tokenExist?.type === "TRC20") {
-      chain = "Tron";
+    if (tokenExist?.symbol === 'usdt' && tokenExist?.type === 'TRC20') {
+      chain = 'Tron';
       // address = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t' // mainnet usdt address (USDT)
       // decimals = '6'// mainnet usdt address
       // address = 'TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf' // test tron on Nile (USDT)
-      address = "TLBaRhANQoJFTqre9Nf1mjuwNWjCJeYqUL"; //USDJ
-      decimals = "18";
+      address = 'TLBaRhANQoJFTqre9Nf1mjuwNWjCJeYqUL'; //USDJ
+      decimals = '18';
     }
 
-    if (tokenExist?.chainId === "56") {
-      chain = "Binance";
+    if (tokenExist?.chainId === '56') {
+      chain = 'Binance';
     }
 
-    if (tokenExist?.chainId === "42161") {
-      chain = "Arbitrum";
+    if (tokenExist?.chainId === '42161') {
+      chain = 'Arbitrum';
     }
 
-    if (tokenExist?.chainId === "1") {
-      chain = "Ethereum";
+    if (tokenExist?.chainId === '1') {
+      chain = 'Ethereum';
     }
 
-    if (tokenExist?.chainId === "10") {
-      chain === "Optimism";
+    if (tokenExist?.chainId === '10') {
+      chain === 'Optimism';
     }
 
-    if (tokenExist?.chainId === "137") {
-      chain = "Polygon";
+    if (tokenExist?.chainId === '137') {
+      chain = 'Polygon';
     }
     const {
       current_price,
@@ -212,10 +212,10 @@ const updatePricesFiat = async (token) => {
     const result = await tokenExist.save();
     if (result) {
       // res.status(200).json(result);
-      console.log("ok");
+      console.log('ok');
       return result;
     } else {
-      console.log("update fiat prices error");
+      console.log('update fiat prices error');
     }
   }
 };
@@ -231,40 +231,40 @@ const updatePricesBuy = async (token) => {
   if (tokenExist) {
     let chain;
 
-    if (tokenExist?.symbol === "btc") {
-      chain = "Bitcoin";
+    if (tokenExist?.symbol === 'btc') {
+      chain = 'Bitcoin';
     }
-    if (tokenExist?.symbol === "trx") {
-      chain = "Tron";
+    if (tokenExist?.symbol === 'trx') {
+      chain = 'Tron';
     }
 
-    if (tokenExist?.symbol === "usdt" && tokenExist?.type === "TRC20") {
-      chain = "Tron";
+    if (tokenExist?.symbol === 'usdt' && tokenExist?.type === 'TRC20') {
+      chain = 'Tron';
       // address = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t' // mainnet usdt address (USDT)
       // decimals = '6'// mainnet usdt address
       // address = 'TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf' // test tron on Nile (USDT)
-      address = "TLBaRhANQoJFTqre9Nf1mjuwNWjCJeYqUL"; //USDJ
-      decimals = "18";
+      address = 'TLBaRhANQoJFTqre9Nf1mjuwNWjCJeYqUL'; //USDJ
+      decimals = '18';
     }
 
-    if (tokenExist?.chainId === "56") {
-      chain = "Binance";
+    if (tokenExist?.chainId === '56') {
+      chain = 'Binance';
     }
 
-    if (tokenExist?.chainId === "42161") {
-      chain = "Arbitrum";
+    if (tokenExist?.chainId === '42161') {
+      chain = 'Arbitrum';
     }
 
-    if (tokenExist?.chainId === "1") {
-      chain = "Ethereum";
+    if (tokenExist?.chainId === '1') {
+      chain = 'Ethereum';
     }
 
-    if (tokenExist?.chainId === "10") {
-      chain === "Optimism";
+    if (tokenExist?.chainId === '10') {
+      chain === 'Optimism';
     }
 
-    if (tokenExist?.chainId === "137") {
-      chain = "Polygon";
+    if (tokenExist?.chainId === '137') {
+      chain = 'Polygon';
     }
     const {
       current_price,
@@ -343,40 +343,40 @@ const updatePricesSell = async (token) => {
   if (tokenExist) {
     let chain;
 
-    if (tokenExist?.symbol === "btc") {
-      chain = "Bitcoin";
+    if (tokenExist?.symbol === 'btc') {
+      chain = 'Bitcoin';
     }
-    if (tokenExist?.symbol === "trx") {
-      chain = "Tron";
+    if (tokenExist?.symbol === 'trx') {
+      chain = 'Tron';
     }
 
-    if (tokenExist?.symbol === "usdt" && tokenExist?.type === "TRC20") {
-      chain = "Tron";
+    if (tokenExist?.symbol === 'usdt' && tokenExist?.type === 'TRC20') {
+      chain = 'Tron';
       // address = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t' // mainnet usdt address (USDT)
       // decimals = '6'// mainnet usdt address
       // address = 'TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf' // test tron on Nile (USDT)
-      address = "TLBaRhANQoJFTqre9Nf1mjuwNWjCJeYqUL"; //USDJ
-      decimals = "18";
+      address = 'TLBaRhANQoJFTqre9Nf1mjuwNWjCJeYqUL'; //USDJ
+      decimals = '18';
     }
 
-    if (tokenExist?.chainId === "56") {
-      chain = "Binance";
+    if (tokenExist?.chainId === '56') {
+      chain = 'Binance';
     }
 
-    if (tokenExist?.chainId === "42161") {
-      chain = "Arbitrum";
+    if (tokenExist?.chainId === '42161') {
+      chain = 'Arbitrum';
     }
 
-    if (tokenExist?.chainId === "1") {
-      chain = "Ethereum";
+    if (tokenExist?.chainId === '1') {
+      chain = 'Ethereum';
     }
 
-    if (tokenExist?.chainId === "10") {
-      chain === "Optimism";
+    if (tokenExist?.chainId === '10') {
+      chain === 'Optimism';
     }
 
-    if (tokenExist?.chainId === "137") {
-      chain = "Polygon";
+    if (tokenExist?.chainId === '137') {
+      chain = 'Polygon';
     }
     const {
       current_price,
@@ -463,13 +463,13 @@ const updatePricesExchange1 = async (token) => {
     //   chain = 'Tron';
     // }
 
-    if (tokenExist?.symbol === "usdt" && tokenExist?.type === "TRC20") {
-      chain = "Tron";
+    if (tokenExist?.symbol === 'usdt' && tokenExist?.type === 'TRC20') {
+      chain = 'Tron';
       // address = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t' // mainnet usdt address (USDT)
       // decimals = '6'// mainnet usdt address
       // address = 'TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf' // test tron on Nile (USDT)
-      address = "TLBaRhANQoJFTqre9Nf1mjuwNWjCJeYqUL"; //USDJ
-      decimals = "18";
+      address = 'TLBaRhANQoJFTqre9Nf1mjuwNWjCJeYqUL'; //USDJ
+      decimals = '18';
     }
 
     // if (tokenExist?.chainId === '56') {
@@ -569,81 +569,81 @@ const updatePricesExchange = async (token) => {
   let decimals;
   let chain;
 
-  if (token?.symbol === "btc") {
+  if (token?.symbol === 'btc') {
     tokenExist = await TokenListExchange.findOne({
       id: token?.id,
     }).exec();
     if (tokenExist) {
-      chain = "Bitcoin";
+      chain = 'Bitcoin';
     }
   }
 
-  if (token?.symbol === "trx") {
+  if (token?.symbol === 'trx') {
     tokenExist = await TokenListExchange.findOne({
       id: token?.id,
     }).exec();
     if (tokenExist) {
-      chain = "Tron";
+      chain = 'Tron';
     }
   }
 
-  if (token?.symbol === "usdt" && token?.type === "TRC20") {
+  if (token?.symbol === 'usdt' && token?.type === 'TRC20') {
     tokenExist = await TokenListExchange.findOne({
-      symbol: "usdt",
-      type: "TRC20",
+      symbol: 'usdt',
+      type: 'TRC20',
     }).exec();
     if (tokenExist) {
-      chain = "Tron";
+      chain = 'Tron';
       // address = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t' // mainnet usdt address (USDT)
       // decimals = '6'// mainnet usdt address
       // address = 'TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf' // test tron on Nile (USDT)
-      address = "TLBaRhANQoJFTqre9Nf1mjuwNWjCJeYqUL"; //USDJ
-      decimals = "18";
+      address = 'TLBaRhANQoJFTqre9Nf1mjuwNWjCJeYqUL'; //USDJ
+      decimals = '18';
     }
   }
 
-  if (token?.chainId === "1") {
+  if (token?.chainId === '1') {
     tokenExist = await TokenListExchange.findOne({
       id: token?.id,
     }).exec();
     if (tokenExist) {
-      chain = "Ethereum";
+      chain = 'Ethereum';
     }
   }
 
-  if (token?.chainId === "56") {
+  if (token?.chainId === '56') {
     tokenExist = await TokenListExchange.findOne({
       id: token?.id,
     }).exec();
     if (tokenExist) {
-      chain = "Binance";
+      chain = 'Binance';
     }
   }
 
-  if (token?.chainId === "42161") {
+  if (token?.chainId === '42161') {
     tokenExist = await TokenListExchange.findOne({
       id: token?.id,
     }).exec();
     if (tokenExist) {
-      chain = "Arbitrum";
+      chain = 'Arbitrum';
     }
   }
 
-  if (token?.chainId === "10") {
+  if (token?.chainId === '10') {
     tokenExist = await TokenListExchange.findOne({
       id: token?.id,
     }).exec();
     if (tokenExist) {
-      chain === "Optimism";
+      chain === 'Optimism';
     }
   }
 
-  if (token?.chainId === "137") {
+  if (token?.chainId === '137') {
     tokenExist = await TokenListExchange.findOne({
       id: token?.id,
     }).exec();
     if (tokenExist) {
-      chain = "Polygon";
+      chain = 'Polygon';
     }
   }
 
@@ -727,40 +727,40 @@ const updatePricesStore = async (token) => {
   if (tokenExist) {
     let chain;
 
-    if (tokenExist?.symbol === "btc") {
-      chain = "Bitcoin";
+    if (tokenExist?.symbol === 'btc') {
+      chain = 'Bitcoin';
     }
-    if (tokenExist?.symbol === "trx") {
-      chain = "Tron";
+    if (tokenExist?.symbol === 'trx') {
+      chain = 'Tron';
     }
 
-    if (tokenExist?.symbol === "usdt" && tokenExist?.type === "TRC20") {
-      chain = "Tron";
+    if (tokenExist?.symbol === 'usdt' && tokenExist?.type === 'TRC20') {
+      chain = 'Tron';
       // address = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t' // mainnet usdt address (USDT)
       // decimals = '6'// mainnet usdt address
       // address = 'TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf' // test tron on Nile (USDT)
-      address = "TLBaRhANQoJFTqre9Nf1mjuwNWjCJeYqUL"; //USDJ
-      decimals = "18";
+      address = 'TLBaRhANQoJFTqre9Nf1mjuwNWjCJeYqUL'; //USDJ
+      decimals = '18';
     }
 
-    if (tokenExist?.chainId === "56") {
-      chain = "Binance";
+    if (tokenExist?.chainId === '56') {
+      chain = 'Binance';
     }
 
-    if (tokenExist?.chainId === "42161") {
-      chain = "Arbitrum";
+    if (tokenExist?.chainId === '42161') {
+      chain = 'Arbitrum';
     }
 
-    if (tokenExist?.chainId === "1") {
-      chain = "Ethereum";
+    if (tokenExist?.chainId === '1') {
+      chain = 'Ethereum';
     }
 
-    if (tokenExist?.chainId === "10") {
-      chain === "Optimism";
+    if (tokenExist?.chainId === '10') {
+      chain === 'Optimism';
     }
 
-    if (tokenExist?.chainId === "137") {
-      chain = "Polygon";
+    if (tokenExist?.chainId === '137') {
+      chain = 'Polygon';
     }
     const {
       current_price,
@@ -842,27 +842,27 @@ const updatePricesCheckTron = async () => {
   //   type: 'TRC20',
   // }).exec();
   const tokenExist2 = await TokenListBuy.findOne({
-    symbol: "usdt",
-    type: "TRC20",
+    symbol: 'usdt',
+    type: 'TRC20',
   }).exec();
   const tokenExist3 = await TokenListSell.findOne({
-    symbol: "usdt",
-    type: "TRC20",
+    symbol: 'usdt',
+    type: 'TRC20',
   }).exec();
 
   const tokenExist4 = await TokenListPrice.findOne({
-    symbol: "usdt",
-    type: "TRC20",
+    symbol: 'usdt',
+    type: 'TRC20',
   }).exec();
   tokenExist = tokenExist4;
   if (tokenExist) {
     console.log({ tokenExist: tokenExist });
-    chain = "Tron";
+    chain = 'Tron';
     // address = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t' // mainnet usdt address (USDT)
     // decimals = '6'// mainnet usdt address
     // address = 'TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf' // test tron on Nile (USDT)
-    address = "TLBaRhANQoJFTqre9Nf1mjuwNWjCJeYqUL"; //USDJ
-    decimals = "18";
+    address = 'TLBaRhANQoJFTqre9Nf1mjuwNWjCJeYqUL'; //USDJ
+    decimals = '18';
   }
 
   tokenExist.chain = chain || tokenExist?.chain;
@@ -888,22 +888,22 @@ const updatePricesCheckEthereum = async () => {
   let tokenExist;
 
   const tokenExist1 = await TokenListExchange.findOne({
-    symbol: "usdt",
-    type: "ERC20",
+    symbol: 'usdt',
+    type: 'ERC20',
   }).exec();
   const tokenExist2 = await TokenListBuy.findOne({
-    symbol: "usdt",
-    type: "ERC20",
+    symbol: 'usdt',
+    type: 'ERC20',
   }).exec();
   const tokenExist3 = await TokenListSell.findOne({
-    symbol: "usdt",
-    type: "ERC20",
+    symbol: 'usdt',
+    type: 'ERC20',
   }).exec();
 
   tokenExist = tokenExist3;
   if (tokenExist) {
     console.log({ tokenExist: tokenExist });
-    chain = "Ethereum";
+    chain = 'Ethereum';
   }
 
   tokenExist.chain = chain || tokenExist?.chain;
@@ -927,14 +927,14 @@ const updatePricesCheckEthereumExchangeOnly = async () => {
   let tokenExist;
 
   const tokenExist1 = await TokenListExchange.findOne({
-    symbol: "eth",
+    symbol: 'eth',
   }).exec();
 
   tokenExist = tokenExist1;
   if (tokenExist) {
     console.log({ tokenExist: tokenExist });
     // chain = 'Ethereum';
-    address = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+    address = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
     decimals = 18;
   }
 
@@ -961,7 +961,7 @@ const updateAllTokenListPrice = asyncHandler(async (req, res) => {
     await updatePricesExchange(token);
   });
 
-  res.status(200).json("ok");
+  res.status(200).json('ok');
 });
 
 const updateAllTokenListPriceLocal = async () => {
@@ -1005,35 +1005,36 @@ const allTokenListPoolRequest = async () => {
 const getTokensDefiById = asyncHandler(async (req, res) => {
   const { chainId } = req.params;
   const tokenList = await TokenListDefi.find({ chainId: chainId });
+  console.log({ defiList: tokenList });
   res.status(200).json(tokenList);
 });
 
 const getTokensDefiEthereum = asyncHandler(async (req, res) => {
-  const chainId = "1";
+  const chainId = '1';
   const tokenList = await TokenListDefi.find({ chainId: chainId });
   res.status(200).json(tokenList);
 });
 
 const getTokensDefiBinance = asyncHandler(async (req, res) => {
-  const chainId = "56";
+  const chainId = '56';
   const tokenList = await TokenListDefi.find({ chainId: chainId });
   res.status(200).json(tokenList);
 });
 
 const getTokensDefiPolygon = asyncHandler(async (req, res) => {
-  const chainId = "137";
+  const chainId = '137';
   const tokenList = await TokenListDefi.find({ chainId: chainId });
   res.status(200).json(tokenList);
 });
 
 const getTokensDefiArbitrum = asyncHandler(async (req, res) => {
-  const chainId = "42161";
+  const chainId = '42161';
   const tokenList = await TokenListDefi.find({ chainId: chainId });
   res.status(200).json(tokenList);
 });
 
 const getTokensDefiOptimism = asyncHandler(async (req, res) => {
-  const chainId = "10";
+  const chainId = '10';
   const tokenList = await TokenListDefi.find({ chainId: chainId });
   res.status(200).json(tokenList);
 });
@@ -1104,9 +1105,9 @@ const updatePrices = async (token) => {
     const result = await tokenExist.save();
 
     if (result) {
-      console.log("success: tokens update");
+      console.log('success: tokens update');
     } else {
-      console.log("error: tokens update");
+      console.log('error: tokens update');
     }
   }
 };
@@ -1116,17 +1117,17 @@ const updatedTokenPrices = asyncHandler(async (req, res) => {
     const result = await updatePrices(token);
     if (result) {
       // console.log({ result: result });
-      console.log("ok");
+      console.log('ok');
     }
   });
-  res.status(200).json("ok");
+  res.status(200).json('ok');
 });
 
 //=================={AllTokenList}============================
 
 const updateTokenData = async (token) => {
   let tokenExist = await TokenList.findOne({ id: token?.id }).exec();
-  console.log({ status: "update" });
+  console.log({ status: 'update' });
   if (tokenExist) {
     const {
       current_price,
@@ -1185,15 +1186,15 @@ const updateTokenData = async (token) => {
     const result = await tokenExist.save();
 
     if (result) {
-      console.log("ok");
+      console.log('ok');
     } else {
-      console.log("error");
+      console.log('error');
     }
   }
 };
 
 const addTokenData = async (token) => {
-  console.log({ status: "new" });
+  console.log({ status: 'new' });
   const result = await TokenList.create({
     id: token?.id,
     symbol: token?.symbol,
@@ -1224,9 +1225,9 @@ const addTokenData = async (token) => {
   });
 
   if (result) {
-    console.log("ok");
+    console.log('ok');
   } else {
-    console.log("error");
+    console.log('error');
   }
 };
 
@@ -1266,7 +1267,7 @@ const addTokenByPage = asyncHandler(async (req, res) => {
       }
     }
   });
-  res.status(200).json("ok");
+  res.status(200).json('ok');
 });
 
 const addToken = async (page) => {
@@ -1407,7 +1408,7 @@ const getTokensController = asyncHandler(async (req, res) => {
     setTimeout(async () => {
       await addAllTokens(allPages);
       res.status(200).json({
-        message: "ok",
+        message: 'ok',
         allPages: allPages,
       });
     }, 360000); // 5min
@@ -1430,7 +1431,7 @@ const getTokensControllerLocal = async () => {
   let allPages = [];
 
   setTimeout(async () => {
-    console.log({ page1: "fetching" });
+    console.log({ page1: 'fetching' });
     // page1 = await fetchTokenFromCoinGeko(250, 1);
     page1 = await fetchTokenFromCoinGeko(250, 1);
     if (page1) {
@@ -1441,7 +1442,7 @@ const getTokensControllerLocal = async () => {
     }
 
     setTimeout(async () => {
-      console.log({ page2: "fetching" });
+      console.log({ page2: 'fetching' });
       page2 = await fetchTokenFromCoinGeko(250, 2);
       if (page2) {
         page2.map(async (tokens) => {
@@ -1451,7 +1452,7 @@ const getTokensControllerLocal = async () => {
     }, 30000); // 30 sec
 
     setTimeout(async () => {
-      console.log({ page3: "fetching" });
+      console.log({ page3: 'fetching' });
       page3 = await fetchTokenFromCoinGeko(250, 3);
       if (page3) {
         page3.map(async (tokens) => {
@@ -1461,7 +1462,7 @@ const getTokensControllerLocal = async () => {
     }, 60000); // 1 min
 
     setTimeout(async () => {
-      console.log({ page4: "fetching" });
+      console.log({ page4: 'fetching' });
       page4 = await fetchTokenFromCoinGeko(250, 4);
       if (page4) {
         page4.map(async (tokens) => {
@@ -1471,7 +1472,7 @@ const getTokensControllerLocal = async () => {
     }, 90000); // 1.5min
 
     setTimeout(async () => {
-      console.log({ page5: "fetching" });
+      console.log({ page5: 'fetching' });
       page5 = await fetchTokenFromCoinGeko(250, 5);
       if (page5) {
         page5.map(async (tokens) => {
@@ -1481,7 +1482,7 @@ const getTokensControllerLocal = async () => {
     }, 120000); // 2min
 
     setTimeout(async () => {
-      console.log({ page6: "fetching" });
+      console.log({ page6: 'fetching' });
       page6 = await fetchTokenFromCoinGeko(250, 6);
       if (page6) {
         page6.map(async (tokens) => {
@@ -1491,7 +1492,7 @@ const getTokensControllerLocal = async () => {
     }, 150000); // 2.5min
 
     setTimeout(async () => {
-      console.log({ page7: "fetching" });
+      console.log({ page7: 'fetching' });
       page7 = await fetchTokenFromCoinGeko(250, 7);
       if (page7) {
         page7.map(async (tokens) => {
@@ -1501,7 +1502,7 @@ const getTokensControllerLocal = async () => {
     }, 180000); // 3min
 
     setTimeout(async () => {
-      console.log({ page8: "fetching" });
+      console.log({ page8: 'fetching' });
       page8 = await fetchTokenFromCoinGeko(250, 8);
       if (page8) {
         page8.map(async (tokens) => {
@@ -1511,7 +1512,7 @@ const getTokensControllerLocal = async () => {
     }, 210000); // 3.5min
 
     setTimeout(async () => {
-      console.log({ page9: "fetching" });
+      console.log({ page9: 'fetching' });
       page9 = await fetchTokenFromCoinGeko(250, 9);
       if (page9) {
         page8.map(async (tokens) => {
@@ -1521,14 +1522,14 @@ const getTokensControllerLocal = async () => {
     }, 240000); // 4min
 
     setTimeout(async () => {
-      console.log({ page10: "fetching" });
+      console.log({ page10: 'fetching' });
       page10 = await fetchTokenFromCoinGeko(250, 10);
       if (page10) {
         page10.map(async (tokens) => {
           allPages.push(tokens);
         });
         allPages?.map(async (token) => {
-          if (token?.symbol === "btc") {
+          if (token?.symbol === 'btc') {
             console.log({ btcToke: token });
           }
           await updatePrices(token); // update tokens prices
@@ -1536,8 +1537,8 @@ const getTokensControllerLocal = async () => {
         });
         await addAllTokens(allPages);
       }
-      console.log("all Pages fetched");
-      console.log("all updates completed");
+      console.log('all Pages fetched');
+      console.log('all updates completed');
     }, 300000); // 4min 30sec
   }, 100);
 };
@@ -1562,7 +1563,7 @@ const test1 = async () => {
   let verify = false;
 
   if (p) {
-    console.log("P1");
+    console.log('P1');
     verify = true;
   }
 
@@ -1576,7 +1577,7 @@ const test2 = async () => {
 
   if (p) {
     setTimeout(() => {
-      console.log("P2");
+      console.log('P2');
       verify = true;
       return true;
     }, 5000);
@@ -1610,7 +1611,7 @@ const test3 = async () => {
   let p = 1;
   let verify = false;
   if (p) {
-    console.log("P3");
+    console.log('P3');
     verify = true;
 
     if (verify === true) {
@@ -2027,7 +2028,7 @@ const TOF1 = async () => {
 const btcExchangeRates = asyncHandler(async (req, res) => {
   try {
     const response = await axios.get(
-      "https://api.coingecko.com/api/v3/exchange_rates"
+      'https://api.coingecko.com/api/v3/exchange_rates'
     );
     if (response.data) {
       let result = await Rates.create({
@@ -2046,7 +2047,7 @@ const btcExchangeRates = asyncHandler(async (req, res) => {
 const btcExchangeRatesLocal = async () => {
   try {
     const response = await axios.get(
-      "https://api.coingecko.com/api/v3/exchange_rates"
+      'https://api.coingecko.com/api/v3/exchange_rates'
     );
     if (response.data) {
       let result = await Rates.create({
@@ -2253,7 +2254,7 @@ const btcExchangeRatesLocal = async () => {
 const trending = asyncHandler(async (req, res) => {
   try {
     const response = await axios.get(
-      "https://api.coingecko.com/api/v3/search/trending"
+      'https://api.coingecko.com/api/v3/search/trending'
     );
     if (response.data) {
       let result = await Trending.create({
@@ -2420,7 +2421,7 @@ const trending = asyncHandler(async (req, res) => {
 // };
 
 const globalData = asyncHandler(async (req, res) => {
-  const response = await axios.get("https://api.coingecko.com/api/v3/global");
+  const response = await axios.get('https://api.coingecko.com/api/v3/global');
   if (response.data) {
     let result = await Global.create({
       global: response.data,
@@ -2457,7 +2458,7 @@ const searchTokenMarketInfo = asyncHandler(async (req, res) => {
 const trending2 = asyncHandler(async (req, res) => {
   try {
     const response = await axios.get(
-      "https://api.coingecko.com/api/v3/search/trending"
+      'https://api.coingecko.com/api/v3/search/trending'
     );
     if (response.data) {
       let result = await Trending.create({
@@ -2506,16 +2507,16 @@ const historyChart = asyncHandler(async (req, res) => {
 //====================================================================================================
 
 const addExchangePair = async (token) => {
-  console.log({ status: "new" });
+  console.log({ status: 'new' });
   let result;
   const formData = {
     file: token.image,
     public_id: token.symbol,
-    upload_preset: "kxxtmdn1", //testing
+    upload_preset: 'kxxtmdn1', //testing
     // upload_preset: 'blendery', // production
   };
   const response = await axios.post(
-    "https://api.cloudinary.com/v1_1/datkh2oxv/image/upload/",
+    'https://api.cloudinary.com/v1_1/datkh2oxv/image/upload/',
     formData
   );
   const url = response.data.secure_url;
@@ -2561,126 +2562,126 @@ const addExchangePair = async (token) => {
 const updateExchangePair = async () => {
   let tokensFrom = [
     {
-      id: "bitcoin",
-      symbol: "btc",
-      price_symbol: "btc",
-      name: "Bitcoin",
-      token_type: "native",
+      id: 'bitcoin',
+      symbol: 'btc',
+      price_symbol: 'btc',
+      name: 'Bitcoin',
+      token_type: 'native',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
       current_price: 26615,
-      pricUSD: "",
-      pricEUR: "",
-      pricGBP: "",
-      pricRUB: "",
-      pricAED: "",
+      pricUSD: '',
+      pricEUR: '',
+      pricGBP: '',
+      pricRUB: '',
+      pricAED: '',
     },
     {
-      id: "ethereum",
-      symbol: "eth",
-      price_symbol: "eth",
-      name: "Ethereum",
-      token_type: "native",
+      id: 'ethereum',
+      symbol: 'eth',
+      price_symbol: 'eth',
+      name: 'Ethereum',
+      token_type: 'native',
       image:
-        "https://assets.coingecko.com/coins/images/279/large/ethereum.png?1696501628",
+        'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1696501628',
       current_price: 1553.55,
-      pricUSD: "",
-      pricEUR: "",
-      pricGBP: "",
-      pricRUB: "",
-      pricAED: "",
+      pricUSD: '',
+      pricEUR: '',
+      pricGBP: '',
+      pricRUB: '',
+      pricAED: '',
     },
     {
-      id: "tether TRC20",
-      symbol: "usdtTRX",
-      price_symbol: "usdt",
-      name: "Tether TRC20",
-      token_type: "TRC20",
+      id: 'tether TRC20',
+      symbol: 'usdtTRX',
+      price_symbol: 'usdt',
+      name: 'Tether TRC20',
+      token_type: 'TRC20',
       image:
-        "https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661",
+        'https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661',
       current_price: 0.999702,
-      pricUSD: "",
-      pricEUR: "",
-      pricGBP: "",
-      pricRUB: "",
-      pricAED: "",
+      pricUSD: '',
+      pricEUR: '',
+      pricGBP: '',
+      pricRUB: '',
+      pricAED: '',
     },
     {
-      id: "tether ERC20",
-      symbol: "usdt20",
-      price_symbol: "usdt",
-      name: "Tether ERC20",
-      token_type: "ERC20",
+      id: 'tether ERC20',
+      symbol: 'usdt20',
+      price_symbol: 'usdt',
+      name: 'Tether ERC20',
+      token_type: 'ERC20',
       image:
-        "https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661",
+        'https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661',
       current_price: 0.999702,
-      pricUSD: "",
-      pricEUR: "",
-      pricGBP: "",
-      pricRUB: "",
-      pricAED: "",
+      pricUSD: '',
+      pricEUR: '',
+      pricGBP: '',
+      pricRUB: '',
+      pricAED: '',
     },
   ];
   let tokensTo = [
     {
-      id: "bitcoin",
-      symbol: "btc",
-      price_symbol: "btc",
-      name: "Bitcoin",
-      token_type: "native",
+      id: 'bitcoin',
+      symbol: 'btc',
+      price_symbol: 'btc',
+      name: 'Bitcoin',
+      token_type: 'native',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
       current_price: 26615,
-      pricUSD: "",
-      pricEUR: "",
-      pricGBP: "",
-      pricRUB: "",
-      pricAED: "",
+      pricUSD: '',
+      pricEUR: '',
+      pricGBP: '',
+      pricRUB: '',
+      pricAED: '',
     },
     {
-      id: "ethereum",
-      symbol: "eth",
-      price_symbol: "eth",
-      name: "Ethereum",
-      token_type: "native",
+      id: 'ethereum',
+      symbol: 'eth',
+      price_symbol: 'eth',
+      name: 'Ethereum',
+      token_type: 'native',
       image:
-        "https://assets.coingecko.com/coins/images/279/large/ethereum.png?1696501628",
+        'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1696501628',
       current_price: 1553.55,
-      pricUSD: "",
-      pricEUR: "",
-      pricGBP: "",
-      pricRUB: "",
-      pricAED: "",
+      pricUSD: '',
+      pricEUR: '',
+      pricGBP: '',
+      pricRUB: '',
+      pricAED: '',
     },
     {
-      id: "tether TRC20",
-      symbol: "usdtTRX",
-      price_symbol: "usdt",
-      name: "Tether TRC20",
-      token_type: "TRC20",
+      id: 'tether TRC20',
+      symbol: 'usdtTRX',
+      price_symbol: 'usdt',
+      name: 'Tether TRC20',
+      token_type: 'TRC20',
       image:
-        "https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661",
+        'https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661',
       current_price: 0.999702,
-      pricUSD: "",
-      pricEUR: "",
-      pricGBP: "",
-      pricRUB: "",
-      pricAED: "",
+      pricUSD: '',
+      pricEUR: '',
+      pricGBP: '',
+      pricRUB: '',
+      pricAED: '',
     },
     {
-      id: "tether ERC20",
-      symbol: "usdt20",
-      price_symbol: "usdt",
-      name: "Tether ERC20",
-      token_type: "ERC20",
+      id: 'tether ERC20',
+      symbol: 'usdt20',
+      price_symbol: 'usdt',
+      name: 'Tether ERC20',
+      token_type: 'ERC20',
       image:
-        "https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661",
+        'https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661',
       current_price: 0.999702,
-      pricUSD: "",
-      pricEUR: "",
-      pricGBP: "",
-      pricRUB: "",
-      pricAED: "",
+      pricUSD: '',
+      pricEUR: '',
+      pricGBP: '',
+      pricRUB: '',
+      pricAED: '',
     },
   ];
 
@@ -2712,16 +2713,16 @@ const updateExchangePair = async () => {
 //====================================================================================================
 
 const addBuyCardPair = async (token) => {
-  console.log({ status: "new" });
+  console.log({ status: 'new' });
   let result;
   const formData = {
     file: token.image,
     public_id: token.symbol,
-    upload_preset: "kxxtmdn1", //testing
+    upload_preset: 'kxxtmdn1', //testing
     // upload_preset: 'blendery', // production
   };
   const response = await axios.post(
-    "https://api.cloudinary.com/v1_1/datkh2oxv/image/upload/",
+    'https://api.cloudinary.com/v1_1/datkh2oxv/image/upload/',
     formData
   );
   const url = response.data.secure_url;
@@ -2767,127 +2768,127 @@ const addBuyCardPair = async (token) => {
 const updateBuyCardPair = async () => {
   let tokensFrom = [
     {
-      id: "US Dollar",
-      symbol: "usd",
-      price_symbol: "usd",
-      name: "US Dollar",
-      unit: "$",
+      id: 'US Dollar',
+      symbol: 'usd',
+      price_symbol: 'usd',
+      name: 'US Dollar',
+      unit: '$',
       value: 26537.264,
-      type: "fiat",
+      type: 'fiat',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
       // logoURI: '/usd.png',
-      logoURI: "",
+      logoURI: '',
     },
     {
-      id: "Euro",
-      symbol: "eur",
-      price_symbol: "eur",
-      name: "Euro",
-      unit: "€",
+      id: 'Euro',
+      symbol: 'eur',
+      price_symbol: 'eur',
+      name: 'Euro',
+      unit: '€',
       value: 25184.368,
-      type: "fiat",
+      type: 'fiat',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
-      logoURI: "",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
+      logoURI: '',
     },
     {
-      id: "British Pound Sterling",
-      symbol: "gbp",
-      price_symbol: "gbp",
-      name: "British Pound Sterling",
-      unit: "£",
+      id: 'British Pound Sterling',
+      symbol: 'gbp',
+      price_symbol: 'gbp',
+      name: 'British Pound Sterling',
+      unit: '£',
       value: 21868.351,
-      type: "fiat",
+      type: 'fiat',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
-      logoURI: "",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
+      logoURI: '',
     },
     {
-      id: "Russian Ruble",
-      symbol: "rub",
-      price_symbol: "rub",
-      name: "Russian Ruble",
-      unit: "₽",
+      id: 'Russian Ruble',
+      symbol: 'rub',
+      price_symbol: 'rub',
+      name: 'Russian Ruble',
+      unit: '₽',
       value: 41675.288,
-      type: "fiat",
+      type: 'fiat',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
-      logoURI: "",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
+      logoURI: '',
     },
     {
-      id: "United Arab Emirates Dirham",
-      symbol: "aed",
-      price_symbol: "aed",
-      name: "United Arab Emirates Dirham",
-      unit: "DH",
+      id: 'United Arab Emirates Dirham',
+      symbol: 'aed',
+      price_symbol: 'aed',
+      name: 'United Arab Emirates Dirham',
+      unit: 'DH',
       value: 97471.904,
-      type: "fiat",
+      type: 'fiat',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
-      logoURI: "",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
+      logoURI: '',
     },
   ];
   let tokensTo = [
     {
-      id: "bitcoin",
-      symbol: "btc",
-      price_symbol: "btc",
-      name: "Bitcoin",
-      token_type: "native",
+      id: 'bitcoin',
+      symbol: 'btc',
+      price_symbol: 'btc',
+      name: 'Bitcoin',
+      token_type: 'native',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
       current_price: 26615,
-      pricUSD: "",
-      pricEUR: "",
-      pricGBP: "",
-      pricRUB: "",
-      pricAED: "",
+      pricUSD: '',
+      pricEUR: '',
+      pricGBP: '',
+      pricRUB: '',
+      pricAED: '',
     },
     {
-      id: "ethereum",
-      symbol: "eth",
-      price_symbol: "eth",
-      name: "Ethereum",
-      token_type: "native",
+      id: 'ethereum',
+      symbol: 'eth',
+      price_symbol: 'eth',
+      name: 'Ethereum',
+      token_type: 'native',
       image:
-        "https://assets.coingecko.com/coins/images/279/large/ethereum.png?1696501628",
+        'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1696501628',
       current_price: 1553.55, // prie usd
-      pricUSD: "",
-      pricEUR: "",
-      pricGBP: "",
-      pricRUB: "",
-      pricAED: "",
+      pricUSD: '',
+      pricEUR: '',
+      pricGBP: '',
+      pricRUB: '',
+      pricAED: '',
     },
     {
-      id: "tether TRC20",
-      symbol: "usdtTRX",
-      price_symbol: "usdt",
-      name: "Tether TRC20",
-      token_type: "TRC20",
+      id: 'tether TRC20',
+      symbol: 'usdtTRX',
+      price_symbol: 'usdt',
+      name: 'Tether TRC20',
+      token_type: 'TRC20',
       image:
-        "https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661",
+        'https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661',
       current_price: 0.999702,
-      pricUSD: "",
-      pricEUR: "",
-      pricGBP: "",
-      pricRUB: "",
-      pricAED: "",
+      pricUSD: '',
+      pricEUR: '',
+      pricGBP: '',
+      pricRUB: '',
+      pricAED: '',
     },
     {
-      id: "tether ERC20",
-      symbol: "usdt20",
-      price_symbol: "usdt",
-      name: "Tether ERC20",
-      token_type: "ERC20",
+      id: 'tether ERC20',
+      symbol: 'usdt20',
+      price_symbol: 'usdt',
+      name: 'Tether ERC20',
+      token_type: 'ERC20',
       image:
-        "https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661",
+        'https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661',
       current_price: 0.999702,
-      pricUSD: "",
-      pricEUR: "",
-      pricGBP: "",
-      pricRUB: "",
-      pricAED: "",
+      pricUSD: '',
+      pricEUR: '',
+      pricGBP: '',
+      pricRUB: '',
+      pricAED: '',
     },
   ];
 
@@ -2919,16 +2920,16 @@ const updateBuyCardPair = async () => {
 //====================================================================================================
 
 const addBuyCashPair = async (token) => {
-  console.log({ status: "new" });
+  console.log({ status: 'new' });
   let result;
   const formData = {
     file: token.image,
     public_id: token.symbol,
-    upload_preset: "kxxtmdn1", //testing
+    upload_preset: 'kxxtmdn1', //testing
     // upload_preset: 'blendery', // production
   };
   const response = await axios.post(
-    "https://api.cloudinary.com/v1_1/datkh2oxv/image/upload/",
+    'https://api.cloudinary.com/v1_1/datkh2oxv/image/upload/',
     formData
   );
   const url = response.data.secure_url;
@@ -2974,127 +2975,127 @@ const addBuyCashPair = async (token) => {
 const updateBuyCashPair = async () => {
   let tokensFrom = [
     {
-      id: "US Dollar",
-      symbol: "usd",
-      price_symbol: "usd",
-      name: "US Dollar",
-      unit: "$",
+      id: 'US Dollar',
+      symbol: 'usd',
+      price_symbol: 'usd',
+      name: 'US Dollar',
+      unit: '$',
       value: 26537.264,
-      type: "fiat",
+      type: 'fiat',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
       // logoURI: '/usd.png',
-      logoURI: "",
+      logoURI: '',
     },
     {
-      id: "Euro",
-      symbol: "eur",
-      price_symbol: "eur",
-      name: "Euro",
-      unit: "€",
+      id: 'Euro',
+      symbol: 'eur',
+      price_symbol: 'eur',
+      name: 'Euro',
+      unit: '€',
       value: 25184.368,
-      type: "fiat",
+      type: 'fiat',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
-      logoURI: "",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
+      logoURI: '',
     },
     {
-      id: "British Pound Sterling",
-      symbol: "gbp",
-      price_symbol: "gbp",
-      name: "British Pound Sterling",
-      unit: "£",
+      id: 'British Pound Sterling',
+      symbol: 'gbp',
+      price_symbol: 'gbp',
+      name: 'British Pound Sterling',
+      unit: '£',
       value: 21868.351,
-      type: "fiat",
+      type: 'fiat',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
-      logoURI: "",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
+      logoURI: '',
     },
     {
-      id: "Russian Ruble",
-      symbol: "rub",
-      price_symbol: "rub",
-      name: "Russian Ruble",
-      unit: "₽",
+      id: 'Russian Ruble',
+      symbol: 'rub',
+      price_symbol: 'rub',
+      name: 'Russian Ruble',
+      unit: '₽',
       value: 41675.288,
-      type: "fiat",
+      type: 'fiat',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
-      logoURI: "",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
+      logoURI: '',
     },
     {
-      id: "United Arab Emirates Dirham",
-      symbol: "aed",
-      price_symbol: "aed",
-      name: "United Arab Emirates Dirham",
-      unit: "DH",
+      id: 'United Arab Emirates Dirham',
+      symbol: 'aed',
+      price_symbol: 'aed',
+      name: 'United Arab Emirates Dirham',
+      unit: 'DH',
       value: 97471.904,
-      type: "fiat",
+      type: 'fiat',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
-      logoURI: "",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
+      logoURI: '',
     },
   ];
   let tokensTo = [
     {
-      id: "bitcoin",
-      symbol: "btc",
-      price_symbol: "btc",
-      name: "Bitcoin",
-      token_type: "native",
+      id: 'bitcoin',
+      symbol: 'btc',
+      price_symbol: 'btc',
+      name: 'Bitcoin',
+      token_type: 'native',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
       current_price: 26615,
-      pricUSD: "",
-      pricEUR: "",
-      pricGBP: "",
-      pricRUB: "",
-      pricAED: "",
+      pricUSD: '',
+      pricEUR: '',
+      pricGBP: '',
+      pricRUB: '',
+      pricAED: '',
     },
     {
-      id: "ethereum",
-      symbol: "eth",
-      price_symbol: "eth",
-      name: "Ethereum",
-      token_type: "native",
+      id: 'ethereum',
+      symbol: 'eth',
+      price_symbol: 'eth',
+      name: 'Ethereum',
+      token_type: 'native',
       image:
-        "https://assets.coingecko.com/coins/images/279/large/ethereum.png?1696501628",
+        'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1696501628',
       current_price: 1553.55,
-      pricUSD: "",
-      pricEUR: "",
-      pricGBP: "",
-      pricRUB: "",
-      pricAED: "",
+      pricUSD: '',
+      pricEUR: '',
+      pricGBP: '',
+      pricRUB: '',
+      pricAED: '',
     },
     {
-      id: "tether TRC20",
-      symbol: "usdtTRX",
-      price_symbol: "usdt",
-      name: "Tether TRC20",
-      token_type: "TRC20",
+      id: 'tether TRC20',
+      symbol: 'usdtTRX',
+      price_symbol: 'usdt',
+      name: 'Tether TRC20',
+      token_type: 'TRC20',
       image:
-        "https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661",
+        'https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661',
       current_price: 0.999702,
-      pricUSD: "",
-      pricEUR: "",
-      pricGBP: "",
-      pricRUB: "",
-      pricAED: "",
+      pricUSD: '',
+      pricEUR: '',
+      pricGBP: '',
+      pricRUB: '',
+      pricAED: '',
     },
     {
-      id: "tether ERC20",
-      symbol: "usdt20",
-      price_symbol: "usdt",
-      name: "Tether ERC20",
-      token_type: "ERC20",
+      id: 'tether ERC20',
+      symbol: 'usdt20',
+      price_symbol: 'usdt',
+      name: 'Tether ERC20',
+      token_type: 'ERC20',
       image:
-        "https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661",
+        'https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661',
       current_price: 0.999702,
-      pricUSD: "",
-      pricEUR: "",
-      pricGBP: "",
-      pricRUB: "",
-      pricAED: "",
+      pricUSD: '',
+      pricEUR: '',
+      pricGBP: '',
+      pricRUB: '',
+      pricAED: '',
     },
   ];
 
@@ -3125,16 +3126,16 @@ const updateBuyCashPair = async () => {
 //======================================={SELL CARD PAIRS}=============================================
 //====================================================================================================
 const addSellCardPair = async (token) => {
-  console.log({ status: "new" });
+  console.log({ status: 'new' });
   let result;
   const formData = {
     file: token.image,
     public_id: token.symbol,
-    upload_preset: "kxxtmdn1", //testing
+    upload_preset: 'kxxtmdn1', //testing
     // upload_preset: 'blendery', // production
   };
   const response = await axios.post(
-    "https://api.cloudinary.com/v1_1/datkh2oxv/image/upload/",
+    'https://api.cloudinary.com/v1_1/datkh2oxv/image/upload/',
     formData
   );
   const url = response.data.secure_url;
@@ -3180,127 +3181,127 @@ const addSellCardPair = async (token) => {
 const updateSellCardPair = async () => {
   let tokensFrom = [
     {
-      id: "bitcoin",
-      symbol: "btc",
-      price_symbol: "btc",
-      name: "Bitcoin",
-      token_type: "native",
+      id: 'bitcoin',
+      symbol: 'btc',
+      price_symbol: 'btc',
+      name: 'Bitcoin',
+      token_type: 'native',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
       current_price: 26615,
-      pricUSD: "",
-      pricEUR: "",
-      pricGBP: "",
-      pricRUB: "",
-      pricAED: "",
+      pricUSD: '',
+      pricEUR: '',
+      pricGBP: '',
+      pricRUB: '',
+      pricAED: '',
     },
     {
-      id: "ethereum",
-      symbol: "eth",
-      price_symbol: "eth",
-      name: "Ethereum",
-      token_type: "native",
+      id: 'ethereum',
+      symbol: 'eth',
+      price_symbol: 'eth',
+      name: 'Ethereum',
+      token_type: 'native',
       image:
-        "https://assets.coingecko.com/coins/images/279/large/ethereum.png?1696501628",
+        'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1696501628',
       current_price: 1553.55,
-      pricUSD: "",
-      pricEUR: "",
-      pricGBP: "",
-      pricRUB: "",
-      pricAED: "",
+      pricUSD: '',
+      pricEUR: '',
+      pricGBP: '',
+      pricRUB: '',
+      pricAED: '',
     },
     {
-      id: "tether TRC20",
-      symbol: "usdtTRX",
-      price_symbol: "usdt",
-      name: "Tether TRC20",
-      token_type: "TRC20",
+      id: 'tether TRC20',
+      symbol: 'usdtTRX',
+      price_symbol: 'usdt',
+      name: 'Tether TRC20',
+      token_type: 'TRC20',
       image:
-        "https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661",
+        'https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661',
       current_price: 0.999702,
-      pricUSD: "",
-      pricEUR: "",
-      pricGBP: "",
-      pricRUB: "",
-      pricAED: "",
+      pricUSD: '',
+      pricEUR: '',
+      pricGBP: '',
+      pricRUB: '',
+      pricAED: '',
     },
     {
-      id: "tether ERC20",
-      symbol: "usdt20",
-      price_symbol: "usdt",
-      name: "Tether ERC20",
-      token_type: "ERC20",
+      id: 'tether ERC20',
+      symbol: 'usdt20',
+      price_symbol: 'usdt',
+      name: 'Tether ERC20',
+      token_type: 'ERC20',
       image:
-        "https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661",
+        'https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661',
       current_price: 0.999702,
-      pricUSD: "",
-      pricEUR: "",
-      pricGBP: "",
-      pricRUB: "",
-      pricAED: "",
+      pricUSD: '',
+      pricEUR: '',
+      pricGBP: '',
+      pricRUB: '',
+      pricAED: '',
     },
   ];
   let tokensTo = [
     {
-      id: "US Dollar",
-      symbol: "usd",
-      price_symbol: "usd",
-      name: "US Dollar",
-      unit: "$",
+      id: 'US Dollar',
+      symbol: 'usd',
+      price_symbol: 'usd',
+      name: 'US Dollar',
+      unit: '$',
       value: 26537.264,
-      type: "fiat",
+      type: 'fiat',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
       // logoURI: '/usd.png',
-      logoURI: "",
+      logoURI: '',
     },
     {
-      id: "Euro",
-      symbol: "eur",
-      price_symbol: "eur",
-      name: "Euro",
-      unit: "€",
+      id: 'Euro',
+      symbol: 'eur',
+      price_symbol: 'eur',
+      name: 'Euro',
+      unit: '€',
       value: 25184.368,
-      type: "fiat",
+      type: 'fiat',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
-      logoURI: "",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
+      logoURI: '',
     },
     {
-      id: "British Pound Sterling",
-      symbol: "gbp",
-      price_symbol: "gbp",
-      name: "British Pound Sterling",
-      unit: "£",
+      id: 'British Pound Sterling',
+      symbol: 'gbp',
+      price_symbol: 'gbp',
+      name: 'British Pound Sterling',
+      unit: '£',
       value: 21868.351,
-      type: "fiat",
+      type: 'fiat',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
-      logoURI: "",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
+      logoURI: '',
     },
     {
-      id: "Russian Ruble",
-      symbol: "rub",
-      price_symbol: "rub",
-      name: "Russian Ruble",
-      unit: "₽",
+      id: 'Russian Ruble',
+      symbol: 'rub',
+      price_symbol: 'rub',
+      name: 'Russian Ruble',
+      unit: '₽',
       value: 41675.288,
-      type: "fiat",
+      type: 'fiat',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
-      logoURI: "",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
+      logoURI: '',
     },
     {
-      id: "United Arab Emirates Dirham",
-      symbol: "aed",
-      price_symbol: "aed",
-      name: "United Arab Emirates Dirham",
-      unit: "DH",
+      id: 'United Arab Emirates Dirham',
+      symbol: 'aed',
+      price_symbol: 'aed',
+      name: 'United Arab Emirates Dirham',
+      unit: 'DH',
       value: 97471.904,
-      type: "fiat",
+      type: 'fiat',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
-      logoURI: "",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
+      logoURI: '',
     },
   ];
 
@@ -3331,16 +3332,16 @@ const updateSellCardPair = async () => {
 //======================================={SELL CASH PAIRS}=============================================
 //====================================================================================================
 const addSellCashPair = async (token) => {
-  console.log({ status: "new" });
+  console.log({ status: 'new' });
   let result;
   const formData = {
     file: token.image,
     public_id: token.symbol,
-    upload_preset: "kxxtmdn1", //testing
+    upload_preset: 'kxxtmdn1', //testing
     // upload_preset: 'blendery', // production
   };
   const response = await axios.post(
-    "https://api.cloudinary.com/v1_1/datkh2oxv/image/upload/",
+    'https://api.cloudinary.com/v1_1/datkh2oxv/image/upload/',
     formData
   );
   const url = response.data.secure_url;
@@ -3385,127 +3386,127 @@ const addSellCashPair = async (token) => {
 const updateSellCashPair = async () => {
   let tokensFrom = [
     {
-      id: "bitcoin",
-      symbol: "btc",
-      price_symbol: "btc",
-      name: "Bitcoin",
-      token_type: "native",
+      id: 'bitcoin',
+      symbol: 'btc',
+      price_symbol: 'btc',
+      name: 'Bitcoin',
+      token_type: 'native',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
       current_price: 26615,
-      pricUSD: "",
-      pricEUR: "",
-      pricGBP: "",
-      pricRUB: "",
-      pricAED: "",
+      pricUSD: '',
+      pricEUR: '',
+      pricGBP: '',
+      pricRUB: '',
+      pricAED: '',
     },
     {
-      id: "ethereum",
-      symbol: "eth",
-      price_symbol: "eth",
-      name: "Ethereum",
-      token_type: "native",
+      id: 'ethereum',
+      symbol: 'eth',
+      price_symbol: 'eth',
+      name: 'Ethereum',
+      token_type: 'native',
       image:
-        "https://assets.coingecko.com/coins/images/279/large/ethereum.png?1696501628",
+        'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1696501628',
       current_price: 1553.55,
-      pricUSD: "",
-      pricEUR: "",
-      pricGBP: "",
-      pricRUB: "",
-      pricAED: "",
+      pricUSD: '',
+      pricEUR: '',
+      pricGBP: '',
+      pricRUB: '',
+      pricAED: '',
     },
     {
-      id: "tether TRC20",
-      symbol: "usdtTRX",
-      price_symbol: "usdt",
-      name: "Tether TRC20",
-      token_type: "TRC20",
+      id: 'tether TRC20',
+      symbol: 'usdtTRX',
+      price_symbol: 'usdt',
+      name: 'Tether TRC20',
+      token_type: 'TRC20',
       image:
-        "https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661",
+        'https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661',
       current_price: 0.999702,
-      pricUSD: "",
-      pricEUR: "",
-      pricGBP: "",
-      pricRUB: "",
-      pricAED: "",
+      pricUSD: '',
+      pricEUR: '',
+      pricGBP: '',
+      pricRUB: '',
+      pricAED: '',
     },
     {
-      id: "tether ERC20",
-      symbol: "usdt20",
-      price_symbol: "usdt",
-      name: "Tether ERC20",
-      token_type: "ERC20",
+      id: 'tether ERC20',
+      symbol: 'usdt20',
+      price_symbol: 'usdt',
+      name: 'Tether ERC20',
+      token_type: 'ERC20',
       image:
-        "https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661",
+        'https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661',
       current_price: 0.999702,
-      pricUSD: "",
-      pricEUR: "",
-      pricGBP: "",
-      pricRUB: "",
-      pricAED: "",
+      pricUSD: '',
+      pricEUR: '',
+      pricGBP: '',
+      pricRUB: '',
+      pricAED: '',
     },
   ];
   let tokensTo = [
     {
-      id: "US Dollar",
-      symbol: "usd",
-      price_symbol: "usd",
-      name: "US Dollar",
-      unit: "$",
+      id: 'US Dollar',
+      symbol: 'usd',
+      price_symbol: 'usd',
+      name: 'US Dollar',
+      unit: '$',
       value: 26537.264,
-      type: "fiat",
+      type: 'fiat',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
       // logoURI: '/usd.png',
-      logoURI: "",
+      logoURI: '',
     },
     {
-      id: "Euro",
-      symbol: "eur",
-      price_symbol: "eur",
-      name: "Euro",
-      unit: "€",
+      id: 'Euro',
+      symbol: 'eur',
+      price_symbol: 'eur',
+      name: 'Euro',
+      unit: '€',
       value: 25184.368,
-      type: "fiat",
+      type: 'fiat',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
-      logoURI: "",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
+      logoURI: '',
     },
     {
-      id: "British Pound Sterling",
-      symbol: "gbp",
-      price_symbol: "gbp",
-      name: "British Pound Sterling",
-      unit: "£",
+      id: 'British Pound Sterling',
+      symbol: 'gbp',
+      price_symbol: 'gbp',
+      name: 'British Pound Sterling',
+      unit: '£',
       value: 21868.351,
-      type: "fiat",
+      type: 'fiat',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
-      logoURI: "",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
+      logoURI: '',
     },
     {
-      id: "Russian Ruble",
-      symbol: "rub",
-      price_symbol: "rub",
-      name: "Russian Ruble",
-      unit: "₽",
+      id: 'Russian Ruble',
+      symbol: 'rub',
+      price_symbol: 'rub',
+      name: 'Russian Ruble',
+      unit: '₽',
       value: 41675.288,
-      type: "fiat",
+      type: 'fiat',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
-      logoURI: "",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
+      logoURI: '',
     },
     {
-      id: "United Arab Emirates Dirham",
-      symbol: "aed",
-      price_symbol: "aed",
-      name: "United Arab Emirates Dirham",
-      unit: "DH",
+      id: 'United Arab Emirates Dirham',
+      symbol: 'aed',
+      price_symbol: 'aed',
+      name: 'United Arab Emirates Dirham',
+      unit: 'DH',
       value: 97471.904,
-      type: "fiat",
+      type: 'fiat',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
-      logoURI: "",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
+      logoURI: '',
     },
   ];
 
@@ -3537,16 +3538,16 @@ const updateSellCashPair = async () => {
 //====================================================================================================
 // use oneInch List
 const addDefiPair = async (token) => {
-  console.log({ status: "new" });
+  console.log({ status: 'new' });
   let result;
   const formData = {
     file: token.image,
     public_id: token.symbol,
-    upload_preset: "kxxtmdn1", //testing
+    upload_preset: 'kxxtmdn1', //testing
     // upload_preset: 'blendery', // production
   };
   const response = await axios.post(
-    "https://api.cloudinary.com/v1_1/datkh2oxv/image/upload/",
+    'https://api.cloudinary.com/v1_1/datkh2oxv/image/upload/',
     formData
   );
   const url = response.data.secure_url;
@@ -3592,88 +3593,88 @@ const addDefiPair = async (token) => {
 const updateDefiPair = async () => {
   let tokensFrom = [
     {
-      id: "bitcoin",
-      symbol: "btc",
-      price_symbol: "btc",
-      name: "Bitcoin",
-      token_type: "native",
+      id: 'bitcoin',
+      symbol: 'btc',
+      price_symbol: 'btc',
+      name: 'Bitcoin',
+      token_type: 'native',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
       current_price: 26615,
-      chainId: "1",
-      address: "",
-      decimals: "",
+      chainId: '1',
+      address: '',
+      decimals: '',
     },
     {
-      id: "ethereum",
-      symbol: "eth",
-      price_symbol: "eth",
-      name: "Ethereum",
-      token_type: "native",
+      id: 'ethereum',
+      symbol: 'eth',
+      price_symbol: 'eth',
+      name: 'Ethereum',
+      token_type: 'native',
       image:
-        "https://assets.coingecko.com/coins/images/279/large/ethereum.png?1696501628",
+        'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1696501628',
       current_price: 1553.55,
     },
     {
-      id: "tether TRC20",
-      symbol: "usdtTRX",
-      price_symbol: "usdt",
-      name: "Tether TRC20",
-      token_type: "TRC20",
+      id: 'tether TRC20',
+      symbol: 'usdtTRX',
+      price_symbol: 'usdt',
+      name: 'Tether TRC20',
+      token_type: 'TRC20',
       image:
-        "https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661",
+        'https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661',
       current_price: 0.999702,
     },
     {
-      id: "tether ERC20",
-      symbol: "usdt20",
-      price_symbol: "usdt",
-      name: "Tether ERC20",
-      token_type: "ERC20",
+      id: 'tether ERC20',
+      symbol: 'usdt20',
+      price_symbol: 'usdt',
+      name: 'Tether ERC20',
+      token_type: 'ERC20',
       image:
-        "https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661",
+        'https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661',
       current_price: 0.999702,
     },
   ];
   let tokensTo = [
     {
-      id: "bitcoin",
-      symbol: "btc",
-      price_symbol: "btc",
-      name: "Bitcoin",
-      token_type: "native",
+      id: 'bitcoin',
+      symbol: 'btc',
+      price_symbol: 'btc',
+      name: 'Bitcoin',
+      token_type: 'native',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
       current_price: 26615,
     },
     {
-      id: "ethereum",
-      symbol: "eth",
-      price_symbol: "eth",
-      name: "Ethereum",
-      token_type: "native",
+      id: 'ethereum',
+      symbol: 'eth',
+      price_symbol: 'eth',
+      name: 'Ethereum',
+      token_type: 'native',
       image:
-        "https://assets.coingecko.com/coins/images/279/large/ethereum.png?1696501628",
+        'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1696501628',
       current_price: 1553.55,
     },
     {
-      id: "tether TRC20",
-      symbol: "usdtTRX",
-      price_symbol: "usdt",
-      name: "Tether TRC20",
-      token_type: "TRC20",
+      id: 'tether TRC20',
+      symbol: 'usdtTRX',
+      price_symbol: 'usdt',
+      name: 'Tether TRC20',
+      token_type: 'TRC20',
       image:
-        "https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661",
+        'https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661',
       current_price: 0.999702,
     },
     {
-      id: "tether ERC20",
-      symbol: "usdt20",
-      price_symbol: "usdt",
-      name: "Tether ERC20",
-      token_type: "ERC20",
+      id: 'tether ERC20',
+      symbol: 'usdt20',
+      price_symbol: 'usdt',
+      name: 'Tether ERC20',
+      token_type: 'ERC20',
       image:
-        "https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661",
+        'https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661',
       current_price: 0.999702,
     },
   ];
@@ -3690,11 +3691,11 @@ const updateDefiPair = async () => {
 
   let tokensFromEthereum = [
     {
-      id: "bitcoin",
-      symbol: "btc",
-      name: "Bitcoin",
+      id: 'bitcoin',
+      symbol: 'btc',
+      name: 'Bitcoin',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
       current_price: 26615,
       market_cap: 518927028307,
       market_cap_rank: 1,
@@ -3711,19 +3712,19 @@ const updateDefiPair = async () => {
       max_supply: 21000000,
       ath: 69045,
       ath_change_percentage: -61.44603,
-      ath_date: "2021-11-10T14:24:11.849Z",
+      ath_date: '2021-11-10T14:24:11.849Z',
       atl: 67.81,
       atl_change_percentage: 39156.58473,
-      atl_date: "2013-07-06T00:00:00.000Z",
+      atl_date: '2013-07-06T00:00:00.000Z',
       roi: null,
-      last_updated: "2023-10-11T17:57:36.197Z",
+      last_updated: '2023-10-11T17:57:36.197Z',
     },
     {
-      id: "ethereum",
-      symbol: "eth",
-      name: "Ethereum",
+      id: 'ethereum',
+      symbol: 'eth',
+      name: 'Ethereum',
       image:
-        "https://assets.coingecko.com/coins/images/279/large/ethereum.png?1696501628",
+        'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1696501628',
       current_price: 1553.55,
       market_cap: 186734441975,
       market_cap_rank: 2,
@@ -3740,23 +3741,23 @@ const updateDefiPair = async () => {
       max_supply: null,
       ath: 4878.26,
       ath_change_percentage: -68.1423,
-      ath_date: "2021-11-10T14:24:19.604Z",
+      ath_date: '2021-11-10T14:24:19.604Z',
       atl: 0.432979,
       atl_change_percentage: 358832.41577,
-      atl_date: "2015-10-20T00:00:00.000Z",
+      atl_date: '2015-10-20T00:00:00.000Z',
       roi: {
         times: 77.0509894490856,
-        currency: "btc",
+        currency: 'btc',
         percentage: 7705.098944908561,
       },
-      last_updated: "2023-10-11T17:57:42.803Z",
+      last_updated: '2023-10-11T17:57:42.803Z',
     },
     {
-      id: "tether",
-      symbol: "usdt",
-      name: "Tether",
+      id: 'tether',
+      symbol: 'usdt',
+      name: 'Tether',
       image:
-        "https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661",
+        'https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661',
       current_price: 0.999702,
       market_cap: 83534390789,
       market_cap_rank: 3,
@@ -3773,21 +3774,21 @@ const updateDefiPair = async () => {
       max_supply: null,
       ath: 1.32,
       ath_change_percentage: -24.442,
-      ath_date: "2018-07-24T00:00:00.000Z",
+      ath_date: '2018-07-24T00:00:00.000Z',
       atl: 0.572521,
       atl_change_percentage: 74.61443,
-      atl_date: "2015-03-02T00:00:00.000Z",
+      atl_date: '2015-03-02T00:00:00.000Z',
       roi: null,
-      last_updated: "2023-10-11T17:55:00.498Z",
+      last_updated: '2023-10-11T17:55:00.498Z',
     },
   ];
   let tokensToEthereum = [
     {
-      id: "bitcoin",
-      symbol: "btc",
-      name: "Bitcoin",
+      id: 'bitcoin',
+      symbol: 'btc',
+      name: 'Bitcoin',
       image:
-        "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400",
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
       current_price: 26615,
       market_cap: 518927028307,
       market_cap_rank: 1,
@@ -3804,19 +3805,19 @@ const updateDefiPair = async () => {
       max_supply: 21000000,
       ath: 69045,
       ath_change_percentage: -61.44603,
-      ath_date: "2021-11-10T14:24:11.849Z",
+      ath_date: '2021-11-10T14:24:11.849Z',
       atl: 67.81,
       atl_change_percentage: 39156.58473,
-      atl_date: "2013-07-06T00:00:00.000Z",
+      atl_date: '2013-07-06T00:00:00.000Z',
       roi: null,
-      last_updated: "2023-10-11T17:57:36.197Z",
+      last_updated: '2023-10-11T17:57:36.197Z',
     },
     {
-      id: "ethereum",
-      symbol: "eth",
-      name: "Ethereum",
+      id: 'ethereum',
+      symbol: 'eth',
+      name: 'Ethereum',
       image:
-        "https://assets.coingecko.com/coins/images/279/large/ethereum.png?1696501628",
+        'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1696501628',
       current_price: 1553.55,
       market_cap: 186734441975,
       market_cap_rank: 2,
@@ -3833,23 +3834,23 @@ const updateDefiPair = async () => {
       max_supply: null,
       ath: 4878.26,
       ath_change_percentage: -68.1423,
-      ath_date: "2021-11-10T14:24:19.604Z",
+      ath_date: '2021-11-10T14:24:19.604Z',
       atl: 0.432979,
       atl_change_percentage: 358832.41577,
-      atl_date: "2015-10-20T00:00:00.000Z",
+      atl_date: '2015-10-20T00:00:00.000Z',
       roi: {
         times: 77.0509894490856,
-        currency: "btc",
+        currency: 'btc',
         percentage: 7705.098944908561,
       },
-      last_updated: "2023-10-11T17:57:42.803Z",
+      last_updated: '2023-10-11T17:57:42.803Z',
     },
     {
-      id: "tether",
-      symbol: "usdt",
-      name: "Tether",
+      id: 'tether',
+      symbol: 'usdt',
+      name: 'Tether',
       image:
-        "https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661",
+        'https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661',
       current_price: 0.999702,
       market_cap: 83534390789,
       market_cap_rank: 3,
@@ -3866,12 +3867,12 @@ const updateDefiPair = async () => {
       max_supply: null,
       ath: 1.32,
       ath_change_percentage: -24.442,
-      ath_date: "2018-07-24T00:00:00.000Z",
+      ath_date: '2018-07-24T00:00:00.000Z',
       atl: 0.572521,
       atl_change_percentage: 74.61443,
-      atl_date: "2015-03-02T00:00:00.000Z",
+      atl_date: '2015-03-02T00:00:00.000Z',
       roi: null,
-      last_updated: "2023-10-11T17:55:00.498Z",
+      last_updated: '2023-10-11T17:55:00.498Z',
     },
   ];
 
@@ -3927,7 +3928,7 @@ async function BtcExchangeRatesLocal() {
   let result;
   try {
     const response = await axios.get(
-      "https://api.coingecko.com/api/v3/exchange_rates"
+      'https://api.coingecko.com/api/v3/exchange_rates'
     );
     if (response.data) {
       result = await Rates.create({
@@ -4091,19 +4092,19 @@ const updateTokenListFiat = async () => {
 
   const tokens = [
     {
-      symbol: "usd",
+      symbol: 'usd',
       value: usdValue,
     },
     {
-      symbol: "eur",
+      symbol: 'eur',
       value: eurValue,
     },
     {
-      symbol: "gbp",
+      symbol: 'gbp',
       value: gbpValue,
     },
     {
-      symbol: "aed",
+      symbol: 'aed',
       value: aedValue,
     },
   ];

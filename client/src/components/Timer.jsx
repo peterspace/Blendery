@@ -24,29 +24,32 @@ export const Timer = (props) => {
               <TimerFormat duration={txData?.timeLeft} />
             </div> */}
             {txData?.status === 'Received' || txData?.service === 'defi' ? (
-              <div className="text-base leading-[24px] text-gray-300 inline-block w-[69px]">
+              <div className="text-base leading-[24px] text-gray-300 inline-block">
                 {`-- : -- : --`}
               </div>
             ) : (
               <>
                 {txData?.timeStatus === 'Expired' ? (
-                  <div className="text-base leading-[24px] text-red-600 inline-block w-[69px]">
+                  <div className="text-base leading-[24px] text-red-600 inline-block">
                     Expired
                   </div>
-                ) : (<>
-                {
-                    txData?.status === "Completed" ? (<div className="text-base leading-[24px] text-gray-300 inline-block w-[69px]">
-                    {`-- : -- : --`}
-                  </div>): (<div className="text-base leading-[24px] text-gray-300 inline-block w-[69px]">
-                    <TimerFormat duration={txData?.timeLeft} />
-                  </div>)
-                  }</>
-                  
+                ) : (
+                  <>
+                    {txData?.status === 'Completed' ? (
+                      <div className="text-base leading-[24px] text-gray-300 inline-block">
+                        {`-- : -- : --`}
+                      </div>
+                    ) : (
+                      <div className="text-base leading-[24px] text-gray-300 inline-block">
+                        <TimerFormat duration={txData?.timeLeft} />
+                      </div>
+                    )}
+                  </>
                 )}
               </>
             )}
           </div>
-          <div className="text-xs leading-[18px] text-darkslategray-100 inline-block w-[146px]">
+          <div className="text-xs leading-[18px] text-darkslategray-100 inline-block">
             Time left to send {txData?.fValue}{' '}
             {txData?.fToken?.symbol.toUpperCase()}
           </div>
@@ -54,11 +57,16 @@ export const Timer = (props) => {
           <div className="">
             <div className="flex flex-row gap-2 mt-2">
               <div className="leading-[20px] text-gray-300 inline-block">
-                {/* 97pqbllmmxbzpbhz */}
-                {/* {txData?.txId} */}
                 {txData?.orderNo}
               </div>
-              <RxCopy size={15} color="#b4b4b4" />
+              <div
+                className="ccursor-pointer text-[#b4b4b4] hover:text-darkslategray-100 hover:-translate-y-0.5 transform transition"
+                onClick={() => {
+                  navigator.clipboard.writeText(txData?.orderNo);
+                }}
+              >
+                <RxCopy size={15} />
+              </div>
             </div>
 
             <div className="text-xs leading-[18px] text-darkslategray-100 inline-block w-[87px]">

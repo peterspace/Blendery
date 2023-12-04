@@ -96,12 +96,12 @@ export const Forgot = (props) => {
             <div className="flex bg-lightslategray-300 md:w-[452px] w-[370px] h-px" />
           </div>
           <div className="flex flex-col gap-[8px]">
-            <div className="flex flex-col mb-4 h-[48px] bg-whitesmoke-100 rounded outline outline-lightslategray-300 outline-[1px]">
+            <div className="flex flex-col mb-4 h-[48px] bg-white rounded outline outline-lightslategray-300 outline-[1px]">
               <input
                 id="email"
                 name="email"
                 type="email"
-                className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 placeholder-darkgray-100 inline-block w-full outline-none bg-gray-100"
+                className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 placeholder-darkgray-100 inline-block outline-none bg-white"
                 placeholder="your@email.com"
                 value={values.email}
                 onChange={handleChange}

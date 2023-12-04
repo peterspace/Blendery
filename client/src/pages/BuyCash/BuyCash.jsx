@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useLocation, Navigate } from 'react-router-dom';
+import { useLocation, Navigate } from 'react-router-dom';
 import { Exchange3of4 } from './Exchange3of4';
 import { Exchange4of4 } from './Exchange4of4';
 import { Exchange5of5 } from './Exchange5of5';
@@ -12,7 +12,6 @@ export const BuyCash = (props) => {
   const { mode, user, service, subService, setTxInfo, txInfo } = props;
   const location = useLocation();
   const dispatch = useDispatch();
-  const { id } = useParams();
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
   /*********************************************     REDUX STATES    **************************************************** */
@@ -27,7 +26,7 @@ export const BuyCash = (props) => {
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
   const [refetchTxData, setRefetchTxData] = useState(false);
-  const [fTitle, setFTitle] = useState('You send');
+  const [fTitle, setFTitle] = useState('You give');
   const [tTitle, setTTitle] = useState('You get');
   //====================================================================================================
 
@@ -52,19 +51,6 @@ export const BuyCash = (props) => {
       setTxInfo(response);
     }
   };
-
-  //=================={On Component Mount}==================================
-  useEffect(() => {
-    if (id) {
-      updateTxData();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  async function updateTxData() {
-    const response = await getTransactionByTxIdService(id);
-    dispatch(getTransactionByTxIdInternal(response)); // dispatch txData globally
-  }
 
   if (!user?.token) {
     return <Navigate to="/auth" />;

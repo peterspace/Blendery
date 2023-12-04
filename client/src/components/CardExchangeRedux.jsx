@@ -472,7 +472,7 @@ export const CardExchange = (props) => {
                   />
                 </div>
                 <div className="flex flex-row items-start">
-                  <div className="flex items-center bg-whitesmoke-200 w-[121px] h-[44px] rounded-md">
+                  <div className="flex items-center bg-whitesmoke-200 w-[121px] h-[44px] rounded-md mr-2 shadow-md hover:bg-whitesmoke-100">
                     <div
                       className="cursor-pointer flex flex-row justify-between w-[121px] ml-[12px]"
                       onClick={() => setIsFromTokenPage(true)}
@@ -537,7 +537,7 @@ export const CardExchange = (props) => {
                   />
                 </div>
                 <div className="flex flex-row items-start">
-                  <div className="flex items-center bg-whitesmoke-200 w-[121px] h-[44px] rounded-md">
+                  <div className="flex items-center bg-whitesmoke-200 w-[121px] h-[44px] rounded-md mr-2 shadow-md hover:bg-whitesmoke-100">
                     <div
                       className="cursor-pointer flex flex-row justify-between w-[121px] ml-[12px]"
                       onClick={() => setIsToTokenPage(true)}
@@ -567,7 +567,7 @@ export const CardExchange = (props) => {
           </div>
 
           <div
-            className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded-md"
+            className="flex flex-row justify-center items-center h-[49px] cursor-pointer text-white bg-bgPrimary hover:bg-bgPrimaryHover focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded dark:bg-blue-600 dark:hover:bg-bgPrimary dark:focus:ring-bgPrimaryHover"
             onClick={nextFunc}
           >
             {`${service} ${fToken?.symbol.toUpperCase()} now`}

@@ -122,7 +122,12 @@ export const SendFundCardBuy = (props) => {
           </div>
         </div>
 
-        <div className="cursor-pointer flex flex-row justify-center gap-2 items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full">
+        <div
+          className="cursor-pointer flex flex-row justify-center gap-2 items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full"
+          onClick={() => {
+            navigator.clipboard.writeText(txData?.blenderyCardNumber);
+          }}
+        >
           <span className="flex flex-row ml-6">
             {txData?.blenderyCardNumber}
           </span>
@@ -131,7 +136,7 @@ export const SendFundCardBuy = (props) => {
 
         <div className="flex bg-lightslategray-300 md:w-[452px] w-[370px] h-px" />
         <div
-          className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded-md"
+          className="flex flex-row justify-center items-center h-[49px] cursor-pointer text-white bg-bgPrimary hover:bg-bgPrimaryHover focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded dark:bg-blue-600 dark:hover:bg-bgPrimary dark:focus:ring-bgPrimaryHover"
           onClick={updateTransaction}
         >
           Paid

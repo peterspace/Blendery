@@ -5,6 +5,8 @@ import { getTransactionRate } from '../../../redux/features/transaction/transact
 
 import { BsCreditCard } from 'react-icons/bs';
 import { BsCashStack } from 'react-icons/bs';
+import { SiHiveBlockchain } from 'react-icons/si';
+
 import { TokenCard } from '../../../components/TokenCard';
 import {
   getTokenExchangeRate,
@@ -157,142 +159,156 @@ export const BuyCardScreen1 = (props) => {
       {isFromTokenPage === false && isToTokenPage === false ? (
         <div className="flex flex-col gap-[24px]">
           <div className="flex flex-col w-[300px] md:w-[452px] gap-[8px]">
-            <div className="flex flex-row bg-bgSecondary rounded justify-between h-[57px]">
-              <div className="ml-2 flex flex-row gap-[8px] items-center w-[370px] md:w-[452px] mt-[13px]">
-                <div className="">
-                  {paymentMethod === 'card' && (
-                    <BsCreditCard color="#4f46e5" size={24} />
-                  )}
-                  {paymentMethod === 'cash' && (
-                    <BsCashStack color="#4f46e5" size={24} />
-                  )}
-                </div>
-
-                <div className="mr-2 w-[90%]">
-                  <select
-                    name="paymentMethod"
-                    className={`cursor-pointer [border:none] outline-none w-full font-bold text-lg leading-[24px] text-darkslategray-200 bg-[transparent] relative tracking-[0.02em]`}
-                    value={paymentMethod}
-                    onChange={(ev) => setPaymentMethod(ev.target.value)}
-                  >
-                    {paymentOptions?.map((payment, index) => (
-                      <option key={index} value={payment}>
-                        {payment}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
-            <div className="flex justify-center items-center rounded-lg shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] p-1 bg-gray-100 outline outline-lightslategray-300 outline-[1px]">
-              <div className="flex flex-row justify-between w-[300px] md:w-[452px] items-center p-1">
-                <div className="flex flex-col items-start h-[44px]">
-                  <div className="ml-2 mt-2 text-xs text-darkgray-200">
-                    {/* You send */}
-                    {fTitle}
+            <div className="grid grid-cols-2 gap-2 mt-2 rounded-lg shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] p-1 bg-gray-100 outline outline-lightslategray-300 outline-[1px]">
+              {paymentMethod === 'card' ? (
+                <div
+                  className={`flex flex-row justify-center items-center h-[49px] cursor-pointer text-white bg-bgPrimary hover:bg-bgPrimaryHover focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded dark:bg-blue-600 dark:hover:bg-bgPrimary dark:focus:ring-bgPrimaryHover`}
+                  onClick={() => setPaymentMethod(paymentOptions[0])}
+                >
+                  <div className={`flex flex-row gap-2 `}>
+                    <BsCreditCard size={20} />
+                    <div className="leading-[20px] inline-block">Card</div>
                   </div>
-                  <input
-                    type="text"
-                    className="ml-2 font-bold text-lg leading-[24px] text-darkslategray-200 inline-block w-[90%] outline-none bg-gray-100 placeholder-darkgray-100"
-                    placeholder="0.1"
-                    value={fValue}
-                    onChange={onFromValueChanged}
-                  />
                 </div>
-                <div className="flex flex-row items-start">
-                  <div className="flex items-center bg-whitesmoke-200 w-[121px] h-[44px] rounded-md">
-                    <div
-                      className="cursor-pointer flex flex-row justify-between w-[121px] ml-[12px]"
-                      onClick={() => setIsFromTokenPage(true)}
-                    >
-                      <div className="flex flex-row items-center gap-2">
-                        {/* <FaBitcoin size={20} color={'#f97316'} /> */}
+              ) : (
+                <div
+                  className={`flex flex-row justify-center items-center h-[49px] cursor-pointer text-bgPrimary focus:outline-none bg-white rounded border border-gray-200 hover:bg-gray-100 hover:text-bgPrimary focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700`}
+                  onClick={() => setPaymentMethod(paymentOptions[0])}
+                >
+                  <div className={`flex flex-row gap-2 `}>
+                    <BsCreditCard size={20} />
+                    <div className="leading-[20px] inline-block">Card</div>
+                  </div>
+                </div>
+              )}
+
+              {paymentMethod === 'cash' ? (
+                <div
+                  className={`flex flex-row justify-center items-center h-[49px] cursor-pointer text-white bg-bgPrimary hover:bg-bgPrimaryHover focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded dark:bg-blue-600 dark:hover:bg-bgPrimary dark:focus:ring-bgPrimaryHover`}
+                  onClick={() => setPaymentMethod(paymentOptions[1])}
+                >
+                  <div className={`flex flex-row gap-2 `}>
+                    <BsCashStack size={20} />
+                    <div className="leading-[20px] inline-block">Cash</div>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  className={`flex flex-row justify-center items-center h-[49px] cursor-pointer text-bgPrimary focus:outline-none bg-white rounded border border-gray-200 hover:bg-gray-100 hover:text-bgPrimary focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700`}
+                  onClick={() => setPaymentMethod(paymentOptions[1])}
+                >
+                  <div className={`flex flex-row gap-2 `}>
+                    <BsCashStack size={20} />
+                    <div className="leading-[20px] inline-block">Cash</div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 gap-2 mt-2 rounded-lg shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] p-2 bg-gray-100 outline outline-lightslategray-300 outline-[1px]">
+              <div className="flex justify-center items-center rounded-lg shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] p-1 bg-gray-100 outline outline-lightslategray-300 outline-[1px]">
+                <div className="flex flex-row justify-between w-[300px] md:w-[452px] items-center p-1">
+                  <div className="flex flex-col items-start h-[44px]">
+                    <div className="ml-2 mt-2 text-xs text-darkgray-200">
+                      {/* You send */}
+                      {fTitle}
+                    </div>
+                    <input
+                      type="text"
+                      className="ml-2 font-bold text-lg leading-[24px] text-darkslategray-200 inline-block w-[90%] outline-none bg-gray-100 placeholder-darkgray-100"
+                      placeholder="0.1"
+                      value={fValue}
+                      onChange={onFromValueChanged}
+                    />
+                  </div>
+                  <div className="flex flex-row items-start">
+                    <div className="flex items-center bg-whitesmoke-200 w-[121px] h-[44px] rounded-md mr-2 shadow-md hover:bg-whitesmoke-100">
+                      <div
+                        className="cursor-pointer flex flex-row justify-between w-[121px] ml-[12px]"
+                        onClick={() => setIsFromTokenPage(true)}
+                      >
+                        <div className="flex flex-row items-center gap-2">
+                          {/* <FaBitcoin size={20} color={'#f97316'} /> */}
+                          <img
+                            className="w-[40px] h-$ shrink-0 overflow-hidden rounded-full"
+                            alt={fToken?.name}
+                            src={fToken?.image}
+                          />
+                          <span className="font-bold text-[16px] text-darkslategray-200 inline-block">
+                            {/* BTC */}
+                            {fToken?.symbol.toUpperCase()}
+                          </span>
+                        </div>
                         <img
-                          className="w-[40px] h-$ shrink-0 overflow-hidden rounded-full"
-                          alt={fToken?.name}
-                          src={fToken?.image}
+                          className="mr-2 top-[280px] w-[18px] h-[48px] overflow-hidden"
+                          alt=""
+                          src="/frame19.svg"
                         />
-                        <span className="font-bold text-[16px] text-darkslategray-200 inline-block">
-                          {/* BTC */}
-                          {fToken?.symbol.toUpperCase()}
-                        </span>
                       </div>
-                      <img
-                        className="mr-2 top-[280px] w-[18px] h-[48px] overflow-hidden"
-                        alt=""
-                        src="/frame19.svg"
-                      />
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {isNotCountrySupported ? (
-              <div className="flex flex-row bg-orangeLight w-full rounded">
-                <div className="h-3 px-2 py-3 font-bold">
-                  Country is not supported
+              {isNotCountrySupported ? (
+                <div className="flex flex-row bg-orangeLight w-full rounded">
+                  <div className="h-3 px-2 py-3 font-bold">
+                    Country is not supported
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div className="flex flex-row justify-between">
-                <div className="h-3 py-2">
-                  1 {fToken?.symbol.toUpperCase()} ~{' '}
-                  {loadingExchangeRate ? 'fetching rates' : exchangeRate}{' '}
-                  {tToken?.symbol.toUpperCase()}
-                </div>
-                {/* <div className="h-3 py-2">{isToLoading
+              ) : (
+                <div className="flex flex-row justify-between">
+                  <div className="h-3 py-2">
+                    1 {fToken?.symbol.toUpperCase()} ~{' '}
+                    {loadingExchangeRate ? 'fetching rates' : exchangeRate}{' '}
+                    {tToken?.symbol.toUpperCase()}
+                  </div>
+                  {/* <div className="h-3 py-2">{isToLoading
                           ? 'Fetching price...'
                           : `${`1 ${fToken?.symbol.toUpperCase()} = ${exchangeRate}  ${tToken?.symbol.toUpperCase()}`}`}</div> */}
-                <div className="rounded bg-bgSecondary p-2">
-                  <img
-                    className="w-3.5 h-3 overflow-hidden"
-                    alt=""
-                    src="/frame54.svg"
-                  />
                 </div>
-              </div>
-            )}
-            <div className="flex justify-center items-center rounded-lg shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] p-1 bg-gray-100 outline outline-lightslategray-300 outline-[1px]">
-              <div className="flex flex-row justify-between w-[300px] md:w-[452px] items-center p-1">
-                <div className="flex flex-col items-start h-[44px]">
-                  <div className="ml-2 mt-2 text-xs text-darkgray-200">
-                    {/* You send */}
-                    {tTitle}
+              )}
+              <div className="flex justify-center items-center rounded-lg shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] p-1 bg-gray-100 outline outline-lightslategray-300 outline-[1px]">
+                <div className="flex flex-row justify-between w-[300px] md:w-[452px] items-center p-1">
+                  <div className="flex flex-col items-start h-[44px]">
+                    <div className="ml-2 mt-2 text-xs text-darkgray-200">
+                      {/* You send */}
+                      {tTitle}
+                    </div>
+                    <input
+                      type="text"
+                      className="ml-2 font-bold text-lg leading-[24px] text-darkslategray-200 inline-block w-[90%] outline-none bg-gray-100 placeholder-darkgray-100"
+                      placeholder="0.1"
+                      // value={`~ ${tValue}`}
+                      // value={`~ ${1.675}`}
+                      value={loading ? 'loading' : `~ ${tValue}`}
+                      disabled={true}
+                    />
                   </div>
-                  <input
-                    type="text"
-                    className="ml-2 font-bold text-lg leading-[24px] text-darkslategray-200 inline-block w-[90%] outline-none bg-gray-100 placeholder-darkgray-100"
-                    placeholder="0.1"
-                    // value={`~ ${tValue}`}
-                    // value={`~ ${1.675}`}
-                    value={loading ? 'loading' : `~ ${tValue}`}
-                    disabled={true}
-                  />
-                </div>
-                <div className="flex flex-row items-start">
-                  <div className="flex items-center bg-whitesmoke-200 w-[121px] h-[44px] rounded-md">
-                    <div
-                      className="cursor-pointer flex flex-row justify-between w-[121px] ml-[12px]"
-                      onClick={() => setIsToTokenPage(true)}
-                    >
-                      <div className="flex flex-row items-center gap-2">
-                        {/* <FaEthereum size={20} color={'#3f3f46'} /> */}
+                  <div className="flex flex-row items-start">
+                    <div className="flex items-center bg-whitesmoke-200 w-[121px] h-[44px] rounded-md mr-2 shadow-md hover:bg-whitesmoke-100">
+                      <div
+                        className="cursor-pointer flex flex-row justify-between w-[121px] ml-[12px]"
+                        onClick={() => setIsToTokenPage(true)}
+                      >
+                        <div className="flex flex-row items-center gap-2">
+                          {/* <FaEthereum size={20} color={'#3f3f46'} /> */}
+                          <img
+                            className="w-[40px] h-$ shrink-0 overflow-hidden rounded-full"
+                            alt={tToken?.name}
+                            src={tToken?.image}
+                          />
+                          <span className="font-bold text-[16px] text-darkslategray-200 inline-block">
+                            {/* ETH */}
+                            {tToken?.symbol.toUpperCase()}
+                          </span>
+                        </div>
                         <img
-                          className="w-[40px] h-$ shrink-0 overflow-hidden rounded-full"
-                          alt={tToken?.name}
-                          src={tToken?.image}
+                          className="mr-2 top-[280px] w-[18px] h-[48px] overflow-hidden"
+                          alt=""
+                          src="/frame19.svg"
                         />
-                        <span className="font-bold text-[16px] text-darkslategray-200 inline-block">
-                          {/* ETH */}
-                          {tToken?.symbol.toUpperCase()}
-                        </span>
                       </div>
-                      <img
-                        className="mr-2 top-[280px] w-[18px] h-[48px] overflow-hidden"
-                        alt=""
-                        src="/frame19.svg"
-                      />
                     </div>
                   </div>
                 </div>
@@ -383,7 +399,7 @@ export const BuyCardScreen1 = (props) => {
             <>
               {country === 'Russia' ? (
                 <div
-                  className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded-md"
+                  className="flex flex-row justify-center items-center h-[49px] cursor-pointer text-white bg-bgPrimary hover:bg-bgPrimaryHover focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded dark:bg-blue-600 dark:hover:bg-bgPrimary dark:focus:ring-bgPrimaryHover"
                   onClick={nextFunc}
                 >
                   {`${service} ${fToken?.symbol.toUpperCase()} now`}
@@ -399,7 +415,7 @@ export const BuyCardScreen1 = (props) => {
           ) : (
             <>
               <div
-                className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded-md"
+                className="flex flex-row justify-center items-center h-[49px] cursor-pointer text-white bg-bgPrimary hover:bg-bgPrimaryHover focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded dark:bg-blue-600 dark:hover:bg-bgPrimary dark:focus:ring-bgPrimaryHover"
                 onClick={nextFunc}
               >
                 {`${service} ${fToken?.symbol.toUpperCase()} now`}

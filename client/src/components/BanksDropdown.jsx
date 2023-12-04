@@ -1,31 +1,35 @@
-import { useState, useRef, useEffect } from "react";
-import { FiSearch } from "react-icons/fi";
+import { useState, useRef, useEffect } from 'react';
+import { FiSearch } from 'react-icons/fi';
 
-import { banksOptions } from "../constants";
-import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { banksOptions } from '../constants';
+import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 
-const BanksDropdown = ({ handleBankSelect }) => {
+const BanksDropdown = (props) => {
+  const { selectedBank, setSelectedBank } = props;
   const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedBank, setSelectedBank] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  // const [selectedBank, setSelectedBank] = useState(null);
   const [banks, setBanks] = useState([]);
+
+  // console.log({ selectedBank: selectedBank });
 
   useEffect(() => {
     handleSearchBank(selectedBank?.name);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm]);
 
-  useEffect(() => {
-    if (selectedBank?.name) {
-      handleBankSelect(selectedBank?.name);
-    }
-  }, [selectedBank]);
+  // useEffect(() => {
+  //   if (selectedBank?.name) {
+  //     handleBankSelect(selectedBank?.name);
+  //   }
+  // }, [selectedBank]);
 
   const handleToggleDropdown = () => {
     setIsOpen(!isOpen);
 
     if (!isOpen) {
       // Reset search term and focus on input when opening dropdown
-      setSearchTerm("");
+      setSearchTerm('');
     }
   };
 
@@ -75,7 +79,7 @@ const BanksDropdown = ({ handleBankSelect }) => {
             ) : (
               <div className="flex w-full items-center justify-between">
                 <span className="text-darkslategray-200">
-                  {"Select a Bank"}
+                  {'Select a Bank'}
                 </span>
                 {isOpen ? (
                   <FaChevronUp size={16} />

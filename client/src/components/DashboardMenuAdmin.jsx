@@ -257,14 +257,13 @@ export const DashboardMenuAdmin = (props) => {
           ${Menu.gap ? 'mt-9' : 'mt-2'} ${index === 0 && 'bg-light-white'} `}
               onClick={() => setPage(Menu?.page)}
             >
-              {/* <img src={`./src/assets/${Menu.src}.png`} /> */}
               <img src={Menu.src} />
               <span
                 className={`${!open && 'hidden'} origin-left duration-200 ${
                   page === Menu?.page
                     ? 'text-bgPrimary text-base font-black inline-block'
-                    : 'text-black text-mini'
-                } ${mode === true ? 'text-black' : 'text-gray-100'}`}
+                    : 'text-black dark:text-white text-mini'
+                }`}
               >
                 {Menu.title}
               </span>

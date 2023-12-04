@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { LoginUser } from '../../redux/features/user/userSlice';
@@ -7,15 +7,9 @@ import { LoginUser } from '../../redux/features/user/userSlice';
 import { Login } from './Login';
 import { Register } from './Register';
 import { Forgot } from './Forgot';
-import Modal from './Modal';
-// import { Header } from '../../components/Header';
-// import { Footer } from '../../components/Footer';
-
 //w-[370px] ===w-[300px]z
 //w-[375px] === w-[320px] xs:w-[340px]
 import {
-  successUserGoogle,
-  registerUser,
   registerSocial,
   loginSocial,
 } from '../../services/apiService';
@@ -30,12 +24,16 @@ export const Auth = (props) => {
   //===============================================================================================
   //============================={Login redirects}===============================================
   const { user } = useSelector((state) => state.user);
-  let from = location?.state?.from?.pathname || '/';
-  console.log({ fromLocation: from });
+
+  // let from = location?.state?.from?.pathname || '/';
+  // console.log({ fromLocation: from });
   //============================={Login redirects}===============================================
   //=============================================================================================
-  // const [isLogin, setIsLogin] = useState(false);
-  // initially true
+  const prevLocation = localStorage.getItem('prevLocation')
+    ? JSON.parse(localStorage.getItem('prevLocation'))
+    : '/';
+
+  console.log({ prevLocation: prevLocation });
   const isLoginL = localStorage.getItem('isLogin')
     ? JSON.parse(localStorage.getItem('isLogin'))
     : true; // initially true
@@ -57,14 +55,9 @@ export const Auth = (props) => {
 
   const [redirectLogin, setRedirectLogin] = useState(false);
   const [redirectRegister, setRedirectRegister] = useState(false);
-  const [redirectForgot, setRedirectForgot] = useState(false);
   const [redirectHome, setRedirectHome] = useState(false);
 
-  const prevLocation = localStorage.getItem('prevLocation')
-    ? JSON.parse(localStorage.getItem('prevLocation'))
-    : '/';
 
-  console.log({ prevLocation: prevLocation });
   // useEffect(() => {
   //   if (redirectHome) {
   //     navigate('/');
@@ -178,7 +171,7 @@ export const Auth = (props) => {
   //   return window.location.replace(from);
   // }
 
-  if (user.token) {
+  if (user?.token) {
     return window.location.replace(prevLocation);
   }
   //============================={Login redirects}===============================================

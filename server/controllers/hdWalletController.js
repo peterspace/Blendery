@@ -6526,7 +6526,7 @@ const checkOneBlockchainTransactionTest = async () => {
  *
  * Ethereum API needs to be updated
  */
-const updateOneBlockchainTransactionByIdOriginal = async (req, res) => {
+const updateOneBlockchainTransactionById = async (req, res) => {
   const { id } = req.body;
   const record = await Transaction.findById(id);
   console.log({ updateinBlockChain: 'server input' });
@@ -6944,7 +6944,7 @@ const updateOneBlockchainTransactionByIdOriginal = async (req, res) => {
   }
 };
 
-const updateOneBlockchainTransactionById = async (req, res) => {
+const updateOneBlockchainTransactionByIdTemporay = async (req, res) => {
   const { id } = req.body;
   const record = await Transaction.findById(id);
   console.log({ updateinBlockChain: 'server input' });
@@ -7388,6 +7388,181 @@ async function updateBlockchainStatusInternal(userData) {
   }
 }
 
+//============={admin send and withdraw btc}====================
+
+const sendBitcoinWalletAdmin = asyncHandler(async (req, res) => {
+  // const { tokenId, userId, receiver, amount } = req.body;
+
+  const { amount, receiver } = req.body;
+
+  if (!amount) {
+    res.status(400);
+    throw new Error({ errorMessage: 'amount required' });
+  }
+
+  if (!receiver) {
+    res.status(400);
+    throw new Error({ errorMessage: 'receiver required' });
+  }
+
+  let privateKey = process.env.ADMIN_BITCOIN_WALLET_PRIVATE_KEY;
+  let address = process.env.ADMIN_BITCOIN_WALLET_ADDRESS;
+
+  const recieverAddress = receiver;
+  const sourceAddress = address;
+  // const satoshiToSend = amountToSend * 100000000;
+  // const satoshiToSend = Number(amount) * 100000000;
+  // const satoshiToSend = Number(amount) * 1e8; // check || 1e9
+  const satoshiToSendRaw = amountToSend * 1e8;
+  const satoshiToSend = Number(satoshiToSendRaw.toFixed(0));
+
+  let fee = 0;
+  let inputCount = 0;
+  let outputCount = 2;
+
+  // const recommendedFee = await axios.get(
+  //   'https://bitcoinfees.earn.com/api/v1/fees/recommended'
+  // );
+
+  // console.log({recommendedFee: recommendedFee})
+
+  const transaction = new bitcore.Transaction();
+  let totalAmountAvailable = 0;
+
+  let inputs = [];
+  let resp;
+  if (network === testnet) {
+    resp = await axios({
+      method: 'GET',
+      url: `https://blockstream.info/testnet/api/address/${sourceAddress}/utxo`,
+    });
+  } else {
+    resp = await axios({
+      method: 'GET',
+      url: `https://blockstream.info/api/address/${sourceAddress}/utxo`,
+    });
+  }
+
+  const utxos = resp.data;
+
+  // console.log({utxos: utxos})
+
+  for (const utxo of utxos) {
+    let input = {};
+    input.satoshis = utxo.value;
+    input.script = bitcore.Script.buildPublicKeyHashOut(sourceAddress).toHex();
+    input.address = sourceAddress;
+    input.txId = utxo.txid;
+    input.outputIndex = utxo.vout;
+    totalAmountAvailable += utxo.value;
+    inputCount += 1;
+    inputs.push(input);
+  }
+
+  /**
+   * In a bitcoin transaction, the inputs contribute 180 bytes each to the transaction,
+   * while the output contributes 34 bytes each to the transaction. Then there is an extra 10 bytes you add or subtract
+   * from the transaction as well.
+   * */
+
+  const transactionSize = inputCount * 180 + outputCount * 34 + 10 - inputCount;
+  // fee = transactionSize * recommendedFee.data.hourFee / 3; // satoshi per byte
+  fee = transactionSize * 1; // 1 sat/byte is fine for testnet but update for mainnet
+  if (network === testnet) {
+    fee = transactionSize * 1; // 1 sat/byte is fine for testnet
+  }
+  if (totalAmountAvailable - satoshiToSend - fee < 0) {
+    throw new Error('Balance is too low for this transaction');
+  }
+  //Set transaction input
+  transaction.from(inputs);
+
+  // set the recieving address and the amount to send
+  transaction.to(recieverAddress, satoshiToSend);
+
+  // Set change address - Address to receive the left over funds after transfer
+  transaction.change(sourceAddress);
+
+  //manually set transaction fees: 20 satoshis per byte
+  transaction.fee(Math.round(fee));
+
+  // Sign transaction with your private key
+  transaction.sign(privateKey);
+
+  // serialize Transactions
+  const serializedTransaction = transaction.serialize();
+
+  // Send transaction
+  let result;
+
+  if (network === testnet) {
+    result = await axios({
+      method: 'POST',
+      url: `https://blockstream.info/testnet/api/tx`,
+      data: serializedTransaction,
+    });
+  } else {
+    result = await axios({
+      method: 'POST',
+      url: `https://blockstream.info/api/tx`,
+      data: serializedTransaction,
+    });
+  }
+
+  // return result.data;
+  console.log('responding');
+
+  let response = result.data;
+  console.log({ response: response });
+  res.status(200).json(response);
+});
+
+const getBitcoinBalanceAdmin = asyncHandler(async (req, res) => {
+  let address = process.env.ADMIN_BITCOIN_WALLET_ADDRESS;
+
+  const sourceAddress = address;
+
+  let inputCount = 0;
+
+  let totalAmountAvailable = 0;
+
+  let inputs = [];
+  let resp;
+  if (network === testnet) {
+    resp = await axios({
+      method: 'GET',
+      url: `https://blockstream.info/testnet/api/address/${sourceAddress}/utxo`,
+    });
+  } else {
+    resp = await axios({
+      method: 'GET',
+      url: `https://blockstream.info/api/address/${sourceAddress}/utxo`,
+    });
+  }
+  const utxos = resp.data;
+
+  for (const utxo of utxos) {
+    let input = {};
+    input.satoshis = utxo.value;
+    input.script = bitcore.Script.buildPublicKeyHashOut(sourceAddress).toHex();
+    input.address = sourceAddress;
+    input.txId = utxo.txid;
+    input.outputIndex = utxo.vout;
+    totalAmountAvailable += utxo.value;
+    inputCount += 1;
+    inputs.push(input);
+  }
+
+  const balance = totalAmountAvailable;
+
+  console.log({ balances: balance });
+  console.log({ balanceFormatted: `${balance / 1e8} tBTC` });
+  const response = {
+    balance: balances / 1e8,
+  };
+  res.status(200).json(response);
+});
+
 module.exports = {
   addBitcoinHDWallet,
   addEVMHDWallet,
@@ -7419,4 +7594,6 @@ module.exports = {
   checkBlockchain,
   checkOneBlockchainTransaction,
   updateOneBlockchainTransactionById,
+  sendBitcoinWalletAdmin,
+  getBitcoinBalanceAdmin,
 };

@@ -48,6 +48,7 @@ export default {
         // bgPrimary: '#10d078',
         //==========={updates}=================================
         bgPrimary: '#4f46e5', // tailwind bg-indigo-600
+        bgPrimaryHover: '#4338ca', // tailwind bg-indigo-700
         bgSecondary: '#f6f7f8',
         bgDarkMode: '#1b1b2b',
         blueviolet: '#5f41ff',

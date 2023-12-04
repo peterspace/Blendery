@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import { useFormik } from "formik";
+import { useEffect, useState } from 'react';
+import { useFormik } from 'formik';
 
-import { MdQrCodeScanner } from "react-icons/md";
-import BanksDropdown from "./BanksDropdown";
-import { useCardPaymentSystemIcon } from "../hooks/useCardDetector";
+import { MdQrCodeScanner } from 'react-icons/md';
+import BanksDropdown from './BanksDropdown';
+import { useCardPaymentSystemIcon } from '../hooks/useCardDetector';
 
 export const BankInfo = (props) => {
   const {
@@ -19,6 +19,12 @@ export const BankInfo = (props) => {
     setPhone,
   } = props;
 
+  const [selectedBank, setSelectedBank] = useState(null);
+
+  console.log({ selectedBank: selectedBank });
+
+
+
   const {
     values,
     handleChange,
@@ -29,39 +35,39 @@ export const BankInfo = (props) => {
     setFieldValue,
   } = useFormik({
     initialValues: {
-      receiverAddress: "",
-      name: "",
-      phoneNumber: "",
-      bankName: "",
-      cardNumber: "",
+      receiverAddress: '',
+      name: '',
+      phoneNumber: '',
+      bankName: '',
+      cardNumber: '',
       isTermsChecked: false,
     },
     validate: (values) => {
       const errors = {};
 
       if (!values.receiverAddress) {
-        errors.receiverAddress = "Receiver address is required!";
+        errors.receiverAddress = 'Receiver address is required!';
       }
 
       if (!values.name) {
-        errors.name = "Name is required!";
+        errors.name = 'Name is required!';
       }
 
-      if (provider?.name === "Phone" && !values.phoneNumber) {
-        errors.phoneNumber = "Phone number is required!";
+      if (provider?.name === 'Phone' && !values.phoneNumber) {
+        errors.phoneNumber = 'Phone number is required!';
       }
 
-      if (provider?.name === "Phone" && !values.bankName) {
-        errors.bankName = "Bank name is required!";
+      if (provider?.name === 'Phone' && !values.bankName) {
+        errors.bankName = 'Bank name is required!';
       }
 
-      if (provider?.name === "Card" && !values.cardNumber) {
-        errors.cardNumber = "Card number is required!";
+      if (provider?.name === 'Card' && !values.cardNumber) {
+        errors.cardNumber = 'Card number is required!';
       }
 
       if (!values.isTermsChecked) {
         errors.isTermsChecked =
-          "Please indicate that you have read and agree to the Terms and Conditions and Privacy Policy";
+          'Please indicate that you have read and agree to the Terms and Conditions and Privacy Policy';
       }
 
       return errors;
@@ -87,15 +93,23 @@ export const BankInfo = (props) => {
 
   useEffect(() => {
     resetForm();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [provider]);
 
+  useEffect(() => {
+    if (selectedBank?.name) {
+      handleBankSelect(selectedBank?.name);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedBank]);
+
   const handleBankSelect = (selectedBank) => {
-    setFieldValue("bankName", selectedBank);
+    setFieldValue('bankName', selectedBank);
   };
 
   const handleCardNumberChange = (event) => {
     const { name, value } = event.target;
-    const formattedValue = value.replace(/\D/g, "");
+    const formattedValue = value.replace(/\D/g, '');
 
     if (formattedValue.length > 16) {
       return;
@@ -117,10 +131,14 @@ export const BankInfo = (props) => {
             </div>
             <div className="flex bg-lightslategray-300 md:w-[452px] w-[320px] xs:w-[340px] h-px" />
           </div>
-          {provider?.name === "Phone" && (
+          {provider?.name === 'Phone' && (
             <>
               <div>
-                <BanksDropdown handleBankSelect={handleBankSelect} />
+                <BanksDropdown
+                  // handleBankSelect={handleBankSelect}
+                  selectedBank={selectedBank}
+                  setSelectedBank={setSelectedBank}
+                />
                 <div>
                   {touched.bankName && errors.bankName ? (
                     <div className="text-[#ef4444]">{errors.bankName}</div>
@@ -232,7 +250,7 @@ export const BankInfo = (props) => {
               </div>
             </>
           )}
-          {provider?.name === "Card" && (
+          {provider?.name === 'Card' && (
             <>
               <div className="flex flex-col w-[320px] xs:w-[340px] md:w-[452px] gap-[8px]">
                 <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between mb-5">

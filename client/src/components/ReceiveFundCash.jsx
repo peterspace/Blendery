@@ -79,7 +79,9 @@ export const ReceiveFundCash = (props) => {
                 blockchain: {txData?.fToken?.chain}
               </div>
               <div className="flex flex-row gap-2 mt-2">
-                <div className=" cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]">
+                <div className="cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]" onClick={() => {
+                  navigator.clipboard.writeText(txData?.blenderyAddress);
+                }}>
                   <div className="flex flex-row gap-2">
                     <RxCopy size={15} color="#ffffff" />
                     <div className="leading-[20px] inline-block">

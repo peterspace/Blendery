@@ -110,7 +110,6 @@ export const Login = (props) => {
 
   useEffect(() => {
     if (redirect) {
-      // navigate('/dashboard');
       handleSuccessLogin();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -118,7 +117,6 @@ export const Login = (props) => {
 
   useEffect(() => {
     if (redirectS) {
-      // navigate('/dashboard');
       handleSuccessLogin();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -133,17 +131,11 @@ export const Login = (props) => {
 
   const handleSuccessLogin = () => {
     console.log('loggedIn sucessfull');
-    // navigate('/dashboard');
   };
 
   /************************************************************************************** */
   /******************************{TODO REDIRECT TO LOGIN********************************* */
   /************************************************************************************** */
-
-  // const handleSuccessLogin = () => {
-  //   const { redirectTo } = queryString.parse(location.search);
-  //   history.push(redirectTo == null ? '/dashboard' : redirectTo);
-  // };
 
   /************************************************************************************** */
   /******************************{TODO REDIRECT TO LOGIN********************************* */
@@ -185,12 +177,12 @@ export const Login = (props) => {
               setIsGoogle(false);
             }}
           >
-            <div className="flex flex-col mb-6 h-[48px] bg-whitesmoke-100 rounded outline outline-lightslategray-300 outline-[1px]">
+            <div className="flex flex-col mb-6 h-[48px] bg-white rounded outline outline-lightslategray-300 outline-[1px]">
               <input
                 id="email"
                 name="email"
                 type="email"
-                className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 placeholder-darkgray-100 inline-block w-full outline-none bg-gray-100"
+                className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 placeholder-darkgray-100 inline-block outline-none bg-white"
                 placeholder="Email"
                 value={values.email}
                 onChange={handleChange}
@@ -201,12 +193,12 @@ export const Login = (props) => {
                 ) : null}
               </div>
             </div>
-            <div className="flex flex-col mb-6 h-[48px] bg-whitesmoke-100 rounded outline outline-lightslategray-300 outline-[1px]">
+            <div className="flex flex-col mb-6 h-[48px] bg-white rounded outline outline-lightslategray-300 outline-[1px]">
               <input
                 id="password"
                 name="password"
                 type="password"
-                className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 placeholder-darkgray-100 inline-block w-full outline-none bg-gray-100"
+                className="ml-2 text-[16px] md:text-[14px] leading-[24px] text-darkslategray-200 placeholder-darkgray-100 inline-block outline-none bg-white"
                 placeholder="Password"
                 value={values.password}
                 onChange={handleChange}

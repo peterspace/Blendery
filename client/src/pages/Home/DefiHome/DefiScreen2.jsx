@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Progress } from '../../../components/Progress';
 import { EstimatorDefi } from '../../../components/EstimatorDefi';
-import { WalletInfo } from '../../../components/WalletInfo';
 import { DetailsLocal } from '../../../components/DetailsLocal';
+import { useDispatch } from 'react-redux';
+
+import { getTokensDefiByIdService } from '../../../services/apiService';
+import { getTokensDefiById } from '../../../redux/features/swap/swapSlice';
 
 export const DefiScreen2 = (props) => {
   const {
@@ -25,21 +28,20 @@ export const DefiScreen2 = (props) => {
     setTxInfo,
     allTokensFrom,
     allTokensTo,
-    exchangeRate,
     transactionRates,
     userAddress,
     setUserAddress,
     chain,
-    // setChain,
+    setChain,
     chainId,
     //====================={new}===============================
     isFromLoading,
     fromBalance,
     fromPrice,
+    toPrice,
     isToLoading,
     toBalance,
     priceDeviation,
-    tValue,
     fromBalancePercent,
     //========================={modals control}=======================================
     isConnected,
@@ -48,10 +50,28 @@ export const DefiScreen2 = (props) => {
     isSlippagePage,
     isConnecting,
     setIsConnectingL,
+    loadingExchangeRate
   } = props;
 
-  // const allTokensFromL = useSelector((state) => state.token?.tokenListDefi);
-  // const allTokensToL = useSelector((state) => state.token?.tokenListDefi);
+  const dispatch = useDispatch();
+
+  //======================={RATES and PRICES}========================================================
+  const tValue = transactionRates ? transactionRates?.tValueFormatted : 0;
+  const exchangeRate = transactionRates ? transactionRates?.exchangeRate : 0;
+
+  // useEffect(() => {
+  //   getConnectedChain();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
+
+  // async function getConnectedChain() {
+  //   const response = await getTokensDefiByIdService(chainId);
+  //   if (response) {
+  //     dispatch(getTokensDefiById(response));
+  //   }
+
+  //   // window.location.reload(); // reconsider removing
+  // }
 
   return (
     <div className="flex flex-col xl:flex-row justify-center">
@@ -77,12 +97,13 @@ export const DefiScreen2 = (props) => {
               exchangeRate={exchangeRate}
               transactionRates={transactionRates}
               chain={chain}
-              // setChain={setChain}
+              setChain={setChain}
               setPercentageProgress={setPercentageProgress}
               //============={New}=================
               isFromLoading={isFromLoading}
               fromBalance={fromBalance}
               fromPrice={fromPrice}
+              toPrice={toPrice}
               isToLoading={isToLoading}
               toBalance={toBalance}
               priceDeviation={priceDeviation}
@@ -93,6 +114,7 @@ export const DefiScreen2 = (props) => {
               isFromTokenPage={isFromTokenPage}
               isToTokenPage={isToTokenPage}
               isSlippagePage={isSlippagePage}
+              loadingExchangeRate={loadingExchangeRate}
             />
           </>
         </div>

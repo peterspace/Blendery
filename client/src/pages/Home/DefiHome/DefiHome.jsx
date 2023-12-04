@@ -18,12 +18,7 @@ import { DefiScreen3 } from './DefiScreen3';
 import { DefiScreen4 } from './DefiScreen4';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { getTransactionRate } from '../../../redux/features/transaction/transactionSlice';
 
-import {
-  getTokenExchangeRate,
-  getTransactionRateInfo,
-} from '../../../services/apiService';
 import {
   getTokenExchangeRateSwap,
   getTransactionRateSwap,
@@ -101,9 +96,9 @@ export const DefiHome = (props) => {
     : networksOptions[0];
 
   // const chain = useSelector((state) => state.swap?.chain) || networksOptions[0];
-  const chain = useSelector((state) => state.swap?.chain);
+  // const chain = useSelector((state) => state.swap?.chain);
 
-  // const [chain, setChain] = useState(chainL);
+  const [chain, setChain] = useState(chainL);
   // const [chain, setChain] = useState();
   const chainId = chain?.chainId;
   console.log({ chainIdApp: chainId });
@@ -115,6 +110,8 @@ export const DefiHome = (props) => {
 
     watch: true,
   });
+
+  console.log({ fullBalance: dataBal });
 
   const [balance, setBalance] = useState('');
   const [fromBalance, setFromBalance] = useState(0.0);
@@ -139,24 +136,43 @@ export const DefiHome = (props) => {
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
   const dispatch = useDispatch();
-  const allTokensFromL = useSelector((state) => state.token?.tokensDefiById);
-  const allTokensToL = useSelector((state) => state.token?.tokensDefiById);
+  // const allTokensFromL = useSelector((state) => state.token?.tokensDefiById);
+  // const allTokensToL = useSelector((state) => state.token?.tokensDefiById);
 
-  const [allTokensFrom, setAllTokensFrom] = useState(allTokensFromL || null);
-  const [allTokensTo, setAllTokensTo] = useState(allTokensToL || null);
+  const allTokensFromL = localStorage.getItem('allTokensFromDefi')
+    ? JSON.parse(localStorage.getItem('allTokensFromDefi'))
+    : null;
+
+  const allTokensToL = localStorage.getItem('allTokensToDefi')
+    ? JSON.parse(localStorage.getItem('allTokensToDefi'))
+    : null;
+
+  console.log({ allTokensFromL: allTokensFromL });
+  console.log({ allTokensToL: allTokensToL });
+
+  const [allTokensFrom, setAllTokensFrom] = useState(allTokensFromL);
+  const [allTokensTo, setAllTokensTo] = useState(allTokensToL);
+  // const [allTokensFrom, setAllTokensFrom] = useState(allTokensFromL || null);
+  // const [allTokensTo, setAllTokensTo] = useState(allTokensToL || null);
   //======================={RATES and PRICES}========================================================
   const [loading, setLoading] = useState(false);
+  const [loadingExchangeRate, setLoadingExchangeRate] = useState(false);
+
   const [error, setError] = useState('');
-  const exchangeRateInfo = useSelector(
-    (state) => state.swap?.getTokenExchangeRateSwap
-  );
-  const exchangeRate = exchangeRateInfo?.exchangeRate || 0;
-  const fromPrice = exchangeRateInfo?.fUSDPrice || 0;
-  const toPrice = exchangeRateInfo?.tUSDPrice || 0;
-  const transactionRates = useSelector(
-    (state) => state.swap?.getTransactionRateSwap
-  );
+  const [retryMessage, setRetryMessage] = useState();
+  const [exchangeRateInfo, setExchangeRateInfo] = useState();
+  console.log({ exchangeRateInfo: exchangeRateInfo });
+  const transactionRatesL = localStorage.getItem('transactionRatesDefi')
+    ? JSON.parse(localStorage.getItem('transactionRatesDefi'))
+    : 0;
+  const [transactionRates, setTransactionRates] = useState(transactionRatesL);
   const tValue = transactionRates ? transactionRates?.tValueFormatted : 0;
+  const exchangeRate = transactionRates ? transactionRates?.exchangeRate : 0;
+  const fromPrice = transactionRates ? transactionRates?.fromPrice : 0;
+  const toPrice = transactionRates ? transactionRates?.toPrice : 0;
+  //
+  // const fromPrice = exchangeRateInfo?.fUSDPrice || 0;
+  // const toPrice = exchangeRateInfo?.tUSDPrice || 0;
   console.log({ exchangeRateInfo: exchangeRateInfo });
   console.log({ transactionRates: transactionRates });
 
@@ -196,6 +212,19 @@ export const DefiHome = (props) => {
     : '1';
 
   const [slippage, setSlippage] = useState(slippageL);
+  console.log({ slippage: slippage });
+
+  const approvingDataL = localStorage.getItem('approvingDataDefi')
+    ? JSON.parse(localStorage.getItem('approvingDataDefi'))
+    : null;
+  const [approvingData, setApprovingData] = useState(approvingDataL);
+  console.log({ approvingData: approvingData });
+
+  const approvalResponseL = localStorage.getItem('approvalResponseDefi')
+    ? JSON.parse(localStorage.getItem('approvalResponseDefi'))
+    : null;
+  const [approvalResponse, setApprovalResponse] = useState(approvalResponseL);
+  console.log({ approvalResponse: approvalResponse });
 
   const swappingDataL = localStorage.getItem('swappingDataDefi')
     ? JSON.parse(localStorage.getItem('swappingDataDefi'))
@@ -287,8 +316,19 @@ export const DefiHome = (props) => {
 
   const [userAddress, setUserAddress] = useState(userAddressL);
   const [spender, setSpender] = useState();
+  // console.log({ spender: spender });
 
-  //==================={All Tokens List}===========================
+  //==================={ON: On delay Timer}===========================
+  const [activeInterval, setActiveInterval] = useState(0);
+  const [initailInterval, setInitailInterval] = useState(30000); // fixed
+  const [delay, setDelay] = useState(60000); // fixed 1 minute 0r 60 secs
+  const [nextInterval, setNextInterval] = useState(initailInterval);
+
+  console.log({ activeInterval: activeInterval });
+  // const [nextInterval, setNextInterval] = useState(30000);
+  console.log({ nextInterval: nextInterval });
+
+  //==================={All Tokens List}====================================
 
   useEffect(() => {
     if (chain) {
@@ -301,24 +341,41 @@ export const DefiHome = (props) => {
   useEffect(() => {
     if (!chain && chainL) {
       // setChain(chainL);
-      dispatch(updateChain(chainL));
+      // dispatch(updateChain(chainL));
+
+      setChain(chainL);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chain]);
 
-  useEffect(() => {
-    if (allTokensFromL) {
-      setAllTokensFrom(allTokensFromL);
+  async function getConnectedChain() {
+    const response = await getTokensDefiByIdService(chainId);
+    if (response) {
+      setAllTokensFrom(response);
+      setAllTokensTo(response);
+      setFromToken(response[0]);
+      setToToken(response[1]);
+      // dispatch(getTokensDefiById(response));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allTokensFromL]);
+
+    // window.location.reload(); // reconsider removing
+  }
+
+  // useEffect(() => {
+  //   getConnectedChain();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   useEffect(() => {
-    if (allTokensToL) {
-      setAllTokensTo(allTokensToL);
-    }
+    getConnectedChain();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allTokensToL]);
+  }, [chain]);
+
+  // useEffect(() => {
+  //   getConnectedChain();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [chain, allTokensFrom, allTokensTo]);
+
   //==================={Default Selected Tokens }===========================
 
   useEffect(() => {
@@ -332,6 +389,30 @@ export const DefiHome = (props) => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [percentageProgress]);
+
+  useEffect(() => {
+    if (allTokensFrom) {
+      localStorage.setItem('allTokensFromDefi', JSON.stringify(allTokensFrom));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allTokensFrom]);
+
+  useEffect(() => {
+    if (approvalResponse) {
+      localStorage.setItem(
+        'approvalResponseDefi',
+        JSON.stringify(approvalResponse)
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [approvalResponse]);
+
+  useEffect(() => {
+    if (allTokensTo) {
+      localStorage.setItem('allTokensToDefi', JSON.stringify(allTokensTo));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allTokensTo]);
 
   useEffect(() => {
     if (allTokensFromL && !fToken) {
@@ -394,6 +475,16 @@ export const DefiHome = (props) => {
   //======================================================================================================
 
   useEffect(() => {
+    if (transactionRates) {
+      localStorage.setItem(
+        'transactionRatesDefi',
+        JSON.stringify(transactionRates)
+      );
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [transactionRates]);
+  useEffect(() => {
     if (fToken) {
       localStorage.setItem('fTokenDefi', JSON.stringify(fToken));
     }
@@ -437,85 +528,72 @@ export const DefiHome = (props) => {
   //======================================={PRICE BLOCK}================================================
   //====================================================================================================
 
+  useEffect(() => {
+    if (activeInterval) {
+      setNextInterval(activeInterval);
+    }
+  }, [activeInterval]);
+
+  useEffect(() => {
+    if (exchangeRateInfo === '0.000') {
+      setActiveInterval(initailInterval + delay);
+
+      setTimeout(() => {
+        setActiveInterval(initailInterval);
+      }, initailInterval + delay);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exchangeRateInfo]);
+
   // Simulate fetching expected prices
   useEffect(() => {
-    fetchPriceData();
+    priceDataException();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fValue, exchangeRate]);
+  }, [fValue, exchangeRateInfo]);
+
+  //=========={on Page Reload or Mount}=============================
 
   useEffect(() => {
     const fetchPrices = async () => {
-      fetchExchangeRate();
+      exchangeRateException();
+      priceDataException();
     };
-    // Fetch prices immediately and then every 2 minutes
-    fetchExchangeRate();
-    const priceInterval = setInterval(fetchPrices, 2 * 60 * 1000);
+
+    fetchPrices();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fToken, tToken]);
+  useEffect(() => {
+    const fetchPrices = async () => {
+      exchangeRateException();
+      priceDataException();
+    };
+    fetchPrices();
+
+    let priceInterval;
+
+    let duration = nextInterval; // stable mode // 15000 for buy and sell since we're only making a single request per time
+
+    priceInterval = setInterval(fetchPrices, duration); // once every 30 seconds (i.e 4 calls per minute)
+
     // Clear the interval on unmount
     return () => clearInterval(priceInterval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fToken, tToken]);
 
-  const fetchPriceData = async () => {
-    if (loading) {
-      return;
-    }
-    if (
-      fValue === 0 ||
-      fValue === '0' ||
-      fValue === null ||
-      fValue === undefined
-    ) {
-      return;
-    }
-
-    if (
-      exchangeRate === 0 ||
-      exchangeRate === '0' ||
-      exchangeRate === null ||
-      exchangeRate === undefined
-    ) {
-      return;
-    }
-
-    if (!fToken) {
-      return;
-    }
-
-    if (!tToken) {
-      return;
-    }
-    const userData = {
-      exchangeRate,
-      fValue,
-    };
-    try {
+  useEffect(() => {
+    if (exchangeRateInfo === '0.000') {
+      setLoadingExchangeRate(true);
       setLoading(true);
-
-      const response = await getTransactionSwapRateService(userData);
-
-      if (response.tValueFormatted) {
-        // setTransactionRates(response);
-        let newRates = response;
-        let updatedRate = {
-          ...newRates,
-          exchangeRate: exchangeRate,
-          fromPrice: fromPrice,
-          toPrice: toPrice,
-        };
-        dispatch(getTransactionRateSwap(updatedRate));
-      }
-    } catch (err) {
-      setError(err);
-    } finally {
+      console.log({ loading: 'loading prices please hold' });
+    } else {
+      setLoadingExchangeRate(false);
       setLoading(false);
     }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exchangeRateInfo]);
 
-  const fetchExchangeRate = async () => {
-    if (loading) {
-      return;
-    }
-
+  const exchangeRateException = async () => {
     if (!fToken) {
       return;
     }
@@ -526,12 +604,13 @@ export const DefiHome = (props) => {
     // const userData = { fToken, tToken, service: 'defi', subService: 'defi' };
     const userData = {
       fToken,
-      chainId,
       tToken,
+      chainId,
     };
 
     try {
       setLoading(true);
+      setLoadingExchangeRate(true);
 
       const response = await getTokenExchangeRateSwapService(userData);
       console.log({ exchangeData: response });
@@ -539,8 +618,66 @@ export const DefiHome = (props) => {
         return;
       }
       if (response.exchangeRate) {
-        dispatch(getTokenExchangeRateSwap(response));
-        //
+        setExchangeRateInfo(response);
+        setRetryMessage('');
+      }
+      if (response.message) {
+        setRetryMessage(response?.message);
+      }
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
+      setLoadingExchangeRate(false);
+    }
+  };
+  //====================={PRICE DATA RATE ERROR HANDLING}=========================
+
+  const priceDataException = async () => {
+    if (
+      fValue === 0 ||
+      fValue === '0' ||
+      fValue === null ||
+      fValue === undefined
+    ) {
+      return;
+    }
+
+    if (
+      Number(exchangeRateInfo?.exchangeRate) === 0 ||
+      exchangeRateInfo?.exchangeRate === '0.000' ||
+      exchangeRateInfo?.exchangeRate === null ||
+      exchangeRateInfo?.exchangeRate === undefined
+    ) {
+      return;
+    }
+
+    if (!fToken) {
+      return;
+    }
+
+    if (!tToken) {
+      return;
+    }
+    const userData = {
+      exchangeRate: exchangeRateInfo?.exchangeRate,
+      fValue,
+    };
+    try {
+      setLoading(true);
+
+      const response = await getTransactionSwapRateService(userData);
+
+      if (response.tValueFormatted) {
+        let newRates = response;
+        let updatedRate = {
+          ...newRates,
+          exchangeRate: exchangeRateInfo?.exchangeRate,
+          fromPrice: exchangeRateInfo?.fUSDPrice,
+          toPrice: exchangeRateInfo?.tUSDPrice,
+        };
+        setTransactionRates(updatedRate); // update the transaction rate
+        dispatch(getTransactionRateSwap(updatedRate));
       }
     } catch (err) {
       setError(err);
@@ -548,13 +685,6 @@ export const DefiHome = (props) => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (loading) {
-      // add loading animate to toPrice and exchange rate
-      console.log({ loading: 'loading prices please hold' });
-    }
-  }, [loading]);
 
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
@@ -681,6 +811,13 @@ export const DefiHome = (props) => {
   }, [swappingData]);
 
   useEffect(() => {
+    if (approvingData) {
+      localStorage.setItem('approvingDataDefi', JSON.stringify(approvingData));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [approvingData]);
+
+  useEffect(() => {
     localStorage.setItem(
       'isValidTransactionDefi',
       JSON.stringify(isValidTransaction)
@@ -792,6 +929,7 @@ export const DefiHome = (props) => {
       const response = await getSwapApprovalService(userData);
       if (response.approveData) {
         let tx = response?.approveData;
+        setApprovingData(tx);
 
         let wallet = signer.data;
         setIsSent(true);
@@ -799,6 +937,7 @@ export const DefiHome = (props) => {
         console.log({ approvalReward: approval });
 
         let approvalStatus = await approval.wait();
+        setApprovalResponse(approvalStatus);
 
         if (approvalStatus?.status) {
           // if (approvalStatus?.status === 1) {
@@ -847,6 +986,72 @@ export const DefiHome = (props) => {
       // return error?.message;
     }
   }
+
+  async function approve2() {
+    setIsProcessing(true);
+    setIsLoading(true);
+    try {
+      // let tx = response?.approveData;
+      // setApprovingData(tx);
+
+      let tx = approvingData;
+
+      let wallet = signer.data;
+      setIsSent(true);
+      const approval = await wallet.sendTransaction(tx);
+      console.log({ approvalReward: approval });
+
+      let approvalStatus = await approval.wait();
+      setApprovalResponse(approvalStatus);
+
+      // if (approvalStatus?.status) {
+      //   // if (approvalStatus?.status === 1) {
+      //   setIsSucess(true);
+      //   setIsApproved(true);
+      //   setIsApproveSuccess(true);
+      //   console.log({ approvalData: approvalStatus });
+      //   console.log({
+      //     txHash:
+      //       (approvalStatus?.hash && approvalStatus?.hash) ||
+      //       (approvalStatus?.transactionHash &&
+      //         approvalStatus?.transactionHash) ||
+      //       '',
+      //   });
+      //   setTimeout(() => {
+      //     setIsSwap(false);
+      //   }, 2000);
+      //   setTimeout(async () => {
+      //     // await swapOwner();
+      //     await fetchSwapData(); // updated
+      //   }, 2000);
+      // }
+    } catch (error) {
+      console.log(error);
+      setIsError(true); // original
+      setIsApproveError(true);
+      // For testing purpose
+      // if (error?.message) {
+      //   setTimeout(async()=>{
+      //     await swapOwner();
+      //   }, 2000)
+      //   setIsApproved(false);
+      // }
+
+      // For testing purpose
+      // if (error?.message) {
+      //   setTimeout(async()=>{
+      //     setIsChainModalVisible(true)
+      //   }, 2000)
+      // }
+      setTimeout(() => {
+        setIsApproved(false);
+      }, 20000);
+      console.log({ ApproveError: error?.message });
+      // return error?.message;
+    }
+  }
+// approve2()
+
 
   useEffect(() => {
     if (isApprove === false && isSwap === false) {
@@ -1094,22 +1299,23 @@ export const DefiHome = (props) => {
   //======================================={USD Value Converter}===============================================
 
   //========{API CALLS}=========================
-  useEffect(() => {
-    UpdateSpender();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [spender, chain]);
+  // useEffect(() => {
+  //   UpdateSpender();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [spender, chain]);
 
-  async function UpdateSpender() {
-    const userData = {
-      chainId: chainId ? chainId : '1',
-    };
-    const response = await getSpenderService(userData);
-    if (response) {
-      const { spenderData } = response;
-      setSpender(spenderData);
-      dispatch(getSpender(response));
-    }
-  }
+  // async function UpdateSpender() {
+  //   if (chainId) {
+  //     const userData = {
+  //       chainId: chainId ? chainId : '1',
+  //     };
+  //     const response = await getSpenderService(userData);
+  //     if (response) {
+  //       const { spenderData } = response;
+  //       setSpender(spenderData);
+  //     }
+  //   }
+  // }
 
   //=============={BACKEND CALLS}==========================
 
@@ -1139,25 +1345,6 @@ export const DefiHome = (props) => {
     }
   }, [isSwapSuccess, isSwapError, isApproveSuccess, isApproveError]);
 
-  async function getConnectedChain() {
-    const response = await getTokensDefiByIdService(chainId);
-    if (response) {
-      dispatch(getTokensDefiById(response));
-    }
-
-    // window.location.reload(); // reconsider removing
-  }
-
-  useEffect(() => {
-    getConnectedChain();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // useEffect(() => {
-  //   getConnectedChain();
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [chain]);
-
   //=====================================================================================
 
   return (
@@ -1183,12 +1370,11 @@ export const DefiHome = (props) => {
           setTxInfo={setTxInfo}
           allTokensFrom={allTokensFrom}
           allTokensTo={allTokensTo}
-          exchangeRate={exchangeRate}
           transactionRates={transactionRates}
           chain={chain}
-          // setChain={setChain}
+          setChain={setChain}
           chainId={chainId}
-          tValue={tValue}
+          loadingExchangeRate={loadingExchangeRate}
         />
       )}
       {percentageProgress === 2 && (
@@ -1212,18 +1398,17 @@ export const DefiHome = (props) => {
           setTxInfo={setTxInfo}
           allTokensFrom={allTokensFrom}
           allTokensTo={allTokensTo}
-          exchangeRate={exchangeRate}
           transactionRates={transactionRates}
           userAddress={userAddress}
           setUserAddress={setUserAddress}
           chain={chain}
-          // setChain={setChain}
+          setChain={setChain}
           chainId={chainId}
           //============={New}=================
-          tValue={tValue}
           isFromLoading={isFromLoading}
           fromBalance={fromBalance}
           fromPrice={fromPrice}
+          toPrice={toPrice}
           isToLoading={isToLoading}
           toBalance={toBalance}
           priceDeviation={priceDeviation}
@@ -1233,6 +1418,8 @@ export const DefiHome = (props) => {
           isFromTokenPage={isFromTokenPage}
           isToTokenPage={isToTokenPage}
           isSlippagePage={isSlippagePage}
+          loadingExchangeRate={loadingExchangeRate}
+
         />
       )}
       {percentageProgress === 3 && (
@@ -1248,15 +1435,17 @@ export const DefiHome = (props) => {
           service={service}
           subService={subService}
           setTxInfo={setTxInfo}
-          tValue={tValue}
           setIsSwapping={setIsSwapping}
           estimatedGas={estimatedGas}
-          exchangeRate={exchangeRate}
+          transactionRates={transactionRates}
           chain={chain}
+          chainId={chainId}
           swappingData={swappingData}
           isValidTransaction={isValidTransaction}
           setIsSendTransaction={setIsSendTransaction}
           isSwapSuccess={isSwapSuccess}
+          loadingExchangeRate={loadingExchangeRate}
+
         />
       )}
       {percentageProgress === 4 && (

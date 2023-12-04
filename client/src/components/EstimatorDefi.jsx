@@ -42,7 +42,7 @@ export const EstimatorDefi = (props) => {
     exchangeRate,
     transactionRates,
     chain,
-    // setChain,
+    setChain,
     setPercentageProgress,
     //================={new}=================================================
     isFromLoading,
@@ -54,6 +54,7 @@ export const EstimatorDefi = (props) => {
     priceDeviation,
     tValue,
     fromBalancePercent,
+    loadingExchangeRate,
   } = props;
   //======================={RATES and PRICES}========================================================
 
@@ -147,18 +148,23 @@ export const EstimatorDefi = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connectedNetworkSwitchL]);
 
-  async function getConnectedChain() {
-    const response = await getTokensDefiByIdService(checkChain?.chainId);
-    if (response) {
-      dispatch(getTokensDefiById(response));
-    }
+  // async function updateConnectedChain() {
+  //   const response = await getTokensDefiByIdService(checkChain?.chainId);
+  //   if (response) {
+  //     dispatch(getTokensDefiById(response));
+  //   }
 
-    // window.location.reload(); // reconsider removing
-  }
+  //   // window.location.reload(); // reconsider removing
+  // }
+
+  useEffect(() => {
+    setChain(checkChain);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [checkChain]);
 
   useEffect(() => {
     if (checkChain && isConnected) {
-      getConnectedChain();
+      // updateConnectedChain();
       dispatch(updateChain(checkChain));
       switchNetwork(checkChain?.id);
       dispatch(updateIsChangeChainId(true));
@@ -167,7 +173,7 @@ export const EstimatorDefi = (props) => {
       setIsNetworkPage(false);
     }
     if (checkChain && !isConnected) {
-      getConnectedChain();
+      // updateConnectedChain();
       dispatch(updateChain(checkChain));
       dispatch(updateIsChangeChainId(true));
       dispatch(updateConnectedNetwork(false));
@@ -234,14 +240,14 @@ export const EstimatorDefi = (props) => {
                     <img
                       className="w-[24px] h-$ shrink-0 overflow-hidden rounded-full"
                       src={chain?.image}
-                      alt={chain.symbol}
+                      alt={chain?.symbol}
                     />
                   </div>
                   <div className="flex flex-row gap-1">
                     <div
                       className={`text-base font-sans font-medium leading-[24px] inline-block text-black`}
                     >
-                      {chain.name}
+                      {chain?.name}
                     </div>
                   </div>
                 </div>
@@ -272,7 +278,7 @@ export const EstimatorDefi = (props) => {
                     />
                   </div>
                   <div className="flex flex-row items-start">
-                    <div className="flex items-center bg-whitesmoke-200 w-[121px] h-[44px] rounded-md mr-2">
+                    <div className="flex items-center bg-whitesmoke-200 w-[121px] h-[44px] rounded-md mr-2 shadow-md hover:bg-whitesmoke-100 mr-2 shadow-md hover:bg-whitesmoke-100">
                       <div
                         className="cursor-pointer flex flex-row justify-between w-[121px] ml-[12px]"
                         onClick={() => setIsFromTokenPage(true)}
@@ -323,14 +329,15 @@ export const EstimatorDefi = (props) => {
 
             <div className="flex flex-row justify-between">
               <div className="h-3 py-2">
-                1 {fToken?.symbol.toUpperCase()} ~ {exchangeRate}{' '}
+                1 {fToken?.symbol.toUpperCase()} ~{' '}
+                {loadingExchangeRate ? 'fetching rates' : exchangeRate}{' '}
                 {tToken?.symbol.toUpperCase()}
               </div>
               {/* <div className="h-3 py-2">{isToLoading
                           ? 'Fetching price...'
                           : `${`1 ${fToken?.symbol.toUpperCase()} = ${exchangeRate}  ${tToken?.symbol.toUpperCase()}`}`}</div> */}
               <div
-                className="cursor-pointer rounded bg-bgSecondary p-2"
+                className="cursor-pointer transition-transform duration-300 hover:scale-110 shadow-md rounded bg-bgSecondary p-2"
                 onClick={swapTokensPosition}
               >
                 <img
@@ -359,7 +366,7 @@ export const EstimatorDefi = (props) => {
                     />
                   </div>
                   <div className="flex flex-row items-start">
-                    <div className="flex items-center bg-whitesmoke-200 w-[121px] h-[44px] rounded-md mr-2">
+                    <div className="flex items-center bg-whitesmoke-200 w-[121px] h-[44px] rounded-md mr-2 shadow-md hover:bg-whitesmoke-100 mr-2 shadow-md hover:bg-whitesmoke-100">
                       <div
                         className="cursor-pointer flex flex-row justify-between w-[121px] ml-[12px]"
                         onClick={() => setIsToTokenPage(true)}
@@ -411,7 +418,7 @@ export const EstimatorDefi = (props) => {
           {/* Control Logic for connect and swap */}
           {!isConnected && (
             <div
-              className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded-md"
+              className="flex flex-row justify-center items-center h-[49px] cursor-pointer text-white bg-bgPrimary hover:bg-bgPrimaryHover focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded dark:bg-blue-600 dark:hover:bg-bgPrimary dark:focus:ring-bgPrimaryHover"
               onClick={() => {
                 setIsWalletPage(true);
               }}
@@ -421,7 +428,7 @@ export const EstimatorDefi = (props) => {
           )}
           {isConnected && (
             <div
-              className="mb-4 cursor-pointer flex flex-row justify-center items-center w-full bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded-md"
+              className="flex flex-row justify-center items-center h-[49px] cursor-pointer text-white bg-bgPrimary hover:bg-bgPrimaryHover focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded dark:bg-blue-600 dark:hover:bg-bgPrimary dark:focus:ring-bgPrimaryHover"
               onClick={() => {
                 setPercentageProgress(3);
               }}

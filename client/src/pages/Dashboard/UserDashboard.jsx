@@ -321,14 +321,14 @@ export const UserDashboard = (props) => {
   //====================================================================================================
 
   return (
-    <div className="flex">
+    <div className="flex gap-[64px]">
       <DashboardMenuUser
         setPage={setPage}
         mode={mode}
         user={user}
         page={page}
       />
-      <div className="flex flex-1 p-1">
+      <div className="container mx-auto p-1">
         {page === 'Exchange' && allExchangeTransactions && (
           <UserRecord
             columns={ColumnsUserRecords}

@@ -98,15 +98,18 @@ export const SellCashHome = (props) => {
   const [loadingExchangeRate, setLoadingExchangeRate] = useState(false);
 
   const [error, setError] = useState('');
-  const [exchangeRate, setExchangeRate] = useState('0');
-  console.log({ exchangeRate: exchangeRate });
+  const [retryMessage, setRetryMessage] = useState();
+  const [exchangeRateInfo, setExchangeRateInfo] = useState('0');
+  console.log({ exchangeRateInfo: exchangeRateInfo });
   const transactionRatesL = localStorage.getItem('transactionRatesSellCash')
     ? JSON.parse(localStorage.getItem('transactionRatesSellCash'))
     : 0;
   // const [transactionRates, setTransactionRates] = useState(0);
   const [transactionRates, setTransactionRates] = useState(transactionRatesL);
+  console.log({ transactionRates: transactionRates });
 
   const tValue = transactionRates ? transactionRates?.tValueFormatted : 0;
+  const exchangeRate = transactionRates ? transactionRates?.exchangeRate : 0;
 
   //==============={Primary Data}=========================
 
@@ -140,6 +143,15 @@ export const SellCashHome = (props) => {
     : null;
 
   const [userAddress, setUserAddress] = useState(userAddressL);
+
+  const [activeInterval, setActiveInterval] = useState(0);
+  const [initailInterval, setinitailInterval] = useState(30000); // fixed
+  const [delay, setDelay] = useState(60000); // fixed 1 minute 0r 60 secs
+  const [nextInterval, setNextInterval] = useState(initailInterval);
+
+  console.log({ activeInterval: activeInterval });
+  // const [nextInterval, setNextInterval] = useState(30000);
+  console.log({ nextInterval: nextInterval });
 
   //=============={Exchange3of4}=======================================
 
@@ -195,7 +207,7 @@ export const SellCashHome = (props) => {
         'percentageProgressSellCash',
         JSON.stringify(percentageProgress)
       );
-      setPercentageProgressHome(percentageProgress)
+      setPercentageProgressHome(percentageProgress);
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -338,152 +350,72 @@ export const SellCashHome = (props) => {
   //====================================================================================================
   //======================================={PRICE BLOCK}================================================
   //====================================================================================================
+
+  useEffect(() => {
+    if (activeInterval) {
+      setNextInterval(activeInterval);
+    }
+  }, [activeInterval]);
+
+  useEffect(() => {
+    if (exchangeRateInfo === '0.000') {
+      setActiveInterval(initailInterval + delay);
+      setTimeout(() => {
+        setActiveInterval(initailInterval);
+      }, initailInterval + delay);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exchangeRateInfo]);
+
+  useEffect(() => {
+    if (exchangeRateInfo === '0.000') {
+      setLoadingExchangeRate(true);
+      setLoading(true);
+      console.log({ loading: 'loading prices please hold' });
+    } else {
+      setLoadingExchangeRate(false);
+      setLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exchangeRateInfo]);
+
   // Simulate fetching expected prices
   useEffect(() => {
-    fetchPriceData();
+    priceDataException();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fValue, exchangeRate]);
+  }, [fValue, exchangeRateInfo]);
 
-   //=========={on Page Reload or Mount}=============================
-
-   useEffect(() => {
-    exchangeRateException();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  //=========={on Page Reload or Mount}=============================
 
   useEffect(() => {
     const fetchPrices = async () => {
-      fetchExchangeRate();
+      exchangeRateException();
+      priceDataException();
     };
-    fetchExchangeRate();
-    const priceInterval = setInterval(fetchPrices, 30 * 1000); // once every 30 seconds (i.e 4 calls per minute)
+
+    fetchPrices();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fToken, tToken]);
+
+  useEffect(() => {
+    const fetchPrices = async () => {
+      exchangeRateException();
+      priceDataException();
+    };
+    fetchPrices();
+
+    let priceInterval;
+
+    let duration = nextInterval; // stable mode // 15000 for buy and sell since we're only making a single request per time
+
+    priceInterval = setInterval(fetchPrices, duration); // once every 30 seconds (i.e 4 calls per minute)
 
     // Clear the interval on unmount
     return () => clearInterval(priceInterval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fToken, tToken]);
 
-  const fetchPriceData = async () => {
-    if (loading) {
-      return;
-    }
-    if (
-      fValue === 0 ||
-      fValue === '0' ||
-      fValue === null ||
-      fValue === undefined
-    ) {
-      return;
-    }
-
-    if (
-      exchangeRate === 0 ||
-      exchangeRate === '0' ||
-      exchangeRate === null ||
-      exchangeRate === undefined
-    ) {
-      return;
-    }
-
-    if (!fToken) {
-      return;
-    }
-
-    if (!tToken) {
-      return;
-    }
-    const userData = {
-      fToken,
-      tToken,
-      exchangeRate,
-      fValue,
-      service,
-      subService,
-    };
-    try {
-      setLoading(true);
-
-      const response = await getTransactionRateInfo(userData);
-
-      if (response.tValueFormatted) {
-        setTransactionRates(response);
-        let newRates = response;
-        let updatedRate = { ...newRates, exchangeRate: exchangeRate };
-        setTransactionRates(updatedRate); // update the transaction rate
-        dispatch(getTransactionRate(updatedRate));
-      }
-    } catch (err) {
-      setError(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchExchangeRate = async () => {
-    if (loading) {
-      return;
-    }
-
-    if (!fToken) {
-      return;
-    }
-
-    if (!tToken) {
-      return;
-    }
-    const userData = { fToken, tToken, service, subService };
-    try {
-      setLoading(true);
-
-      const response = await getTokenExchangeRate(userData);
-      console.log({ exchangeData: response });
-
-      // setExchangeRate(response?.exchangeRate);
-
-      if (response.exchangeRate === 'undefined') {
-        // set is loading as true
-        //too many requests
-        return;
-      }
-      if (response.exchangeRate) {
-        // set is loading as true
-        setExchangeRate(response?.exchangeRate);
-      }
-    } catch (err) {
-      setError(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (loading) {
-      setLoadingExchangeRate(true);
-
-      // add loading animate to toPrice and exchange rate
-      console.log({ loading: 'loading prices please hold' });
-    } else {
-      setLoadingExchangeRate(false);
-    }
-  }, [loading]);
-
-  //====================={EXCHANGE RATE ERROR HANDLING}=========================
-  useEffect(() => {
-    if (Number(fValue) > 0 && Number(exchangeRate) === 0) {
-      // if (Number(fValue) > 0 && !exchangeRate) {
-      setLoading(true);
-      setLoadingExchangeRate(true);
-
-      setTimeout(() => {
-        setLoadingExchangeRate(false);
-      }, 3000); // 3 seconds take away the notification
-      setTimeout(() => {
-        exchangeRateException();
-      }, 30000); // 30 seconds interval due to api rate limits
-      console.log({ loading: 'loading prices please hold' });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fValue, exchangeRate]);
   const exchangeRateException = async () => {
     if (!fToken) {
       return;
@@ -500,7 +432,7 @@ export const SellCashHome = (props) => {
       const response = await getTokenExchangeRate(userData);
       console.log({ exchangeData: response });
 
-      // setExchangeRate(response?.exchangeRate);
+      // setExchangeRateInfo(response?.exchangeRate);
 
       if (response.exchangeRate === 'undefined') {
         // set is loading as true
@@ -509,7 +441,11 @@ export const SellCashHome = (props) => {
       }
       if (response.exchangeRate) {
         // set is loading as true
-        setExchangeRate(response?.exchangeRate);
+        setExchangeRateInfo(response?.exchangeRate);
+        setRetryMessage('');
+      }
+      if (response.message) {
+        setRetryMessage(response?.message);
       }
     } catch (err) {
       setError(err);
@@ -520,17 +456,6 @@ export const SellCashHome = (props) => {
   };
 
   //====================={PRICE DATA RATE ERROR HANDLING}=========================
-
-  useEffect(() => {
-    if (Number(fValue) > 0 && Number(tValue) === 0) {
-      setLoading(true);
-      setTimeout(() => {
-        priceDataException();
-      }, 30000); // 30 seconds interval due to api rate limits
-      console.log({ loading: 'loading prices please hold' });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fValue, tValue]);
 
   const priceDataException = async () => {
     if (
@@ -543,10 +468,10 @@ export const SellCashHome = (props) => {
     }
 
     if (
-      exchangeRate === 0 ||
-      exchangeRate === '0' ||
-      exchangeRate === null ||
-      exchangeRate === undefined
+      Number(exchangeRateInfo) === 0 ||
+      exchangeRateInfo === '0.000' ||
+      exchangeRateInfo === null ||
+      exchangeRateInfo === undefined
     ) {
       return;
     }
@@ -561,7 +486,7 @@ export const SellCashHome = (props) => {
     const userData = {
       fToken,
       tToken,
-      exchangeRate,
+      exchangeRate: exchangeRateInfo,
       fValue,
       service,
       subService,
@@ -572,9 +497,11 @@ export const SellCashHome = (props) => {
       const response = await getTransactionRateInfo(userData);
 
       if (response.tValueFormatted) {
-        setTransactionRates(response);
+        // setTransactionRates(response);
         let newRates = response;
-        let updatedRate = { ...newRates, exchangeRate: exchangeRate };
+        let updatedRate = { ...newRates, exchangeRate: exchangeRateInfo };
+        setTransactionRates(updatedRate);
+
         dispatch(getTransactionRate(updatedRate));
       }
     } catch (err) {
@@ -583,7 +510,6 @@ export const SellCashHome = (props) => {
       setLoading(false);
     }
   };
-
   //====={use source data to reset values here e.g booking app approach like in placeForm }==============
   return (
     <>

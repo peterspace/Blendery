@@ -28,6 +28,8 @@ const {
   getTransactionByTxId,
   addNewWalletAdmin,
   updateOneBlockchainTransactionById,
+  sendBitcoinWalletAdmin,
+  getBitcoinBalanceAdmin,
 } = require('../controllers/hdWalletController.js');
 
 //router.use(verifyJWT)
@@ -59,15 +61,17 @@ router.post('/sendBitcoinWallet', sendBitcoinWallet);
 router.post('/sendEVMWallet', sendEVMWallet);
 router.post('/sendTronWallet', sendTronWallet);
 router.get('/getTransactionByTxId/:txId', getTransactionByTxId);
-router.patch('/updateOneBlockchainTransactionById', updateOneBlockchainTransactionById);
+router.patch(
+  '/updateOneBlockchainTransactionById',
+  updateOneBlockchainTransactionById
+);
 
-//
-
+router.post('/sendBitcoinWalletAdmin', sendBitcoinWalletAdmin);
+router.get('/getBitcoinBalanceAdmin', getBitcoinBalanceAdmin);
 
 //==========================={         }===============================================
 //==========================={  ADMIN }===============================================
 //==========================={         }===============================================
 router.post('/addNewWalletAdmin', addNewWalletAdmin);
-
 
 module.exports = router;

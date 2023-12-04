@@ -1,81 +1,81 @@
-import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import { BuyCardScreen1 } from "./BuyCardScreen1";
-import { BuyCardScreen2 } from "./BuyCardScreen2";
-import { BuyCardScreen3 } from "./BuyCardScreen3";
-import { useDispatch, useSelector } from "react-redux";
-import { getTransactionRate } from "../../../redux/features/transaction/transactionSlice";
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import { BuyCardScreen1 } from './BuyCardScreen1';
+import { BuyCardScreen2 } from './BuyCardScreen2';
+import { BuyCardScreen3 } from './BuyCardScreen3';
+import { useDispatch, useSelector } from 'react-redux';
+import { getTransactionRate } from '../../../redux/features/transaction/transactionSlice';
 import {
   getTokenExchangeRate,
   getTransactionRateInfo,
-} from "../../../services/apiService";
-import { getTokenListExchange } from "../../../redux/features/token/tokenSlice";
+} from '../../../services/apiService';
+import { getTokenListExchange } from '../../../redux/features/token/tokenSlice';
 
 //w-[370px] ===w-[300px]
 //w-[375px] === w-[320px] xs:w-[340px]
-const paymentOptions = ["card", "cash"];
+const paymentOptions = ['card', 'cash'];
 const providers = [
   {
-    name: "Phone",
-    url: "/image@2x.png",
-    rate: "0.00526",
-    class: "bg-gray-200",
-    providerUrl: "https://www.simplex.com/",
+    name: 'Phone',
+    url: '/image@2x.png',
+    rate: '0.00526',
+    class: 'bg-gray-200',
+    providerUrl: 'https://www.simplex.com/',
   },
   {
-    name: "Card",
-    url: "/MoonPay.png",
-    rate: "0.00519",
-    providerUrl: "https://www.moonpay.com",
+    name: 'Card',
+    url: '/MoonPay.png',
+    rate: '0.00519',
+    providerUrl: 'https://www.moonpay.com',
   },
 ];
 
 const cities = [
   {
-    country: "United States",
-    cities: ["New york"],
-    flag: "",
+    country: 'United States',
+    cities: ['New york'],
+    flag: '',
   },
   {
-    country: "United Kingdom",
-    cities: ["London"],
-    flag: "",
+    country: 'United Kingdom',
+    cities: ['London'],
+    flag: '',
   },
   {
-    country: "France",
-    cities: ["Paris"],
-    flag: "",
+    country: 'France',
+    cities: ['Paris'],
+    flag: '',
   },
 
   {
-    country: "Germany",
-    cities: ["Berlin"],
-    flag: "",
+    country: 'Germany',
+    cities: ['Berlin'],
+    flag: '',
   },
   {
-    country: "Spain",
-    cities: ["Barcelona"],
-    flag: "",
+    country: 'Spain',
+    cities: ['Barcelona'],
+    flag: '',
   },
   {
-    country: "Russia",
-    cities: ["Saint Petersburg", "Moscow"],
-    flag: "",
+    country: 'Russia',
+    cities: ['Saint Petersburg', 'Moscow'],
+    flag: '',
   },
   {
-    country: "Finland",
-    cities: ["Helsinki"],
-    flag: "",
+    country: 'Finland',
+    cities: ['Helsinki'],
+    flag: '',
   },
   {
-    country: "Hungary",
-    cities: ["Budapest"],
-    flag: "",
+    country: 'Hungary',
+    cities: ['Budapest'],
+    flag: '',
   },
   {
-    country: "Czech",
-    cities: ["Prague"],
-    flag: "",
+    country: 'Czech',
+    cities: ['Prague'],
+    flag: '',
   },
 ];
 
@@ -110,99 +110,119 @@ export const BuyCardHome = (props) => {
   const [loading, setLoading] = useState(false);
   const [loadingExchangeRate, setLoadingExchangeRate] = useState(false);
 
-  const [error, setError] = useState("");
-  const [exchangeRate, setExchangeRate] = useState("0");
-  const transactionRatesL = localStorage.getItem("transactionRatesBuyCard")
-    ? JSON.parse(localStorage.getItem("transactionRatesBuyCard"))
+  const [error, setError] = useState('');
+  const [retryMessage, setRetryMessage] = useState();
+  const [exchangeRateInfo, setExchangeRateInfo] = useState('0');
+  console.log({ exchangeRateInfo: exchangeRateInfo });
+  const transactionRatesL = localStorage.getItem('transactionRatesBuyCard')
+    ? JSON.parse(localStorage.getItem('transactionRatesBuyCard'))
     : 0;
   // const [transactionRates, setTransactionRates] = useState(0);
   const [transactionRates, setTransactionRates] = useState(transactionRatesL);
+  console.log({ transactionRates: transactionRates });
 
   const tValue = transactionRates ? transactionRates?.tValueFormatted : 0;
+  const exchangeRate = transactionRates ? transactionRates?.exchangeRate : 0;
 
-  const percentageProgressL = localStorage.getItem("percentageProgressBuyCard")
-    ? JSON.parse(localStorage.getItem("percentageProgressBuyCard"))
+  const percentageProgressL = localStorage.getItem('percentageProgressBuyCard')
+    ? JSON.parse(localStorage.getItem('percentageProgressBuyCard'))
     : 1;
 
   const [percentageProgress, setPercentageProgress] =
     useState(percentageProgressL);
 
-  const fTokenL = localStorage.getItem("fTokenBuyCard")
-    ? JSON.parse(localStorage.getItem("fTokenBuyCard"))
+  const fTokenL = localStorage.getItem('fTokenBuyCard')
+    ? JSON.parse(localStorage.getItem('fTokenBuyCard'))
     : null;
 
   const [fToken, setFromToken] = useState(fTokenL);
-  const tTokenL = localStorage.getItem("tTokenBuyCard")
-    ? JSON.parse(localStorage.getItem("tTokenBuyCard"))
+  const tTokenL = localStorage.getItem('tTokenBuyCard')
+    ? JSON.parse(localStorage.getItem('tTokenBuyCard'))
     : null;
   const [tToken, setToToken] = useState(tTokenL);
-  const fValueL = localStorage.getItem("fValueBuyCard")
-    ? JSON.parse(localStorage.getItem("fValueBuyCard"))
+  const fValueL = localStorage.getItem('fValueBuyCard')
+    ? JSON.parse(localStorage.getItem('fValueBuyCard'))
     : 150;
   const [fValue, setFromValue] = useState(fValueL);
 
-  const [fTitle, setFTitle] = useState("You give");
-  const [tTitle, setTTitle] = useState("You get");
+  const [fTitle, setFTitle] = useState('You give');
+  const [tTitle, setTTitle] = useState('You get');
   //=============={Exchange1of4}=======================================
 
-  const userAddressL = localStorage.getItem("userAddress")
-    ? JSON.parse(localStorage.getItem("userAddress"))
+  const userAddressL = localStorage.getItem('userAddress')
+    ? JSON.parse(localStorage.getItem('userAddress'))
     : null;
 
   const [userAddress, setUserAddress] = useState(userAddressL);
 
   //=============={Exchange3of4}=======================================
 
-  const telegramL = localStorage.getItem("telegram")
-    ? JSON.parse(localStorage.getItem("telegram"))
+  const telegramL = localStorage.getItem('telegram')
+    ? JSON.parse(localStorage.getItem('telegram'))
     : null;
 
   const [telegram, setTelegram] = useState(telegramL);
 
-  const paymentMethodL = localStorage.getItem("paymentMethod")
-    ? JSON.parse(localStorage.getItem("paymentMethod"))
+  const paymentMethodL = localStorage.getItem('paymentMethod')
+    ? JSON.parse(localStorage.getItem('paymentMethod'))
     : paymentOptions[0];
 
   const [paymentMethod, setPaymentMethod] = useState(paymentMethodL);
 
-  const countryL = localStorage.getItem("country")
-    ? JSON.parse(localStorage.getItem("country"))
+  const countryL = localStorage.getItem('country')
+    ? JSON.parse(localStorage.getItem('country'))
     : cities[0]?.country;
 
-  const cityDataL = localStorage.getItem("cityData")
-    ? JSON.parse(localStorage.getItem("cityData"))
+  const cityDataL = localStorage.getItem('cityData')
+    ? JSON.parse(localStorage.getItem('cityData'))
     : null;
-  const cityL = localStorage.getItem("city")
-    ? JSON.parse(localStorage.getItem("city"))
+  const cityL = localStorage.getItem('city')
+    ? JSON.parse(localStorage.getItem('city'))
     : null;
 
   const [country, setCountry] = useState(countryL);
   const [cityData, setCityData] = useState(cityDataL);
   const [city, setCity] = useState(cityL);
 
-  const providerL = localStorage.getItem("provider")
-    ? JSON.parse(localStorage.getItem("provider"))
+  console.log({
+    city: city,
+    cityData: cityData,
+    country: country,
+  });
+
+  const providerL = localStorage.getItem('provider')
+    ? JSON.parse(localStorage.getItem('provider'))
     : providers[0];
   // const [provider, setProvider] = useState(providers[0]); // important
   const [provider, setProvider] = useState(providerL); // important
+  console.log({ providerActive: provider });
+
+  const [activeInterval, setActiveInterval] = useState(0);
+  const [initailInterval, setinitailInterval] = useState(30000); // fixed
+  const [delay, setDelay] = useState(60000); // fixed 1 minute 0r 60 secs
+  const [nextInterval, setNextInterval] = useState(initailInterval);
+
+  console.log({ activeInterval: activeInterval });
+  // const [nextInterval, setNextInterval] = useState(30000);
+  console.log({ nextInterval: nextInterval });
 
   //====================================================================================================
   //======================================={BANK INFO}==================================================
   //====================================================================================================
 
-  const fullNameL = localStorage.getItem("fullName")
-    ? JSON.parse(localStorage.getItem("fullName"))
+  const fullNameL = localStorage.getItem('fullName')
+    ? JSON.parse(localStorage.getItem('fullName'))
     : null;
 
-  const bankNameL = localStorage.getItem("bankName")
-    ? JSON.parse(localStorage.getItem("bankName"))
+  const bankNameL = localStorage.getItem('bankName')
+    ? JSON.parse(localStorage.getItem('bankName'))
     : null;
-  const cardNumberL = localStorage.getItem("cardNumber")
-    ? JSON.parse(localStorage.getItem("cardNumber"))
+  const cardNumberL = localStorage.getItem('cardNumber')
+    ? JSON.parse(localStorage.getItem('cardNumber'))
     : null;
 
-  const phoneL = localStorage.getItem("phone")
-    ? JSON.parse(localStorage.getItem("phone"))
+  const phoneL = localStorage.getItem('phone')
+    ? JSON.parse(localStorage.getItem('phone'))
     : null;
 
   const [fullName, setFullName] = useState(fullNameL);
@@ -210,31 +230,33 @@ export const BuyCardHome = (props) => {
   const [cardNumber, setCardNumber] = useState(cardNumberL);
   const [phone, setPhone] = useState(phoneL);
 
+  console.log({ bankName: bankName });
+
   /************************************************************************************** */
   /******************************{BANK PAYMENT INFORMATION}****************************** */
   /************************************************************************************** */
 
   useEffect(() => {
     if (fullName) {
-      localStorage.setItem("fullName", JSON.stringify(fullName));
+      localStorage.setItem('fullName', JSON.stringify(fullName));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bankName]);
   useEffect(() => {
     if (bankName) {
-      localStorage.setItem("bankName", JSON.stringify(bankName));
+      localStorage.setItem('bankName', JSON.stringify(bankName));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bankName]);
   useEffect(() => {
     if (cardNumber) {
-      localStorage.setItem("cardNumber", JSON.stringify(cardNumber));
+      localStorage.setItem('cardNumber', JSON.stringify(cardNumber));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cardNumber]);
   useEffect(() => {
     if (phone) {
-      localStorage.setItem("phone", JSON.stringify(phone));
+      localStorage.setItem('phone', JSON.stringify(phone));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phone]);
@@ -252,7 +274,7 @@ export const BuyCardHome = (props) => {
   useEffect(() => {
     if (percentageProgress) {
       localStorage.setItem(
-        "percentageProgressBuyCard",
+        'percentageProgressBuyCard',
         JSON.stringify(percentageProgress)
       );
       setPercentageProgressHome(percentageProgress);
@@ -289,7 +311,7 @@ export const BuyCardHome = (props) => {
   }, [allTokensToL]);
 
   useEffect(() => {
-    localStorage.setItem("prevLocation", JSON.stringify(location?.pathname));
+    localStorage.setItem('prevLocation', JSON.stringify(location?.pathname));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -310,7 +332,7 @@ export const BuyCardHome = (props) => {
 
   useEffect(() => {
     if (country) {
-      localStorage.setItem("country", JSON.stringify(country));
+      localStorage.setItem('country', JSON.stringify(country));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -318,7 +340,7 @@ export const BuyCardHome = (props) => {
 
   useEffect(() => {
     if (cityData) {
-      localStorage.setItem("cityData", JSON.stringify(cityData));
+      localStorage.setItem('cityData', JSON.stringify(cityData));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -326,7 +348,7 @@ export const BuyCardHome = (props) => {
 
   useEffect(() => {
     if (city) {
-      localStorage.setItem("city", JSON.stringify(city));
+      localStorage.setItem('city', JSON.stringify(city));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -334,7 +356,7 @@ export const BuyCardHome = (props) => {
 
   useEffect(() => {
     if (telegram) {
-      localStorage.setItem("telegram", JSON.stringify(telegram));
+      localStorage.setItem('telegram', JSON.stringify(telegram));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -342,7 +364,7 @@ export const BuyCardHome = (props) => {
   useEffect(() => {
     if (transactionRates) {
       localStorage.setItem(
-        "transactionRatesBuyCard",
+        'transactionRatesBuyCard',
         JSON.stringify(transactionRates)
       );
     }
@@ -352,7 +374,7 @@ export const BuyCardHome = (props) => {
 
   useEffect(() => {
     if (fToken) {
-      localStorage.setItem("fTokenBuyCard", JSON.stringify(fToken));
+      localStorage.setItem('fTokenBuyCard', JSON.stringify(fToken));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -360,7 +382,7 @@ export const BuyCardHome = (props) => {
 
   useEffect(() => {
     if (tToken) {
-      localStorage.setItem("tTokenBuyCard", JSON.stringify(tToken));
+      localStorage.setItem('tTokenBuyCard', JSON.stringify(tToken));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -368,7 +390,7 @@ export const BuyCardHome = (props) => {
 
   useEffect(() => {
     if (fValue) {
-      localStorage.setItem("fValueBuyCard", JSON.stringify(fValue));
+      localStorage.setItem('fValueBuyCard', JSON.stringify(fValue));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -376,7 +398,7 @@ export const BuyCardHome = (props) => {
 
   useEffect(() => {
     if (userAddress) {
-      localStorage.setItem("userAddress", JSON.stringify(userAddress));
+      localStorage.setItem('userAddress', JSON.stringify(userAddress));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -384,7 +406,7 @@ export const BuyCardHome = (props) => {
 
   useEffect(() => {
     if (paymentMethod) {
-      localStorage.setItem("paymentMethod", JSON.stringify(paymentMethod));
+      localStorage.setItem('paymentMethod', JSON.stringify(paymentMethod));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -395,159 +417,84 @@ export const BuyCardHome = (props) => {
   //================================================================================
 
   useEffect(() => {
-    if (paymentMethod === "cash") {
+    if (paymentMethod === 'cash') {
       setFromValue(2000);
     }
-    if (paymentMethod === "card") {
+    if (paymentMethod === 'card') {
       setFromValue(150);
     }
   }, [paymentMethod]);
 
-  //====================================================================================
   //====================================================================================================
   //======================================={PRICE BLOCK}================================================
   //====================================================================================================
+
+  useEffect(() => {
+    if (activeInterval) {
+      setNextInterval(activeInterval);
+    }
+  }, [activeInterval]);
+
+  useEffect(() => {
+    if (exchangeRateInfo === '0.000') {
+      setActiveInterval(initailInterval + delay);
+
+      setTimeout(() => {
+        setActiveInterval(initailInterval);
+      }, initailInterval + delay);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exchangeRateInfo]);
+
   // Simulate fetching expected prices
   useEffect(() => {
-    fetchPriceData();
+    priceDataException();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fValue, exchangeRate]);
+  }, [fValue, exchangeRateInfo]);
 
   //=========={on Page Reload or Mount}=============================
 
   useEffect(() => {
-    exchangeRateException();
+    const fetchPrices = async () => {
+      exchangeRateException();
+      priceDataException();
+    };
+
+    fetchPrices();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fToken, tToken]);
 
   useEffect(() => {
     const fetchPrices = async () => {
-      fetchExchangeRate();
+      exchangeRateException();
+      priceDataException();
     };
-    fetchExchangeRate();
-    const priceInterval = setInterval(fetchPrices, 30 * 1000); // once every 30 seconds (i.e 4 calls per minute)
+    fetchPrices();
+
+    let priceInterval;
+
+    let duration = nextInterval; // stable mode // 15000 for buy and sell since we're only making a single request per time
+
+    priceInterval = setInterval(fetchPrices, duration); // once every 30 seconds (i.e 4 calls per minute)
 
     // Clear the interval on unmount
     return () => clearInterval(priceInterval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fToken, tToken]);
 
-  const fetchPriceData = async () => {
-    if (loading) {
-      return;
-    }
-    if (
-      fValue === 0 ||
-      fValue === "0" ||
-      fValue === null ||
-      fValue === undefined
-    ) {
-      return;
-    }
-
-    if (
-      exchangeRate === 0 ||
-      exchangeRate === "0" ||
-      exchangeRate === null ||
-      exchangeRate === undefined
-    ) {
-      return;
-    }
-
-    if (!fToken) {
-      return;
-    }
-
-    if (!tToken) {
-      return;
-    }
-    const userData = {
-      fToken,
-      tToken,
-      exchangeRate,
-      fValue,
-      service,
-      subService,
-    };
-    try {
-      setLoading(true);
-
-      const response = await getTransactionRateInfo(userData);
-
-      if (response.tValueFormatted) {
-        setTransactionRates(response);
-        let newRates = response;
-        let updatedRate = { ...newRates, exchangeRate: exchangeRate };
-        setTransactionRates(updatedRate); // update the transaction rate
-        dispatch(getTransactionRate(updatedRate));
-      }
-    } catch (err) {
-      setError(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchExchangeRate = async () => {
-    if (loading) {
-      return;
-    }
-
-    if (!fToken) {
-      return;
-    }
-
-    if (!tToken) {
-      return;
-    }
-    const userData = { fToken, tToken, service, subService };
-    try {
-      setLoading(true);
-
-      const response = await getTokenExchangeRate(userData);
-
-      // setExchangeRate(response?.exchangeRate);
-
-      if (response.exchangeRate === "undefined") {
-        // set is loading as true
-        //too many requests
-        return;
-      }
-      if (response.exchangeRate) {
-        // set is loading as true
-        setExchangeRate(response?.exchangeRate);
-      }
-    } catch (err) {
-      setError(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    if (loading) {
+    if (exchangeRateInfo === '0.000') {
       setLoadingExchangeRate(true);
+      setLoading(true);
+      console.log({ loading: 'loading prices please hold' });
     } else {
       setLoadingExchangeRate(false);
-    }
-  }, [loading]);
-
-  //====================={EXCHANGE RATE ERROR HANDLING}=========================
-  useEffect(() => {
-    if (Number(fValue) > 0 && Number(exchangeRate) === 0) {
-      // if (Number(fValue) > 0 && !exchangeRate) {
-      setLoading(true);
-      setLoadingExchangeRate(true);
-
-      setTimeout(() => {
-        setLoadingExchangeRate(false);
-      }, 3000); // 3 seconds take away the notification
-      setTimeout(() => {
-        exchangeRateException();
-      }, 30000); // 30 seconds interval due to api rate limits
+      setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fValue, exchangeRate]);
+  }, [exchangeRateInfo]);
+
   const exchangeRateException = async () => {
     if (!fToken) {
       return;
@@ -562,17 +509,22 @@ export const BuyCardHome = (props) => {
       setLoadingExchangeRate(true);
 
       const response = await getTokenExchangeRate(userData);
+      console.log({ exchangeData: response });
 
-      // setExchangeRate(response?.exchangeRate);
+      // setExchangeRateInfo(response?.exchangeRate);
 
-      if (response.exchangeRate === "undefined") {
+      if (response.exchangeRate === 'undefined') {
         // set is loading as true
         //too many requests
         return;
       }
       if (response.exchangeRate) {
         // set is loading as true
-        setExchangeRate(response?.exchangeRate);
+        setExchangeRateInfo(response?.exchangeRate);
+        setRetryMessage('');
+      }
+      if (response.message) {
+        setRetryMessage(response?.message);
       }
     } catch (err) {
       setError(err);
@@ -584,20 +536,10 @@ export const BuyCardHome = (props) => {
 
   //====================={PRICE DATA RATE ERROR HANDLING}=========================
 
-  useEffect(() => {
-    if (Number(fValue) > 0 && Number(tValue) === 0) {
-      setLoading(true);
-      setTimeout(() => {
-        priceDataException();
-      }, 30000); // 30 seconds interval due to api rate limits
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fValue, tValue]);
-
   const priceDataException = async () => {
     if (
       fValue === 0 ||
-      fValue === "0" ||
+      fValue === '0' ||
       fValue === null ||
       fValue === undefined
     ) {
@@ -605,10 +547,10 @@ export const BuyCardHome = (props) => {
     }
 
     if (
-      exchangeRate === 0 ||
-      exchangeRate === "0" ||
-      exchangeRate === null ||
-      exchangeRate === undefined
+      Number(exchangeRateInfo) === 0 ||
+      exchangeRateInfo === '0.000' ||
+      exchangeRateInfo === null ||
+      exchangeRateInfo === undefined
     ) {
       return;
     }
@@ -623,7 +565,7 @@ export const BuyCardHome = (props) => {
     const userData = {
       fToken,
       tToken,
-      exchangeRate,
+      exchangeRate: exchangeRateInfo,
       fValue,
       service,
       subService,
@@ -634,9 +576,11 @@ export const BuyCardHome = (props) => {
       const response = await getTransactionRateInfo(userData);
 
       if (response.tValueFormatted) {
-        setTransactionRates(response);
+        // setTransactionRates(response);
         let newRates = response;
-        let updatedRate = { ...newRates, exchangeRate: exchangeRate };
+        let updatedRate = { ...newRates, exchangeRate: exchangeRateInfo };
+        setTransactionRates(updatedRate);
+
         dispatch(getTransactionRate(updatedRate));
       }
     } catch (err) {

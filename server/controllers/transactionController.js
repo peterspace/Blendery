@@ -11,6 +11,8 @@ const Store = require('../models/store.js');
 const StoreRecovery = require('../models/StoreRecovery.js');
 const sendEmail = require('../utils/sendEmail');
 const otpGenerator = require('otp-generator');
+const TokenBucketRateLimiter = require('./TokenBucketRateLimiter.js');
+const { RateLimiter } = require('limiter');
 
 const axios = require('axios');
 
@@ -2748,12 +2750,231 @@ const protect = asyncHandler(async () => {
 //=============================================================================================================
 //============={updated transactions rate}=============================================
 
-const geTokenPriceData = async (id) => {
+const geTokenPriceData1 = async (id) => {
   const url = 'https://api.coingecko.com/api/v3/';
   const param = `coins/${id}`;
   const response = await axios.get(url + param);
   return response.data;
 };
+
+// const geTokenPriceData = async (id) => {
+//   const url = 'https://api.coingecko.com/api/v3/';
+//   const param = `coins/${id}`;
+//   const response = await axios.get(url + param);
+//   // console.log({ fullResponse: response });
+//   // console.log({ fullResponse: response });
+
+//   return response.data;
+// };
+
+const geTokenPriceData = async (id) => {
+  const url = 'https://api.coingecko.com/api/v3/';
+  const param = `coins/${id}`;
+  try {
+    const response = await axios.get(url + param);
+    return response.data;
+  } catch (error) {
+    console.log({ coingekoErrorMsg: error });
+
+    return error;
+  }
+  // console.log({ fullResponse: response });
+  // console.log({ fullResponse: response });
+};
+
+//=================================={Rate Limit Handling}===============================
+
+function getMillisToSleep(retryHeaderString) {
+  let millisToSleep = Math.round(parseFloat(retryHeaderString) * 1000);
+  if (isNaN(millisToSleep)) {
+    millisToSleep = Math.max(0, new Date(retryHeaderString) - new Date());
+  }
+  return millisToSleep;
+}
+
+getMillisToSleep('4'); // => 4000
+getMillisToSleep('Mon, 29 Mar 2021 04:58:00 GMT'); // => 4000
+
+/**
+ * Now we can build out a function that uses
+ * the Retry-After header to retry
+ * when we encounter a 429 HTTP status code:
+ */
+
+async function fetchAndRetryIfNecessary(callAPIFn) {
+  const response = await callAPIFn();
+
+  if (response.status === 429) {
+    const retryAfter = response.headers.get('retry-after');
+    const millisToSleep = getMillisToSleep(retryAfter);
+    await sleep(millisToSleep);
+    return fetchAndRetryIfNecessary(callAPIFn);
+  }
+
+  console.log({ apiResponse: response?.market_data?.current_price?.usd });
+
+  return response;
+}
+
+async function retryApi() {
+  const response = await fetchAndRetryIfNecessary(
+    async () =>
+      // await fetch(apiURL, requestOptions)
+      // await geTokenPriceData(id)
+      await geTokenPriceData('bitcoin')
+  );
+  // console.log(response.status); // => 200
+  console.log({ apiLimitStatus: response.status }); // => 200
+}
+
+// retryApi()
+
+async function fnBucketApi() {
+  const response = await geTokenPriceData('bitcoin');
+  // console.log(response.status); // => 200
+  console.log({ apiResponse: response?.market_data?.current_price?.usd });
+  // console.log({ apiLimitStatus: response.status }); // => 200
+}
+
+async function fnBucketApi1() {
+  const response = await geTokenPriceData('bitcoin');
+  // console.log(response.status); // => 200
+  console.log({
+    apiResponseBitcoin: response?.market_data?.current_price?.usd,
+  });
+  // console.log({ apiLimitStatus: response.status }); // => 200
+}
+
+async function fnBucketApi2() {
+  const response = await geTokenPriceData('ethereum');
+  // console.log(response.status); // => 200
+  console.log({
+    apiResponseEthereum: response?.market_data?.current_price?.usd,
+  });
+  // console.log({ apiLimitStatus: response.status }); // => 200
+}
+
+const tokenBucket = new TokenBucketRateLimiter({
+  // maxRequests: 15,
+  // maxRequestWindowMS: 60000, // max 15 calls within 60 seconds interval
+
+  maxRequests: 10,
+  maxRequestWindowMS: 60000, // max 10 calls within 60 seconds interval
+});
+
+// tokenBucket.acquireToken(() => fnBucketApi());
+
+// const limiter = new RateLimiter({
+//   tokensPerInterval: 150,
+//   interval: "hour",
+//   fireImmediately: true
+// });
+
+// async function requestHandler(request, response) {
+//   // Immediately send 429 header to client when rate limiting is in effect
+//   const remainingRequests = await limiter.removeTokens(1);
+//   if (remainingRequests < 0) {
+//     response.writeHead(429, {'Content-Type': 'text/plain;charset=UTF-8'});
+//     response.end('429 Too Many Requests - your IP is being rate limited');
+//   } else {
+//     await geTokenPriceData('bitcoin')
+//   }
+// }
+
+// const limiter = new RateLimiter({
+//   tokensPerInterval: 10, // we will set backround refetch of 4 calls every minute
+//   interval: 'minute',
+//   fireImmediately: true, // if there is sudden call to the api
+// });
+
+const limiter = new RateLimiter({
+  // tokensPerInterval: 4, // we will set backround refetch of 4 calls every minute
+  tokensPerInterval: 2, // we will set backround refetch of 4 calls every minute
+  interval: 'minute',
+  fireImmediately: true, // if there is sudden call to the api
+});
+
+// console.log({ limiter: limiter });
+
+// async function requestHandler() {
+//   // Immediately send 429 header to client when rate limiting is in effect
+//   const remainingRequests = await limiter.removeTokens(1);
+//   if (remainingRequests < 0) {
+//     console.log('429 Too Many Requests - your IP is being rate limited');
+
+//     // response.writeHead(429, {'Content-Type': 'text/plain;charset=UTF-8'});
+//     // response.end('429 Too Many Requests - your IP is being rate limited');
+//   } else {
+//     await fnBucketApi();
+//   }
+// }
+
+async function requestHandler() {
+  // Immediately send 429 header to client when rate limiting is in effect
+  const remainingRequests = await limiter.removeTokens(1);
+  let errorStatus;
+  if (remainingRequests < 0) {
+    console.log('429 Too Many Requests - your IP is being rate limited');
+    errorStatus = true;
+    return errorStatus;
+
+    // response.writeHead(429, {'Content-Type': 'text/plain;charset=UTF-8'});
+    // response.end('429 Too Many Requests - your IP is being rate limited');
+  } else {
+    await fnBucketApi1();
+    await fnBucketApi2();
+    errorStatus = false;
+    return errorStatus;
+  }
+}
+
+// const checkCoingekoPooling = async () => {
+//   const intervalId = setInterval(() => {
+//     requestHandler();
+//     // }, 6000); // check after every 6 seconds (that should be 10 calls in 60 secons or 1minute )
+//     // }, 15000); // check after every 15 seconds (that should be 4 calls in 60 seconds or 1minute ) // in the case of our use-query hook in frontend
+//   }, 30000); // check after every 30 seconds (that should be 2 calls in 60 seconds or 1minute ) // in the case of our use-query hook in frontend
+
+//   return () => {
+//     clearInterval(intervalId);
+//   };
+// };
+
+// checkCoingekoPooling();
+
+const checkCoingekoPooling = async (status) => {
+  let intervalId = setInterval(async () => {
+    status = await requestHandler();
+    console.log({ status: status });
+    // }, 30000); // normal duration
+  }, 20000); // exceed api limit faster
+  // },1000); // exceed api limit faster
+  if (status) {
+    clearInterval(intervalId); // Stop the interval if the condition holds true
+  }
+};
+
+// checkCoingekoPooling();
+// requestHandler();
+
+async function controlCoingekoFetching() {
+  let status = false;
+  if (!status) {
+    checkCoingekoPooling(status);
+  } else {
+    setTimeout(() => {
+      status = false;
+      console.log('refetching in 60 secons activated');
+      checkCoingekoPooling(status);
+    }, 60000); //after 60 seconds, restart pooling
+  }
+
+  console.log({ updatedStatus: status });
+}
+
+// controlCoingekoFetching();
+
+//=================================={Rate Limit Handling}===============================
 
 const getTokenAmount = async (token, value) => {
   let amount; // fValue formatted to transaction decimals
@@ -2794,7 +3015,7 @@ const getTokenAmount = async (token, value) => {
   // console.log({ response: response });
   return response;
 };
-const getTokenExchangeRate = asyncHandler(async (req, res) => {
+const getTokenExchangeRate1 = asyncHandler(async (req, res) => {
   const { fToken, tToken, service, subService } = req.body;
 
   if (service === 'defi' && subService === 'defi') {
@@ -2919,7 +3140,7 @@ const getTokenExchangeRate = asyncHandler(async (req, res) => {
       exchangeRateRaw: exchangeRate,
       exchangeRate: exchangeRate.toFixed(3),
     };
-    console.log({ response: response });
+    console.log({ responseExchangeRate: response });
     res.status(200).json(response);
   }
   if (service === 'sell' && subService === 'sellCash') {
@@ -3097,6 +3318,350 @@ const getTokenExchangeRate = asyncHandler(async (req, res) => {
 
     res.status(200).json(response);
   }
+});
+
+const getTokenExchangeRate = asyncHandler(async (req, res) => {
+  const { fToken, tToken, service, subService } = req.body;
+
+  const limiter = new RateLimiter({
+    tokensPerInterval: 4, // we will set backround refetch of 4 calls every minute max of 8 calls
+    interval: 'minute',
+    fireImmediately: true, // if there is sudden call to the api
+  });
+
+  async function fetchRates() {
+    if (service === 'defi' && subService === 'defi') {
+      //=================================================================================================
+      const fromPrice = await geTokenPriceData(fToken?.id);
+      const fromPriceData = fromPrice?.market_data?.current_price;
+      const toPrice = await geTokenPriceData(tToken?.id);
+      const toPriceData = toPrice?.market_data?.current_price;
+      //=================================================================================================
+      const fUSDPrice = Number(fromPriceData?.usd); // usd price
+      const tUSDPrice = Number(toPriceData?.usd); // usd price
+      let exchangeRate = 1 * (fUSDPrice / tUSDPrice); //fToken?.symbol/tToken.symbol
+
+      if (isNaN(exchangeRate)) {
+        exchangeRate = 0;
+      }
+      const response = {
+        exchangeRateRaw: exchangeRate,
+        exchangeRate: exchangeRate.toFixed(3),
+      };
+
+      res.status(200).json(response);
+    }
+    if (service === 'buy' && subService === 'buyCash') {
+      //=================================================================================================
+      const toPrice = await geTokenPriceData(tToken?.id);
+      const toPriceData = toPrice?.market_data?.current_price;
+      //=================================================================================================
+
+      let exchangeRate;
+      if (fToken?.symbol === 'usd') {
+        exchangeRate = Number(toPriceData?.usd);
+      }
+      if (fToken?.symbol === 'gbp') {
+        exchangeRate = Number(toPriceData?.gbp);
+      }
+      if (fToken?.symbol === 'eur') {
+        exchangeRate = Number(toPriceData?.eur);
+      }
+      if (fToken?.symbol === 'rub') {
+        exchangeRate = Number(toPriceData?.rub);
+      }
+      if (fToken?.symbol === 'cad') {
+        exchangeRate = Number(toPriceData?.cad);
+      }
+      if (fToken?.symbol === 'aed') {
+        exchangeRate = Number(toPriceData?.aed);
+      }
+      if (fToken?.symbol === 'jpy') {
+        exchangeRate = Number(toPriceData?.jpy);
+      }
+      if (fToken?.symbol === 'ngn') {
+        exchangeRate = Number(toPriceData?.ngn);
+      }
+      if (fToken?.symbol === 'php') {
+        exchangeRate = Number(toPriceData?.php);
+      }
+      if (fToken?.symbol === 'chf') {
+        exchangeRate = Number(toPriceData?.chf);
+      }
+      if (fToken?.symbol === 'aud') {
+        exchangeRate = Number(toPriceData?.aud);
+      }
+
+      if (isNaN(exchangeRate)) {
+        exchangeRate = 0;
+      }
+
+      const response = {
+        exchangeRateRaw: exchangeRate,
+        exchangeRate: exchangeRate.toFixed(3),
+      };
+
+      res.status(200).json(response);
+    }
+    if (service === 'buy' && subService === 'buyCard') {
+      //=================================================================================================
+      const toPrice = await geTokenPriceData(tToken?.id);
+      const toPriceData = toPrice?.market_data?.current_price;
+      //=================================================================================================
+
+      let exchangeRate;
+      if (fToken?.symbol === 'usd') {
+        exchangeRate = Number(toPriceData?.usd);
+      }
+      if (fToken?.symbol === 'gbp') {
+        exchangeRate = Number(toPriceData?.gbp);
+      }
+      if (fToken?.symbol === 'eur') {
+        exchangeRate = Number(toPriceData?.eur);
+      }
+      if (fToken?.symbol === 'rub') {
+        exchangeRate = Number(toPriceData?.rub);
+      }
+      if (fToken?.symbol === 'cad') {
+        exchangeRate = Number(toPriceData?.cad);
+      }
+      if (fToken?.symbol === 'aed') {
+        exchangeRate = Number(toPriceData?.aed);
+      }
+      if (fToken?.symbol === 'jpy') {
+        exchangeRate = Number(toPriceData?.jpy);
+      }
+      if (fToken?.symbol === 'ngn') {
+        exchangeRate = Number(toPriceData?.ngn);
+      }
+      if (fToken?.symbol === 'php') {
+        exchangeRate = Number(toPriceData?.php);
+      }
+      if (fToken?.symbol === 'chf') {
+        exchangeRate = Number(toPriceData?.chf);
+      }
+      if (fToken?.symbol === 'aud') {
+        exchangeRate = Number(toPriceData?.aud);
+      }
+
+      if (isNaN(exchangeRate)) {
+        exchangeRate = 0;
+      }
+
+      const response = {
+        exchangeRateRaw: exchangeRate,
+        exchangeRate: exchangeRate.toFixed(3),
+      };
+      console.log({ responseExchangeRate: response });
+      res.status(200).json(response);
+    }
+    if (service === 'sell' && subService === 'sellCash') {
+      //=================================================================================================
+      const fromPrice = await geTokenPriceData(fToken?.id);
+      const fromPriceData = fromPrice?.market_data?.current_price;
+      //=================================================================================================
+
+      let exchangeRate;
+      if (tToken?.symbol === 'usd') {
+        exchangeRate = Number(fromPriceData?.usd);
+      }
+      if (tToken?.symbol === 'gbp') {
+        exchangeRate = Number(fromPriceData?.gbp);
+      }
+      if (tToken?.symbol === 'eur') {
+        exchangeRate = Number(fromPriceData?.eur);
+      }
+      if (tToken?.symbol === 'rub') {
+        exchangeRate = Number(fromPriceData?.rub);
+      }
+      if (tToken?.symbol === 'cad') {
+        exchangeRate = Number(fromPriceData?.cad);
+      }
+      if (tToken?.symbol === 'aed') {
+        exchangeRate = Number(fromPriceData?.aed);
+      }
+      if (tToken?.symbol === 'jpy') {
+        exchangeRate = Number(fromPriceData?.jpy);
+      }
+      if (tToken?.symbol === 'ngn') {
+        exchangeRate = Number(fromPriceData?.ngn);
+      }
+      if (tToken?.symbol === 'php') {
+        exchangeRate = Number(fromPriceData?.php);
+      }
+      if (tToken?.symbol === 'chf') {
+        exchangeRate = Number(fromPriceData?.chf);
+      }
+      if (tToken?.symbol === 'aud') {
+        exchangeRate = Number(fromPriceData?.aud);
+      }
+
+      if (isNaN(exchangeRate)) {
+        exchangeRate = 0;
+      }
+      const response = {
+        exchangeRateRaw: exchangeRate,
+        exchangeRate: exchangeRate.toFixed(3),
+      };
+
+      res.status(200).json(response);
+    }
+    if (service === 'sell' && subService === 'sellCard') {
+      //=================================================================================================
+      const fromPrice = await geTokenPriceData(fToken?.id);
+      const fromPriceData = fromPrice?.market_data?.current_price;
+      //=================================================================================================
+
+      let exchangeRate;
+      if (tToken?.symbol === 'usd') {
+        exchangeRate = Number(fromPriceData?.usd);
+      }
+      if (tToken?.symbol === 'gbp') {
+        exchangeRate = Number(fromPriceData?.gbp);
+      }
+      if (tToken?.symbol === 'eur') {
+        exchangeRate = Number(fromPriceData?.eur);
+      }
+      if (tToken?.symbol === 'rub') {
+        exchangeRate = Number(fromPriceData?.rub);
+      }
+      if (tToken?.symbol === 'cad') {
+        exchangeRate = Number(fromPriceData?.cad);
+      }
+      if (tToken?.symbol === 'aed') {
+        exchangeRate = Number(fromPriceData?.aed);
+      }
+      if (tToken?.symbol === 'jpy') {
+        exchangeRate = Number(fromPriceData?.jpy);
+      }
+      if (tToken?.symbol === 'ngn') {
+        exchangeRate = Number(fromPriceData?.ngn);
+      }
+      if (tToken?.symbol === 'php') {
+        exchangeRate = Number(fromPriceData?.php);
+      }
+      if (tToken?.symbol === 'chf') {
+        exchangeRate = Number(fromPriceData?.chf);
+      }
+      if (tToken?.symbol === 'aud') {
+        exchangeRate = Number(fromPriceData?.aud);
+      }
+      if (isNaN(exchangeRate)) {
+        exchangeRate = 0;
+      }
+      const response = {
+        exchangeRateRaw: exchangeRate,
+        exchangeRate: exchangeRate.toFixed(3),
+      };
+
+      res.status(200).json(response);
+    }
+    if (service === 'exchange' && subService === 'exchange') {
+      //=================================================================================================
+      const fromPrice = await geTokenPriceData(fToken?.id);
+      const fromPriceData = fromPrice?.market_data?.current_price;
+      const toPrice = await geTokenPriceData(tToken?.id);
+      const toPriceData = toPrice?.market_data?.current_price;
+      //=================================================================================================
+      const fUSDPrice = Number(fromPriceData?.usd); // usd price
+      const tUSDPrice = Number(toPriceData?.usd); // usd price
+
+      let exchangeRate = 1 * (fUSDPrice / tUSDPrice); //fToken?.symbol/tToken.symbol
+
+      if (isNaN(exchangeRate)) {
+        exchangeRate = 0;
+      }
+
+      const response = {
+        exchangeRateRaw: exchangeRate,
+        exchangeRate: exchangeRate.toFixed(3),
+      };
+      res.status(200).json(response);
+    }
+    if (service === 'store' && subService === 'store') {
+      //=================================================================================================
+      const toPrice = await geTokenPriceData(tToken?.id);
+      const toPriceData = toPrice?.market_data?.current_price;
+      //=================================================================================================
+
+      let exchangeRate;
+      if (fToken?.symbol === 'usd') {
+        exchangeRate = Number(toPriceData?.usd);
+      }
+      if (fToken?.symbol === 'gbp') {
+        exchangeRate = Number(toPriceData?.gbp);
+      }
+      if (fToken?.symbol === 'eur') {
+        exchangeRate = Number(toPriceData?.eur);
+      }
+      if (fToken?.symbol === 'rub') {
+        exchangeRate = Number(toPriceData?.rub);
+      }
+      if (fToken?.symbol === 'cad') {
+        exchangeRate = Number(toPriceData?.cad);
+      }
+      if (fToken?.symbol === 'aed') {
+        exchangeRate = Number(toPriceData?.aed);
+      }
+      if (fToken?.symbol === 'jpy') {
+        exchangeRate = Number(toPriceData?.jpy);
+      }
+      if (fToken?.symbol === 'ngn') {
+        exchangeRate = Number(toPriceData?.ngn);
+      }
+      if (fToken?.symbol === 'php') {
+        exchangeRate = Number(toPriceData?.php);
+      }
+      if (fToken?.symbol === 'chf') {
+        exchangeRate = Number(toPriceData?.chf);
+      }
+      if (fToken?.symbol === 'aud') {
+        exchangeRate = Number(toPriceData?.aud);
+      }
+
+      if (isNaN(exchangeRate)) {
+        exchangeRate = 0;
+      }
+
+      const response = {
+        exchangeRateRaw: exchangeRate,
+        exchangeRate: exchangeRate.toFixed(3),
+      };
+      console.log({ exchangeRateInCheck: response });
+      res.status(200).json(response);
+    }
+  }
+
+  async function requestHandler() {
+    // Immediately send 429 header to client when rate limiting is in effect
+    const remainingRequests = await limiter.removeTokens(1);
+    let errorStatus;
+    if (remainingRequests < 0) {
+      const message = '429 Too Many Requests - your IP is being rate limited';
+      console.log('429 Too Many Requests - your IP is being rate limited');
+      errorStatus = true;
+      res.status(500).json(message);
+
+      // response.writeHead(429, {'Content-Type': 'text/plain;charset=UTF-8'});
+      // response.end('429 Too Many Requests - your IP is being rate limited');
+    } else {
+      errorStatus = false;
+      await fetchRates();
+    }
+  }
+
+  await requestHandler();
+
+  // const checkCoingekoPooling = async () => {
+  //   let intervalId = setInterval(async () => {
+  //     await requestHandler();
+  //   }, 30000); // normal duration
+  //   return () => {
+  //     clearInterval(intervalId);
+  //   };
+  // };
+
+  // checkCoingekoPooling();
 });
 
 const getTransactionRate = asyncHandler(async (req, res) => {
@@ -3867,7 +4432,6 @@ const getChainPrice = asyncHandler(async (req, res) => {
 
 const getTransactionRateSwap = asyncHandler(async (req, res) => {
   const { exchangeRate, fValue } = req.body;
-  console.log({ TransactionRateSwapActive: true });
   let tValue = Number(fValue) * Number(exchangeRate);
 
   let tValueFormatted = Number(tValue).toFixed(4);
@@ -3883,7 +4447,7 @@ const getTransactionRateSwap = asyncHandler(async (req, res) => {
     tValue,
     tValueFormatted,
   };
-  console.log({ TransactionRateSwapResult: response });
+  console.log({ SwapTransactionRate: response });
   res.status(200).json(response);
 });
 
@@ -3907,17 +4471,17 @@ const getPriceOneInch = async (
 
   console.log({ validatedValue: validatedValue });
 
-  const url = `https://api.1inch.dev/swap/${version}/${chainId}/quote`;
+  const url = `https://api.1inch.dev/swap/${version}/${Number(chainId)}/quote`;
 
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
     params: {
-      src: fAddress,
-      dst: tAddress,
-      amount: validatedValue,
-      fee,
+      src: fAddress, // string
+      dst: tAddress, // string
+      amount: validatedValue, // string
+      fee: Number(fee), // number
     },
   };
 
@@ -3945,7 +4509,7 @@ const getPriceOneInch = async (
         ).toString();
         toTokenAmountFixed = Number(toTokenAmountFormatted).toFixed(3);
 
-        console.log({ toTokenAmountFixed: toTokenAmountFixed });
+        // console.log({ toTokenAmountFixed: toTokenAmountFixed });
       }
       const result = {
         validatedValue,
@@ -3954,8 +4518,8 @@ const getPriceOneInch = async (
         // estimatedGas: estimatedGas,
         // allProtocols: protocols,
       };
-      console.log({ toTokenAmountFormatted: toTokenAmountFormatted });
-      console.log({ result: result });
+      // console.log({ toTokenAmountFormatted: toTokenAmountFormatted });
+      console.log({ OneInchRate: result });
       return result;
     }
   } catch (error) {
@@ -4018,7 +4582,9 @@ const getSpender = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error('chainId not found');
   }
-  const url = `https://api.1inch.dev/swap/${version}/${chainId}/approve/spender`;
+  const url = `https://api.1inch.dev/swap/${version}/${Number(
+    chainId
+  )}/approve/spender`;
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -4032,6 +4598,7 @@ const getSpender = asyncHandler(async (req, res) => {
       const response = {
         spenderData: result?.data.address,
       };
+      console.log(response);
       res.status(200).json(response);
     }
   } catch (error) {
@@ -4043,6 +4610,39 @@ const getSpender = asyncHandler(async (req, res) => {
     res.status(400).json(message);
   }
 });
+
+const getSpenderTest = asyncHandler(async (chainId) => {
+  if (!chainId) {
+    res.status(400);
+    throw new Error('chainId not found');
+  }
+  const url = `https://api.1inch.dev/swap/${version}/${Number(
+    chainId
+  )}/approve/spender`;
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    params: {},
+  };
+
+  try {
+    const result = await axios.get(url, config);
+    if (result?.data) {
+      const response = {
+        spenderData: result?.data.address,
+      };
+      console.log(response);
+    }
+  } catch (error) {
+    const message =
+      (error.response && error.response.data && error.response.data.message) ||
+      error.message ||
+      error.toString();
+    console.log(message);
+  }
+});
+// getSpenderTest('1')
 
 // check values
 
@@ -4071,15 +4671,18 @@ const getSwapApproval = asyncHandler(async (req, res) => {
 
   console.log({ validatedValue: validatedValue });
 
-  const url = `https://api.1inch.dev/swap/${version}/${chainId}/approve/transaction`;
+  // const url = `https://api.1inch.dev/swap/${version}/${chainId}/approve/transaction`;
+  const url = `https://api.1inch.dev/swap/${version}/${Number(
+    chainId
+  )}/approve/transaction`;
 
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
     params: {
-      tokenAddress: fToken?.address,
-      amount: validatedValue,
+      tokenAddress: fToken?.address, // string
+      amount: validatedValue, // string
     },
   };
 
@@ -4142,7 +4745,7 @@ const swap = asyncHandler(async (req, res) => {
     dst: tToken?.address,
     amount: validatedValue,
     from: walletAddress,
-    slippage: slippage,
+    slippage: Number(slippage),
     fee,
     referrer: dexAddress,
   };
@@ -4156,13 +4759,13 @@ const swap = asyncHandler(async (req, res) => {
       Authorization: `Bearer ${token}`,
     },
     params: {
-      src: fToken.address,
-      dst: tToken?.address,
+      src: fToken.address, // string
+      dst: tToken?.address, // string
       amount: validatedValue,
-      from: walletAddress,
-      slippage: slippage,
-      fee,
-      referrer: dexAddress,
+      from: walletAddress, // string
+      slippage: Number(slippage), // number
+      fee: Number(fee), // number
+      referrer: dexAddress, // string
     },
   };
 

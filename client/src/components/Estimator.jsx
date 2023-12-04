@@ -331,7 +331,7 @@ export const Estimator = (props) => {
                   />
                 </div>
                 <div className="flex flex-row items-start">
-                  <div className="flex items-center bg-whitesmoke-200 w-[121px] h-[44px] rounded-md">
+                  <div className="flex items-center bg-whitesmoke-200 w-[121px] h-[44px] rounded-md mr-2 shadow-md hover:bg-whitesmoke-100">
                     <div
                       className="cursor-pointer flex flex-row justify-between w-[121px] ml-[12px]"
                       onClick={openFromTokensList}
@@ -394,7 +394,7 @@ export const Estimator = (props) => {
                   ) : null}
                 </div>
                 <div className="flex flex-row items-start">
-                  <div className="flex items-center bg-whitesmoke-200 w-[121px] h-[44px] rounded-md">
+                  <div className="flex items-center bg-whitesmoke-200 w-[121px] h-[44px] rounded-md mr-2 shadow-md hover:bg-whitesmoke-100">
                     <div
                       className="cursor-pointer flex flex-row justify-between w-[121px] ml-[12px]"
                       onClick={openToTokensList}

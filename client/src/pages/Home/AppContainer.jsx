@@ -89,6 +89,10 @@ export const AppContainer = (props) => {
   //====={Controllers}===========================
 
   useEffect(() => {
+    setIsLightMode(mode);
+  }, [mode]);
+
+  useEffect(() => {
     if (percentageProgress) {
       localStorage.setItem(
         'percentageProgress',

@@ -27,7 +27,7 @@ export const SellCash = (props) => {
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
   const [refetchTxData, setRefetchTxData] = useState(false);
-  const [fTitle, setFTitle] = useState('You send');
+  const [fTitle, setFTitle] = useState('You give');
   const [tTitle, setTTitle] = useState('You get');
   //====================================================================================================
 

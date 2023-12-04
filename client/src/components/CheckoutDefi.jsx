@@ -32,9 +32,6 @@ export const CheckoutDefi = (props) => {
   const { address, isConnected } = useAccount();
   const userAddress = address ? address : '';
 
-  const transactionRates = useSelector(
-    (state) => state.transaction?.getTransactionRate
-  );
 
   //===={To be added}========
   // const estimatedGas = transactionRates ? transactionRates?.estimatedGas : 0;

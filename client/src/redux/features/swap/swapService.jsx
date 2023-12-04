@@ -57,13 +57,9 @@ const swap = async (userData) => {
   return response?.data?.swapData;
 };
 
-const getTokensDefiById = async (chainId) => {
-  const response = await axios.get(
-    `${BACKEND_URL}/token/getTokensDefiById/${chainId}`
-  );
-  console.log({ tokensList: response?.data });
-  // return response;
-  return response?.data;
+const getTokensDefiById = async (userData) => {
+  const response = userData;
+  return response;
 };
 
 const swapService = {

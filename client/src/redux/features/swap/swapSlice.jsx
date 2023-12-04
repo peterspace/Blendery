@@ -88,9 +88,9 @@ export const swap = createAsyncThunk(
 
 export const getTokensDefiById = createAsyncThunk(
   'swap/getTokensDefiById',
-  async (chainId, thunkAPI) => {
+  async (userData, thunkAPI) => {
     try {
-      return await swapService.getTokensDefiById(chainId);
+      return await swapService.getTokensDefiById(userData);
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
     }

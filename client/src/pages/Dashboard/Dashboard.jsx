@@ -61,7 +61,8 @@ export const Dashboard = (props) => {
   }
 
   return (
-    <div className="h-screen">
+    // <div className="h-screen">
+    <div className="container mx-auto p-2">
       <>
         {user?.role === 'Admin' && (
           <AdminDashboard

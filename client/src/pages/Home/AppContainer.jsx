@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { useQuery } from 'react-query';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { useQuery } from "react-query";
+import axios from "axios";
 //===============================================================
-import { BuyCardHome } from './BuyCardHome/BuyCardHome';
-import { BuyCashHome } from './BuyCashHome/BuyCashHome';
-import { DefiHome } from './DefiHome/DefiHome';
-import { ExchangeHome } from './ExchangeHome/ExchangeHome';
-import { SellCardHome } from './SellCardHome/SellCardHome';
-import { SellCashHome } from './SellCashHome/SellCashHome';
+import { BuyCardHome } from "./BuyCardHome/BuyCardHome";
+import { BuyCashHome } from "./BuyCashHome/BuyCashHome";
+import { DefiHome } from "./DefiHome/DefiHome";
+import { ExchangeHome } from "./ExchangeHome/ExchangeHome";
+import { SellCardHome } from "./SellCardHome/SellCardHome";
+import { SellCashHome } from "./SellCashHome/SellCashHome";
 //===============================================================
-import styles from './AppContainer.module.css';
-import { Footer } from '../../components/Footer';
+import styles from "./AppContainer.module.css";
+import { Footer } from "../../components/Footer";
 
 import {
   stepsExchange,
@@ -21,15 +21,15 @@ import {
   helpBuy,
   helpSell,
   helpDefi,
-} from '../../constants';
-import { HowToCard } from '../../components/HowToCard';
-import { FaqCard } from '../../components/FaqCard';
-import { faqExchange, faqBuy, faqSell, faqDefi } from '../../constants';
-import { FeedBack } from '../../components/Feedback';
-import { feedback } from '../../constants';
+} from "../../constants";
+import { HowToCard } from "../../components/HowToCard";
+import { FaqCard } from "../../components/FaqCard";
+import { faqExchange, faqBuy, faqSell, faqDefi } from "../../constants";
+import { FeedBack } from "../../components/Feedback";
+import { feedback } from "../../constants";
 
-import { HelpGuide } from '../../components/HelpGuide';
-import { useDispatch, useSelector } from 'react-redux';
+import { HelpGuide } from "../../components/HelpGuide";
+import { useDispatch, useSelector } from "react-redux";
 
 import {
   getTokenList,
@@ -39,7 +39,7 @@ import {
   getTokenListSell,
   getTokenListExchange,
   getTokensDefiById,
-} from '../../redux/features/token/tokenSlice';
+} from "../../redux/features/token/tokenSlice";
 
 import {
   getUserTransactions,
@@ -50,9 +50,9 @@ import {
   getUserBuyCard,
   getUserSellCash,
   getUserSellCard,
-} from '../../redux/features/transaction/transactionSlice';
+} from "../../redux/features/transaction/transactionSlice";
 
-import { networksOptions } from '../../constants';
+import { networksOptions } from "../../constants";
 
 export const AppContainer = (props) => {
   const {
@@ -76,8 +76,8 @@ export const AppContainer = (props) => {
 
   const [isLightMode, setIsLightMode] = useState(true);
   const allTokensDefi = useSelector((state) => state.token?.tokensDefiById);
-  const percentageProgressL = localStorage.getItem('percentageProgress')
-    ? JSON.parse(localStorage.getItem('percentageProgress'))
+  const percentageProgressL = localStorage.getItem("percentageProgress")
+    ? JSON.parse(localStorage.getItem("percentageProgress"))
     : 1;
 
   const [percentageProgress, setPercentageProgress] =
@@ -95,7 +95,7 @@ export const AppContainer = (props) => {
   useEffect(() => {
     if (percentageProgress) {
       localStorage.setItem(
-        'percentageProgress',
+        "percentageProgress",
         JSON.stringify(percentageProgress)
       );
     }
@@ -117,13 +117,13 @@ export const AppContainer = (props) => {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('service', JSON.stringify(service));
+    localStorage.setItem("service", JSON.stringify(service));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [service]);
 
   useEffect(() => {
-    localStorage.setItem('subService', JSON.stringify(subService));
+    localStorage.setItem("subService", JSON.stringify(subService));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subService]);
@@ -142,33 +142,33 @@ export const AppContainer = (props) => {
   }, [user]);
 
   async function nextFuncExchange() {
-    setService('exchange');
-    setSubService('exchange');
+    setService("exchange");
+    setSubService("exchange");
   }
 
   async function nextFuncSellCash() {
-    setService('sell');
-    setSubService('sellCash');
+    setService("sell");
+    setSubService("sellCash");
   }
 
   async function nextFuncSellCard() {
-    setService('sell');
-    setSubService('sellCash');
+    setService("sell");
+    setSubService("sellCard");
   }
 
   async function nextFuncBuyCard() {
-    setService('buy');
-    setSubService('buyCard');
+    setService("buy");
+    setSubService("buyCard");
   }
 
   async function nextFuncBuyCash() {
-    setService('exchange');
-    setSubService('exchange');
+    setService("exchange");
+    setSubService("exchange");
   }
 
   async function nextFuncDefi() {
-    setService('defi');
-    setSubService('defi');
+    setService("defi");
+    setSubService("defi");
   }
 
   return (
@@ -186,9 +186,9 @@ export const AppContainer = (props) => {
                   <div className="flex flex-row gap-4 mt-2">
                     <div
                       className={`cursor-pointer hover:text-bgPrimary leading-[24px] ${
-                        service === 'exchange' && subService === 'exchange'
-                          ? 'text-bgPrimary text-base font-black inline-block underline underline-offset-[16px]'
-                          : 'text-darkgray-200 text-mini'
+                        service === "exchange" && subService === "exchange"
+                          ? "text-bgPrimary text-base font-black inline-block underline underline-offset-[16px]"
+                          : "text-darkgray-200 text-mini"
                       }`}
                       onClick={nextFuncExchange}
                     >
@@ -196,13 +196,9 @@ export const AppContainer = (props) => {
                     </div>
                     <div
                       className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block ${
-                        service === 'buy' && subService === 'buyCash'
-                          ? 'text-bgPrimary text-base font-black inline-block underline underline-offset-[16px]'
-                          : 'text-darkgray-200 text-mini'
-                      } ${
-                        service === 'buy' && subService === 'buyCard'
-                          ? 'text-bgPrimary text-base font-black inline-block underline underline-offset-[16px]'
-                          : 'text-darkgray-200 text-mini'
+                        service === "buy"
+                          ? "text-bgPrimary text-base font-black inline-block underline underline-offset-[16px]"
+                          : "text-darkgray-200 text-mini"
                       }`}
                       onClick={nextFuncBuyCard}
                     >
@@ -210,13 +206,9 @@ export const AppContainer = (props) => {
                     </div>
                     <div
                       className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block ${
-                        service === 'sell' && subService === 'sellCash'
-                          ? 'text-bgPrimary text-base font-black inline-block underline underline-offset-[16px]'
-                          : 'text-darkgray-200 text-mini'
-                      } ${
-                        service === 'sell' && subService === 'sellCard'
-                          ? 'text-bgPrimary text-base font-black inline-block underline underline-offset-[16px]'
-                          : 'text-darkgray-200 text-mini'
+                        service === "sell"
+                          ? "text-bgPrimary text-base font-black inline-block underline underline-offset-[16px]"
+                          : "text-darkgray-200 text-mini"
                       }`}
                       onClick={nextFuncSellCard}
                     >
@@ -225,9 +217,9 @@ export const AppContainer = (props) => {
 
                     <div
                       className={`cursor-pointer hover:text-bgPrimary leading-[24px] inline-block ${
-                        service === 'defi' && subService === 'defi'
-                          ? 'text-bgPrimary text-base font-black inline-block underline underline-offset-[16px]'
-                          : 'text-darkgray-200 text-mini'
+                        service === "defi" && subService === "defi"
+                          ? "text-bgPrimary text-base font-black inline-block underline underline-offset-[16px]"
+                          : "text-darkgray-200 text-mini"
                       }`}
                       onClick={nextFuncDefi}
                     >
@@ -236,7 +228,7 @@ export const AppContainer = (props) => {
                   </div>
                   <div className="flex bg-lightslategray-300 w-full h-px" />
                   <>
-                    {service === 'exchange' && subService === 'exchange' && (
+                    {service === "exchange" && subService === "exchange" && (
                       <ExchangeHome
                         mode={mode}
                         service={service}
@@ -249,7 +241,7 @@ export const AppContainer = (props) => {
                         setPercentageProgressHome={setPercentageProgress}
                       />
                     )}
-                    {service === 'buy' && subService === 'buyCash' && (
+                    {service === "buy" && subService === "buyCash" && (
                       <BuyCashHome
                         mode={mode}
                         service={service}
@@ -262,7 +254,7 @@ export const AppContainer = (props) => {
                         setPercentageProgressHome={setPercentageProgress}
                       />
                     )}
-                    {service === 'buy' && subService === 'buyCard' && (
+                    {service === "buy" && subService === "buyCard" && (
                       <BuyCardHome
                         mode={mode}
                         service={service}
@@ -276,7 +268,7 @@ export const AppContainer = (props) => {
                       />
                     )}
 
-                    {service === 'sell' && subService === 'sellCash' && (
+                    {service === "sell" && subService === "sellCash" && (
                       <SellCashHome
                         mode={mode}
                         service={service}
@@ -290,7 +282,7 @@ export const AppContainer = (props) => {
                       />
                     )}
 
-                    {service === 'sell' && subService === 'sellCard' && (
+                    {service === "sell" && subService === "sellCard" && (
                       <SellCardHome
                         mode={mode}
                         service={service}
@@ -304,7 +296,7 @@ export const AppContainer = (props) => {
                       />
                     )}
 
-                    {service === 'defi' && subService === 'defi' && (
+                    {service === "defi" && subService === "defi" && (
                       <DefiHome
                         mode={mode}
                         service={service}
@@ -325,7 +317,7 @@ export const AppContainer = (props) => {
         ) : (
           <>
             <div className="h-screen mt-[64px] mb-[64px] overflow-auto">
-              {service === 'exchange' && subService === 'exchange' && (
+              {service === "exchange" && subService === "exchange" && (
                 <ExchangeHome
                   mode={mode}
                   service={service}
@@ -338,7 +330,7 @@ export const AppContainer = (props) => {
                   setPercentageProgressHome={setPercentageProgress}
                 />
               )}
-              {service === 'buy' && subService === 'buyCash' && (
+              {service === "buy" && subService === "buyCash" && (
                 <BuyCashHome
                   mode={mode}
                   service={service}
@@ -351,7 +343,7 @@ export const AppContainer = (props) => {
                   setPercentageProgressHome={setPercentageProgress}
                 />
               )}
-              {service === 'buy' && subService === 'buyCard' && (
+              {service === "buy" && subService === "buyCard" && (
                 <BuyCardHome
                   mode={mode}
                   service={service}
@@ -365,7 +357,7 @@ export const AppContainer = (props) => {
                 />
               )}
 
-              {service === 'sell' && subService === 'sellCash' && (
+              {service === "sell" && subService === "sellCash" && (
                 <SellCashHome
                   mode={mode}
                   service={service}
@@ -379,7 +371,7 @@ export const AppContainer = (props) => {
                 />
               )}
 
-              {service === 'sell' && subService === 'sellCard' && (
+              {service === "sell" && subService === "sellCard" && (
                 <SellCardHome
                   mode={mode}
                   service={service}
@@ -393,7 +385,7 @@ export const AppContainer = (props) => {
                 />
               )}
 
-              {service === 'defi' && subService === 'defi' && (
+              {service === "defi" && subService === "defi" && (
                 <DefiHome
                   mode={mode}
                   service={service}
@@ -415,12 +407,12 @@ export const AppContainer = (props) => {
         )}
 
         {/* =============={others}=======================*/}
-        {service === 'exchange' && subService === 'exchange' && (
+        {service === "exchange" && subService === "exchange" && (
           <>
             {isLightMode ? (
               <div className="mt-[64px] flex flex-col justify-center items-center gap-[64px] mb-[64px]">
                 <div className="mt-[64px]">
-                  <FeedBack data={feedback} title={'Testimonials'} />
+                  <FeedBack data={feedback} title={"Testimonials"} />
                 </div>
 
                 <HowToCard
@@ -431,7 +423,7 @@ export const AppContainer = (props) => {
                 <div className="flex flex-col md:flex-row gap-[16px]">
                   <HelpGuide
                     data={helpExchange}
-                    title={'Helpful guides'}
+                    title={"Helpful guides"}
                     isLightMode={isLightMode}
                   />
                   <FaqCard data={faqExchange} title={`FaQ ${service}`} />
@@ -440,7 +432,7 @@ export const AppContainer = (props) => {
             ) : (
               <div className="mt-[64px] flex flex-col justify-center items-center gap-[64px] mb-[64px] bg-black">
                 <div className="mt-[64px]">
-                  <FeedBack data={feedback} title={'Testimonials'} />
+                  <FeedBack data={feedback} title={"Testimonials"} />
                 </div>
 
                 <HowToCard
@@ -451,7 +443,7 @@ export const AppContainer = (props) => {
                 <div className="flex flex-col md:flex-row gap-[16px]">
                   <HelpGuide
                     data={helpExchange}
-                    title={'Helpful guides'}
+                    title={"Helpful guides"}
                     isLightMode={isLightMode}
                   />
                   <FaqCard data={faqExchange} title={`FaQ ${service}`} />
@@ -461,12 +453,12 @@ export const AppContainer = (props) => {
           </>
         )}
 
-        {service === 'buy' && subService === 'buyCash' && (
+        {service === "buy" && subService === "buyCash" && (
           <>
             {isLightMode ? (
               <div className="mt-[64px] flex flex-col justify-center items-center gap-[64px] mb-[64px]">
                 <div className="mt-[64px]">
-                  <FeedBack data={feedback} title={'Testimonials'} />
+                  <FeedBack data={feedback} title={"Testimonials"} />
                 </div>
 
                 <HowToCard data={stepsBuy} title={`How to ${service} Crypto`} />
@@ -474,7 +466,7 @@ export const AppContainer = (props) => {
                 <div className="flex flex-col md:flex-row gap-[16px]">
                   <HelpGuide
                     data={helpBuy}
-                    title={'Helpful guides'}
+                    title={"Helpful guides"}
                     isLightMode={isLightMode}
                   />
                   <FaqCard data={faqBuy} title={`FaQ ${service}`} />
@@ -483,7 +475,7 @@ export const AppContainer = (props) => {
             ) : (
               <div className="mt-[64px] flex flex-col justify-center items-center gap-[64px] mb-[64px] bg-black">
                 <div className="mt-[64px]">
-                  <FeedBack data={feedback} title={'Testimonials'} />
+                  <FeedBack data={feedback} title={"Testimonials"} />
                 </div>
 
                 <HowToCard data={stepsBuy} title={`How to ${service} Crypto`} />
@@ -491,7 +483,7 @@ export const AppContainer = (props) => {
                 <div className="flex flex-col md:flex-row gap-[16px]">
                   <HelpGuide
                     data={helpBuy}
-                    title={'Helpful guides'}
+                    title={"Helpful guides"}
                     isLightMode={isLightMode}
                   />
                   <FaqCard data={faqBuy} title={`FaQ ${service}`} />
@@ -501,12 +493,12 @@ export const AppContainer = (props) => {
           </>
         )}
 
-        {service === 'buy' && subService === 'buyCard' && (
+        {service === "buy" && subService === "buyCard" && (
           <>
             {isLightMode ? (
               <div className="mt-[64px] flex flex-col justify-center items-center gap-[64px] mb-[64px]">
                 <div className="mt-[64px]">
-                  <FeedBack data={feedback} title={'Testimonials'} />
+                  <FeedBack data={feedback} title={"Testimonials"} />
                 </div>
 
                 <HowToCard data={stepsBuy} title={`How to ${service} Crypto`} />
@@ -514,7 +506,7 @@ export const AppContainer = (props) => {
                 <div className="flex flex-col md:flex-row gap-[16px]">
                   <HelpGuide
                     data={helpBuy}
-                    title={'Helpful guides'}
+                    title={"Helpful guides"}
                     isLightMode={isLightMode}
                   />
                   <FaqCard data={faqBuy} title={`FaQ ${service}`} />
@@ -523,7 +515,7 @@ export const AppContainer = (props) => {
             ) : (
               <div className="mt-[64px] flex flex-col justify-center items-center gap-[64px] mb-[64px] bg-black">
                 <div className="mt-[64px]">
-                  <FeedBack data={feedback} title={'Testimonials'} />
+                  <FeedBack data={feedback} title={"Testimonials"} />
                 </div>
 
                 <HowToCard data={stepsBuy} title={`How to ${service} Crypto`} />
@@ -531,7 +523,7 @@ export const AppContainer = (props) => {
                 <div className="flex flex-col md:flex-row gap-[16px]">
                   <HelpGuide
                     data={helpBuy}
-                    title={'Helpful guides'}
+                    title={"Helpful guides"}
                     isLightMode={isLightMode}
                   />
                   <FaqCard data={faqBuy} title={`FaQ ${service}`} />
@@ -541,12 +533,12 @@ export const AppContainer = (props) => {
           </>
         )}
 
-        {service === 'sell' && subService === 'sellCash' && (
+        {service === "sell" && subService === "sellCash" && (
           <>
             {isLightMode ? (
               <div className="mt-[64px] flex flex-col justify-center items-center gap-[64px] mb-[64px]">
                 <div className="mt-[64px]">
-                  <FeedBack data={feedback} title={'Testimonials'} />
+                  <FeedBack data={feedback} title={"Testimonials"} />
                 </div>
 
                 <HowToCard
@@ -557,7 +549,7 @@ export const AppContainer = (props) => {
                 <div className="flex flex-col md:flex-row gap-[16px]">
                   <HelpGuide
                     data={helpSell}
-                    title={'Helpful guides'}
+                    title={"Helpful guides"}
                     isLightMode={isLightMode}
                   />
                   <FaqCard data={faqSell} title={`FaQ ${service}`} />
@@ -566,7 +558,7 @@ export const AppContainer = (props) => {
             ) : (
               <div className="mt-[64px] flex flex-col justify-center items-center gap-[64px] mb-[64px] bg-black">
                 <div className="mt-[64px]">
-                  <FeedBack data={feedback} title={'Testimonials'} />
+                  <FeedBack data={feedback} title={"Testimonials"} />
                 </div>
 
                 <HowToCard
@@ -577,7 +569,7 @@ export const AppContainer = (props) => {
                 <div className="flex flex-col md:flex-row gap-[16px]">
                   <HelpGuide
                     data={helpSell}
-                    title={'Helpful guides'}
+                    title={"Helpful guides"}
                     isLightMode={isLightMode}
                   />
                   <FaqCard data={faqSell} title={`FaQ ${service}`} />
@@ -587,12 +579,12 @@ export const AppContainer = (props) => {
           </>
         )}
 
-        {service === 'sell' && subService === 'sellCard' && (
+        {service === "sell" && subService === "sellCard" && (
           <>
             {isLightMode ? (
               <div className="mt-[64px] flex flex-col justify-center items-center gap-[64px] mb-[64px]">
                 <div className="mt-[64px]">
-                  <FeedBack data={feedback} title={'Testimonials'} />
+                  <FeedBack data={feedback} title={"Testimonials"} />
                 </div>
 
                 <HowToCard
@@ -603,7 +595,7 @@ export const AppContainer = (props) => {
                 <div className="flex flex-col md:flex-row gap-[16px]">
                   <HelpGuide
                     data={helpSell}
-                    title={'Helpful guides'}
+                    title={"Helpful guides"}
                     isLightMode={isLightMode}
                   />
                   <FaqCard data={faqSell} title={`FaQ ${service}`} />
@@ -612,7 +604,7 @@ export const AppContainer = (props) => {
             ) : (
               <div className="mt-[64px] flex flex-col justify-center items-center gap-[64px] mb-[64px] bg-black">
                 <div className="mt-[64px]">
-                  <FeedBack data={feedback} title={'Testimonials'} />
+                  <FeedBack data={feedback} title={"Testimonials"} />
                 </div>
 
                 <HowToCard
@@ -623,7 +615,7 @@ export const AppContainer = (props) => {
                 <div className="flex flex-col md:flex-row gap-[16px]">
                   <HelpGuide
                     data={helpSell}
-                    title={'Helpful guides'}
+                    title={"Helpful guides"}
                     isLightMode={isLightMode}
                   />
                   <FaqCard data={faqSell} title={`FaQ ${service}`} />
@@ -633,12 +625,12 @@ export const AppContainer = (props) => {
           </>
         )}
 
-        {service === 'defi' && subService === 'defi' && (
+        {service === "defi" && subService === "defi" && (
           <>
             {isLightMode ? (
               <div className="mt-[64px] flex flex-col justify-center items-center gap-[64px] mb-[64px]">
                 <div className="mt-[64px]">
-                  <FeedBack data={feedback} title={'Testimonials'} />
+                  <FeedBack data={feedback} title={"Testimonials"} />
                 </div>
 
                 <HowToCard
@@ -649,7 +641,7 @@ export const AppContainer = (props) => {
                 <div className="flex flex-col md:flex-row gap-[16px]">
                   <HelpGuide
                     data={helpDefi}
-                    title={'Helpful guides'}
+                    title={"Helpful guides"}
                     isLightMode={isLightMode}
                   />
                   <FaqCard data={faqDefi} title={`FaQ ${service}`} />
@@ -658,7 +650,7 @@ export const AppContainer = (props) => {
             ) : (
               <div className="mt-[64px] flex flex-col justify-center items-center gap-[64px] mb-[64px] bg-black">
                 <div className="mt-[64px]">
-                  <FeedBack data={feedback} title={'Testimonials'} />
+                  <FeedBack data={feedback} title={"Testimonials"} />
                 </div>
 
                 <HowToCard
@@ -669,7 +661,7 @@ export const AppContainer = (props) => {
                 <div className="flex flex-col md:flex-row gap-[16px]">
                   <HelpGuide
                     data={helpDefi}
-                    title={'Helpful guides'}
+                    title={"Helpful guides"}
                     isLightMode={isLightMode}
                   />
                   <FaqCard data={faqDefi} title={`FaQ ${service}`} />

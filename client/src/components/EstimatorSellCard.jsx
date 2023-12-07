@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
-import { TokenCard } from './TokenCard';
+import { TokenCard } from "./TokenCard";
+import TokenModal from "./TokenModal";
 
 //android small = w-[320px]/ 352px
 //iphone = w-[340px]/ 372px
@@ -14,6 +15,7 @@ export const EstimatorSellCard = (props) => {
     tToken,
     fValue,
     setFromValue,
+    setToToken,
     loading,
     fTitle,
     tTitle,
@@ -36,6 +38,8 @@ export const EstimatorSellCard = (props) => {
   const [isToTokenPage, setIsToTokenPage] = useState(false);
   const [filteredfTokens, setFilteredfTokens] = useState();
   const [filteredtTokens, setFilteredtTokens] = useState();
+  const [isFromTokenModalOpen, setIsFromTokenModalOpen] = useState(false);
+  const [isToTokenModalOpen, setToTokenModalOpen] = useState(false);
 
   //============================================{Token selection}==============================
   useEffect(() => {
@@ -85,6 +89,14 @@ export const EstimatorSellCard = (props) => {
     setFromValue(ev.target.value);
   }
 
+  function openFromTokenModal() {
+    setIsFromTokenModalOpen(true);
+  }
+
+  function openToTokenModal() {
+    setToTokenModalOpen(true);
+  }
+
   const estimator = (
     <div className="flex justify-center rounded-lg bg-white shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[320px] xs:w-[340px] md:w-[500px] p-4">
       {isFromTokenPage === false && isToTokenPage === false ? (
@@ -129,7 +141,7 @@ export const EstimatorSellCard = (props) => {
                     <div className="flex items-center bg-whitesmoke-200 w-[121px] h-[44px] rounded-md mr-2 shadow-md hover:bg-whitesmoke-100">
                       <div
                         className="cursor-pointer flex flex-row justify-between w-[121px] ml-[12px]"
-                        onClick={() => setIsFromTokenPage(true)}
+                        onClick={openFromTokenModal}
                       >
                         <div className="flex flex-row items-center gap-2">
                           {/* <FaBitcoin size={20} color={'#f97316'} /> */}
@@ -156,8 +168,8 @@ export const EstimatorSellCard = (props) => {
 
               <div className="flex flex-row justify-between">
                 <div className="h-3 py-2">
-                  1 {fToken?.symbol.toUpperCase()} ~{' '}
-                  {loadingExchangeRate ? 'fetching rates' : exchangeRate}{' '}
+                  1 {fToken?.symbol.toUpperCase()} ~{" "}
+                  {loadingExchangeRate ? "fetching rates" : exchangeRate}{" "}
                   {tToken?.symbol.toUpperCase()}
                 </div>
                 {/* <div className="h-3 py-2">{isToLoading
@@ -177,7 +189,7 @@ export const EstimatorSellCard = (props) => {
                       placeholder="0.1"
                       // value={`~ ${tValue}`}
                       // value={`~ ${1.675}`}
-                      value={loading ? 'loading' : `~ ${tValue}`}
+                      value={loading ? "loading" : `~ ${tValue}`}
                       disabled={true}
                     />
                   </div>
@@ -185,7 +197,7 @@ export const EstimatorSellCard = (props) => {
                     <div className="flex items-center bg-whitesmoke-200 w-[121px] h-[44px] rounded-md mr-2 shadow-md hover:bg-whitesmoke-100">
                       <div
                         className="cursor-pointer flex flex-row justify-between w-[121px] ml-[12px]"
-                        onClick={() => setIsToTokenPage(true)}
+                        onClick={openToTokenModal}
                       >
                         <div className="flex flex-row items-center gap-2">
                           {/* <FaEthereum size={20} color={'#3f3f46'} /> */}
@@ -216,29 +228,29 @@ export const EstimatorSellCard = (props) => {
       ) : null}
 
       <>
-        {/* =============================={FROM TOKEN COMPONENT: PART THREE}========================== */}
-        {isFromTokenPage === true && isToTokenPage === false ? (
-          <TokenCard
-            setIsTokenPage={setIsFromTokenPage}
-            setFilteredTokens={setFilteredfTokens}
-            filteredTokens={filteredfTokens}
-            setToken={setFromToken}
-            allTokens={allTokensFrom}
-            service={service}
-          />
-        ) : null}
+        {/* From Token Modal */}
+        <TokenModal
+          isTokenModalOpen={isFromTokenModalOpen}
+          setIsTokenModalOpen={setIsFromTokenModalOpen}
+          filteredTokens={filteredfTokens}
+          setToken={setFromToken}
+          allTokens={allTokensFrom}
+          service={service}
+          isNotCrypto={false}
+          title={"Select Token"}
+        />
 
-        {/* ===================={To TOKEN COMPONENT: PART THREE}=================================== */}
-        {isFromTokenPage === false && isToTokenPage === true ? (
-          <TokenCard
-            setIsTokenPage={setIsFromTokenPage}
-            setFilteredTokens={setFilteredfTokens}
-            filteredTokens={filteredtTokens}
-            setToken={setFromToken}
-            allTokens={allTokensTo}
-            service={service}
-          />
-        ) : null}
+        {/* To Token Modal */}
+        <TokenModal
+          isTokenModalOpen={isToTokenModalOpen}
+          setIsTokenModalOpen={setToTokenModalOpen}
+          filteredTokens={filteredtTokens}
+          setToken={setToToken}
+          allTokens={allTokensTo}
+          service={service}
+          isNotCrypto={true}
+          title={"Select Currency"}
+        />
       </>
     </div>
   );

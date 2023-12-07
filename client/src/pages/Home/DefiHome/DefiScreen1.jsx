@@ -1,23 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { TokenCard } from '../../../components/TokenCard';
-import { TokenCardNetworks } from '../../../components/TokenCardNetworks';
-import { networksOptions } from '../../../constants';
-import { useDispatch, useSelector } from 'react-redux';
+import { useState, useEffect } from "react";
+import { TokenCard } from "../../../components/TokenCard";
+import { TokenCardNetworks } from "../../../components/TokenCardNetworks";
+import { networksOptions } from "../../../constants";
+import { useDispatch, useSelector } from "react-redux";
 import {
   updateIsChangeChainId,
   updateConnectedNetwork,
   updateChain,
-} from '../../../redux/features/swap/swapSlice';
-import {
-  useConnect,
-  useAccount,
-  useSwitchNetwork,
-  useSigner,
-  useBalance,
-} from 'wagmi';
-
-import { getTokensDefiByIdService } from '../../../services/apiService';
-import { getTokensDefiById } from '../../../redux/features/swap/swapSlice';
+} from "../../../redux/features/swap/swapSlice";
+import { useAccount, useSwitchNetwork } from "wagmi";
+import TokenModal from "../../../components/TokenModal";
 
 export const DefiScreen1 = (props) => {
   const {
@@ -63,6 +55,10 @@ export const DefiScreen1 = (props) => {
   const [filteredtTokens, setFilteredtTokens] = useState();
   const [isChainChange, setIsChainChange] = useState(false);
   const [checkChain, setCheckChain] = useState();
+  const [isFromTokenModalOpen, setIsFromTokenModalOpen] = useState(false);
+  const [isToTokenModalOpen, setToTokenModalOpen] = useState(false);
+  const [isNetworkModalOpen, setIsNetworkModalOpen] = useState(false);
+
   // console.log({ checkChain: checkChain });
 
   const connectedNetworkSwitchL = useSelector(
@@ -149,8 +145,8 @@ export const DefiScreen1 = (props) => {
   //====================================================================================
 
   async function nextFunc() {
-    setService('defi');
-    setSubService('defi');
+    setService("defi");
+    setSubService("defi");
     setPercentageProgress(2);
   }
 
@@ -177,7 +173,7 @@ export const DefiScreen1 = (props) => {
       switchNetwork(checkChain?.id);
       dispatch(updateIsChangeChainId(true));
       dispatch(updateConnectedNetwork(false));
-      localStorage.setItem('chainSwitch', JSON.stringify(true));
+      localStorage.setItem("chainSwitch", JSON.stringify(true));
       setIsNetworkPage(false);
     }
     if (checkChain && !isConnected) {
@@ -185,11 +181,23 @@ export const DefiScreen1 = (props) => {
       dispatch(updateChain(checkChain));
       dispatch(updateIsChangeChainId(true));
       dispatch(updateConnectedNetwork(false));
-      localStorage.setItem('chainSwitch', JSON.stringify(true));
+      localStorage.setItem("chainSwitch", JSON.stringify(true));
       setIsNetworkPage(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkChain]);
+
+  function openFromTokenModal() {
+    setIsFromTokenModalOpen(true);
+  }
+
+  function openToTokenModal() {
+    setToTokenModalOpen(true);
+  }
+
+  function openNetworkModal() {
+    setIsNetworkModalOpen(true);
+  }
 
   return (
     <>
@@ -201,7 +209,7 @@ export const DefiScreen1 = (props) => {
           <div className="flex flex-col w-[300px] md:w-[452px] gap-[8px]">
             <div
               className={`flex flex-row justify-between rounded-lg shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] px-4 py-2 hover:bg-gray-100 outline outline-lightslategray-300 outline-[1px]`}
-              onClick={() => setIsNetworkPage(true)}
+              onClick={openNetworkModal}
             >
               <div className="cursor-pointer flex flex-row justify-between items-center w-[250px]">
                 <div className="flex flex-row items-center gap-2">
@@ -249,7 +257,7 @@ export const DefiScreen1 = (props) => {
                     <div className="flex items-center bg-whitesmoke-200 w-[121px] h-[44px] rounded-md mr-2 shadow-md hover:bg-whitesmoke-100">
                       <div
                         className="cursor-pointer flex flex-row justify-between w-[121px] ml-[12px]"
-                        onClick={() => setIsFromTokenPage(true)}
+                        onClick={openFromTokenModal}
                       >
                         <div className="flex flex-row items-center gap-2">
                           {/* <FaBitcoin size={20} color={'#f97316'} /> */}
@@ -276,8 +284,8 @@ export const DefiScreen1 = (props) => {
 
               <div className="flex flex-row justify-between">
                 <div className="h-3 py-2">
-                  1 {fToken?.symbol.toUpperCase()} ~{' '}
-                  {loadingExchangeRate ? 'fetching rates' : exchangeRate}{' '}
+                  1 {fToken?.symbol.toUpperCase()} ~{" "}
+                  {loadingExchangeRate ? "fetching rates" : exchangeRate}{" "}
                   {tToken?.symbol.toUpperCase()}
                 </div>
                 {/* <div className="h-3 py-2">{isToLoading
@@ -307,7 +315,7 @@ export const DefiScreen1 = (props) => {
                       placeholder="0.1"
                       // value={`~ ${tValue}`}
                       // value={`~ ${1.675}`}
-                      value={loading ? 'loading' : `~ ${tValue}`}
+                      value={loading ? "loading" : `~ ${tValue}`}
                       disabled={true}
                     />
                   </div>
@@ -315,7 +323,7 @@ export const DefiScreen1 = (props) => {
                     <div className="flex items-center bg-whitesmoke-200 w-[121px] h-[44px] rounded-md mr-2 shadow-md hover:bg-whitesmoke-100">
                       <div
                         className="cursor-pointer flex flex-row justify-between w-[121px] ml-[12px]"
-                        onClick={() => setIsToTokenPage(true)}
+                        onClick={openToTokenModal}
                       >
                         <div className="flex flex-row items-center gap-2">
                           {/* <FaEthereum size={20} color={'#3f3f46'} /> */}
@@ -351,44 +359,39 @@ export const DefiScreen1 = (props) => {
         </div>
       ) : null}
 
-      {isNetworkPage === true &&
-      isFromTokenPage === false &&
-      isToTokenPage === false ? (
-        <TokenCardNetworks
-          setIsTokenPage={setIsNetworkPage}
-          // setToken={setChain}
-          setToken={setCheckChain}
-          allTokens={networksOptions}
-          service={service}
-          setIsChainChange={setIsChainChange}
-        />
-      ) : null}
-      {isNetworkPage === false &&
-      isFromTokenPage === true &&
-      isToTokenPage === false ? (
-        <TokenCard
-          setIsTokenPage={setIsFromTokenPage}
-          setFilteredTokens={setFilteredfTokens}
-          filteredTokens={filteredfTokens}
-          setToken={setFromToken}
-          allTokens={allTokensFrom}
-          service={service}
-        />
-      ) : null}
+      {/* Network Modal */}
+      <TokenModal
+        isTokenModalOpen={isNetworkModalOpen}
+        setIsTokenModalOpen={setIsNetworkModalOpen}
+        filteredTokens={networksOptions}
+        setToken={setCheckChain}
+        service={service}
+        isNotCrypto={false}
+        title={"Select Network"}
+      />
 
-      {/* ===================={To TOKEN COMPONENT: PART THREE}=================================== */}
-      {isNetworkPage === false &&
-      isFromTokenPage === false &&
-      isToTokenPage === true ? (
-        <TokenCard
-          setIsTokenPage={setIsToTokenPage}
-          setFilteredTokens={setFilteredtTokens}
-          filteredTokens={filteredtTokens}
-          setToken={setToToken}
-          allTokens={allTokensTo}
-          service={service}
-        />
-      ) : null}
+      {/* From Token Modal */}
+      <TokenModal
+        isTokenModalOpen={isFromTokenModalOpen}
+        setIsTokenModalOpen={setIsFromTokenModalOpen}
+        filteredTokens={filteredfTokens}
+        setToken={setFromToken}
+        allTokens={allTokensFrom}
+        service={service}
+        isNotCrypto={false}
+        title={"Select Token"}
+      />
+
+      {/* To Token Modal */}
+      <TokenModal
+        isTokenModalOpen={isToTokenModalOpen}
+        setIsTokenModalOpen={setToTokenModalOpen}
+        filteredTokens={filteredtTokens}
+        setToken={setToToken}
+        allTokens={allTokensTo}
+        service={service}
+        title={"Select Token"}
+      />
     </>
   );
 };

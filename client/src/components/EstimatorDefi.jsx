@@ -1,27 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { TokenCardNetworks } from './TokenCardNetworks';
-import { networksOptions } from '../constants';
-import { TokenCard } from './TokenCard';
-import { ConnectWalletCard } from './ConnectWalletCard';
-import { SlippageCard } from './SlippageCard';
-import { useDispatch, useSelector } from 'react-redux';
-import { IoMdSettings } from 'react-icons/io';
-import { TbLogout2 } from 'react-icons/tb';
-import {
-  useConnect,
-  useAccount,
-  useSwitchNetwork,
-  useSigner,
-  useBalance,
-  useDisconnect,
-} from 'wagmi';
-import { getTokensDefiByIdService } from '../services/apiService';
-import { getTokensDefiById } from '../redux/features/token/tokenSlice';
+import React, { useState, useEffect } from "react";
+import { TokenCardNetworks } from "./TokenCardNetworks";
+import { networksOptions } from "../constants";
+import { TokenCard } from "./TokenCard";
+import { ConnectWalletCard } from "./ConnectWalletCard";
+import { SlippageCard } from "./SlippageCard";
+import { useDispatch, useSelector } from "react-redux";
+import { IoMdSettings } from "react-icons/io";
+import { TbLogout2 } from "react-icons/tb";
+import { useAccount, useSwitchNetwork, useDisconnect } from "wagmi";
 import {
   updateIsChangeChainId,
   updateConnectedNetwork,
   updateChain,
-} from '../redux/features/swap/swapSlice';
+} from "../redux/features/swap/swapSlice";
+import TokenModal from "./TokenModal";
 
 //android small = w-[320px]/ 352px
 //iphone = w-[340px]/ 372px
@@ -72,7 +64,11 @@ export const EstimatorDefi = (props) => {
   const [isWalletPage, setIsWalletPage] = useState(false);
   const [isSlippagePage, setIsSlippagePage] = useState(false);
   const [checkChain, setCheckChain] = useState();
-  console.log({ checkChain: checkChain });
+  const [isFromTokenModalOpen, setIsFromTokenModalOpen] = useState(false);
+  const [isToTokenModalOpen, setToTokenModalOpen] = useState(false);
+  const [isNetworkModalOpen, setIsNetworkModalOpen] = useState(false);
+
+  // console.log({ checkChain: checkChain });
 
   const connectedNetworkSwitchL = useSelector(
     (state) => state.swap?.connectedNetwork
@@ -169,7 +165,7 @@ export const EstimatorDefi = (props) => {
       switchNetwork(checkChain?.id);
       dispatch(updateIsChangeChainId(true));
       dispatch(updateConnectedNetwork(false));
-      localStorage.setItem('chainSwitch', JSON.stringify(true));
+      localStorage.setItem("chainSwitch", JSON.stringify(true));
       setIsNetworkPage(false);
     }
     if (checkChain && !isConnected) {
@@ -177,11 +173,23 @@ export const EstimatorDefi = (props) => {
       dispatch(updateChain(checkChain));
       dispatch(updateIsChangeChainId(true));
       dispatch(updateConnectedNetwork(false));
-      localStorage.setItem('chainSwitch', JSON.stringify(true));
+      localStorage.setItem("chainSwitch", JSON.stringify(true));
       setIsNetworkPage(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkChain]);
+
+  function openFromTokenModal() {
+    setIsFromTokenModalOpen(true);
+  }
+
+  function openToTokenModal() {
+    setToTokenModalOpen(true);
+  }
+
+  function openNetworkModal() {
+    setIsNetworkModalOpen(true);
+  }
 
   const estimator = (
     <div className="flex justify-center rounded-lg bg-white shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[320px] xs:w-[340px] md:w-[500px] p-4">
@@ -232,7 +240,7 @@ export const EstimatorDefi = (props) => {
           <div className="flex flex-col w-[300px] md:w-[452px] gap-[8px]">
             <div
               className={`flex flex-row justify-between rounded-lg shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] px-4 py-2 hover:bg-gray-100 outline outline-lightslategray-300 outline-[1px]`}
-              onClick={() => setIsNetworkPage(true)}
+              onClick={openNetworkModal}
             >
               <div className="cursor-pointer flex flex-row justify-between items-center w-[250px]">
                 <div className="flex flex-row items-center gap-2">
@@ -281,7 +289,7 @@ export const EstimatorDefi = (props) => {
                     <div className="flex items-center bg-whitesmoke-200 w-[121px] h-[44px] rounded-md mr-2 shadow-md hover:bg-whitesmoke-100 mr-2 shadow-md hover:bg-whitesmoke-100">
                       <div
                         className="cursor-pointer flex flex-row justify-between w-[121px] ml-[12px]"
-                        onClick={() => setIsFromTokenPage(true)}
+                        onClick={openFromTokenModal}
                       >
                         <div className="flex flex-row items-center gap-2">
                           {/* <FaBitcoin size={20} color={'#f97316'} /> */}
@@ -308,19 +316,19 @@ export const EstimatorDefi = (props) => {
                   <div className="ml-2 mt-2 text-xs text-darkgray-200">
                     {/* fromBalance */}
                     {isFromLoading
-                      ? ''
-                      : `Balance: ${fromBalance.toString() || ''}`}
+                      ? ""
+                      : `Balance: ${fromBalance.toString() || ""}`}
                   </div>
                   <div className="ml-2 mt-2 text-xs text-darkgray-200 mr-2">
                     {/* fromprice */}
                     {isFromLoading
-                      ? ''
+                      ? ""
                       : `~$${
                           fValue
                             ? new Intl.NumberFormat().format(
                                 Number(fValue) * Number(fromPrice)
                               )
-                            : ''
+                            : ""
                         }`}
                   </div>
                 </div>
@@ -329,8 +337,8 @@ export const EstimatorDefi = (props) => {
 
             <div className="flex flex-row justify-between">
               <div className="h-3 py-2">
-                1 {fToken?.symbol.toUpperCase()} ~{' '}
-                {loadingExchangeRate ? 'fetching rates' : exchangeRate}{' '}
+                1 {fToken?.symbol.toUpperCase()} ~{" "}
+                {loadingExchangeRate ? "fetching rates" : exchangeRate}{" "}
                 {tToken?.symbol.toUpperCase()}
               </div>
               {/* <div className="h-3 py-2">{isToLoading
@@ -361,7 +369,7 @@ export const EstimatorDefi = (props) => {
                       placeholder="0.1"
                       // value={`~ ${tValue}`}
                       // value={`~ ${1.675}`}
-                      value={loading ? 'loading' : `~ ${tValue}`}
+                      value={loading ? "loading" : `~ ${tValue}`}
                       disabled={true}
                     />
                   </div>
@@ -369,7 +377,7 @@ export const EstimatorDefi = (props) => {
                     <div className="flex items-center bg-whitesmoke-200 w-[121px] h-[44px] rounded-md mr-2 shadow-md hover:bg-whitesmoke-100 mr-2 shadow-md hover:bg-whitesmoke-100">
                       <div
                         className="cursor-pointer flex flex-row justify-between w-[121px] ml-[12px]"
-                        onClick={() => setIsToTokenPage(true)}
+                        onClick={openToTokenModal}
                       >
                         <div className="flex flex-row items-center gap-2">
                           {/* <FaEthereum size={20} color={'#3f3f46'} /> */}
@@ -396,20 +404,20 @@ export const EstimatorDefi = (props) => {
                   <div className="ml-2 mt-2 text-xs text-darkgray-200">
                     {/* fromBalance */}
                     {isToLoading
-                      ? ''
-                      : `Balance: ${toBalance.toString() || ''}`}
+                      ? ""
+                      : `Balance: ${toBalance.toString() || ""}`}
                   </div>
                   <div className="ml-2 mt-2 text-xs text-darkgray-200 mr-2">
                     {/* fromprice */}
                     {isToLoading
-                      ? ''
+                      ? ""
                       : `~$${
                           tValue
                             ? new Intl.NumberFormat().format(
                                 Number(tValue) * Number(toPrice)
                               )
-                            : ''
-                        } (-${priceDeviation ? priceDeviation : ''}%)`}
+                            : ""
+                        } (-${priceDeviation ? priceDeviation : ""}%)`}
                   </div>
                 </div>
               </div>
@@ -439,49 +447,40 @@ export const EstimatorDefi = (props) => {
         </div>
       ) : null}
       <>
-        {/* =============================={FROM TOKEN COMPONENT: PART THREE}========================== */}
-        {isNetworkPage === true &&
-        isFromTokenPage === false &&
-        isWalletPage === false &&
-        isSlippagePage === false &&
-        isToTokenPage === false ? (
-          <TokenCardNetworks
-            setIsTokenPage={setIsNetworkPage}
-            // setToken={setChain}
-            setToken={setCheckChain}
-            allTokens={networksOptions}
-            service={service}
-          />
-        ) : null}
-        {isNetworkPage === false &&
-        isFromTokenPage === true &&
-        isWalletPage === false &&
-        isSlippagePage === false &&
-        isToTokenPage === false ? (
-          <TokenCard
-            setIsTokenPage={setIsFromTokenPage}
-            setFilteredTokens={setFilteredfTokens}
-            filteredTokens={filteredfTokens}
-            setToken={setFromToken}
-            allTokens={allTokensFrom}
-            service={service}
-          />
-        ) : null}
-        {/* ===================={To TOKEN COMPONENT: PART THREE}=================================== */}
-        {isNetworkPage === false &&
-        isFromTokenPage === false &&
-        isWalletPage === false &&
-        isSlippagePage === false &&
-        isToTokenPage === true ? (
-          <TokenCard
-            setIsTokenPage={setIsToTokenPage}
-            setFilteredTokens={setFilteredtTokens}
-            filteredTokens={filteredtTokens}
-            setToken={setToToken}
-            allTokens={allTokensTo}
-            service={service}
-          />
-        ) : null}
+        {/* Network Modal */}
+        <TokenModal
+          isTokenModalOpen={isNetworkModalOpen}
+          setIsTokenModalOpen={setIsNetworkModalOpen}
+          filteredTokens={networksOptions}
+          setToken={setCheckChain}
+          service={service}
+          isNotCrypto={false}
+          title={"Select Network"}
+        />
+
+        {/* From Token Modal */}
+        <TokenModal
+          isTokenModalOpen={isFromTokenModalOpen}
+          setIsTokenModalOpen={setIsFromTokenModalOpen}
+          filteredTokens={filteredfTokens}
+          setToken={setFromToken}
+          allTokens={allTokensFrom}
+          service={service}
+          isNotCrypto={false}
+          title={"Select Token"}
+        />
+
+        {/* To Token Modal */}
+        <TokenModal
+          isTokenModalOpen={isToTokenModalOpen}
+          setIsTokenModalOpen={setToTokenModalOpen}
+          filteredTokens={filteredtTokens}
+          setToken={setToToken}
+          allTokens={allTokensTo}
+          service={service}
+          title={"Select Token"}
+        />
+
         {isNetworkPage === false &&
         isFromTokenPage === false &&
         isWalletPage === true &&

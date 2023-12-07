@@ -1,80 +1,80 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import { SellCardScreen1 } from './SellCardScreen1';
-import { SellCardScreen2 } from './SellCardScreen2';
-import { SellCardScreen3 } from './SellCardScreen3';
-import { useDispatch, useSelector } from 'react-redux';
-import { getTransactionRate } from '../../../redux/features/transaction/transactionSlice';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { SellCardScreen1 } from "./SellCardScreen1";
+import { SellCardScreen2 } from "./SellCardScreen2";
+import { SellCardScreen3 } from "./SellCardScreen3";
+import { useDispatch, useSelector } from "react-redux";
+import { getTransactionRate } from "../../../redux/features/transaction/transactionSlice";
 import {
   getTokenExchangeRate,
   getTransactionRateInfo,
-} from '../../../services/apiService';
-import { getTokenListExchange } from '../../../redux/features/token/tokenSlice';
+} from "../../../services/apiService";
+import { getTokenListExchange } from "../../../redux/features/token/tokenSlice";
 
-const paymentOptions = ['card', 'cash'];
+const paymentOptions = ["card", "cash"];
 const providers = [
   {
-    name: 'Phone',
-    url: '/image@2x.png',
-    rate: '0.00526',
-    class: 'bg-gray-200',
-    providerUrl: 'https://www.simplex.com/',
+    name: "Phone",
+    url: "/image@2x.png",
+    rate: "0.00526",
+    class: "bg-gray-200",
+    providerUrl: "https://www.simplex.com/",
   },
   {
-    name: 'Card',
-    url: '/MoonPay.png',
-    rate: '0.00519',
-    providerUrl: 'https://www.moonpay.com',
+    name: "Card",
+    url: "/MoonPay.png",
+    rate: "0.00519",
+    providerUrl: "https://www.moonpay.com",
   },
 ];
 
 const cities = [
   {
-    country: 'United States',
-    cities: ['New york'],
-    flag: '',
+    country: "United States",
+    cities: ["New york"],
+    flag: "",
   },
   {
-    country: 'United Kingdom',
-    cities: ['London'],
-    flag: '',
+    country: "United Kingdom",
+    cities: ["London"],
+    flag: "",
   },
   {
-    country: 'France',
-    cities: ['Paris'],
-    flag: '',
+    country: "France",
+    cities: ["Paris"],
+    flag: "",
   },
 
   {
-    country: 'Germany',
-    cities: ['Berlin'],
-    flag: '',
+    country: "Germany",
+    cities: ["Berlin"],
+    flag: "",
   },
   {
-    country: 'Spain',
-    cities: ['Barcelona'],
-    flag: '',
+    country: "Spain",
+    cities: ["Barcelona"],
+    flag: "",
   },
   {
-    country: 'Russia',
-    cities: ['Saint Petersburg', 'Moscow'],
-    flag: '',
+    country: "Russia",
+    cities: ["Saint Petersburg", "Moscow"],
+    flag: "",
   },
   {
-    country: 'Finland',
-    cities: ['Helsinki'],
-    flag: '',
+    country: "Finland",
+    cities: ["Helsinki"],
+    flag: "",
   },
   {
-    country: 'Hungary',
-    cities: ['Budapest'],
-    flag: '',
+    country: "Hungary",
+    cities: ["Budapest"],
+    flag: "",
   },
   {
-    country: 'Czech',
-    cities: ['Prague'],
-    flag: '',
+    country: "Czech",
+    cities: ["Prague"],
+    flag: "",
   },
 ];
 
@@ -109,13 +109,13 @@ export const SellCardHome = (props) => {
   const [loading, setLoading] = useState(false);
   const [loadingExchangeRate, setLoadingExchangeRate] = useState(false);
 
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [retryMessage, setRetryMessage] = useState();
-  const [exchangeRateInfo, setExchangeRateInfo] = useState('0');
+  const [exchangeRateInfo, setExchangeRateInfo] = useState("0");
   console.log({ exchangeRateInfo: exchangeRateInfo });
 
-  const transactionRatesL = localStorage.getItem('transactionRatesSellCard')
-    ? JSON.parse(localStorage.getItem('transactionRatesSellCard'))
+  const transactionRatesL = localStorage.getItem("transactionRatesSellCard")
+    ? JSON.parse(localStorage.getItem("transactionRatesSellCard"))
     : 0;
   // const [transactionRates, setTransactionRates] = useState(0);
   const [transactionRates, setTransactionRates] = useState(transactionRatesL);
@@ -124,60 +124,60 @@ export const SellCardHome = (props) => {
   const tValue = transactionRates ? transactionRates?.tValueFormatted : 0;
   const exchangeRate = transactionRates ? transactionRates?.exchangeRate : 0;
 
-  const percentageProgressL = localStorage.getItem('percentageProgressSellCard')
-    ? JSON.parse(localStorage.getItem('percentageProgressSellCard'))
+  const percentageProgressL = localStorage.getItem("percentageProgressSellCard")
+    ? JSON.parse(localStorage.getItem("percentageProgressSellCard"))
     : 1;
 
   const [percentageProgress, setPercentageProgress] =
     useState(percentageProgressL);
 
-  const fTokenL = localStorage.getItem('fTokenSellCard')
-    ? JSON.parse(localStorage.getItem('fTokenSellCard'))
+  const fTokenL = localStorage.getItem("fTokenSellCard")
+    ? JSON.parse(localStorage.getItem("fTokenSellCard"))
     : null;
 
   const [fToken, setFromToken] = useState(fTokenL);
-  const tTokenL = localStorage.getItem('tTokenSellCard')
-    ? JSON.parse(localStorage.getItem('tTokenSellCard'))
+  const tTokenL = localStorage.getItem("tTokenSellCard")
+    ? JSON.parse(localStorage.getItem("tTokenSellCard"))
     : null;
   const [tToken, setToToken] = useState(tTokenL);
-  const fValueL = localStorage.getItem('fValueSellCard')
-    ? JSON.parse(localStorage.getItem('fValueSellCard'))
+  const fValueL = localStorage.getItem("fValueSellCard")
+    ? JSON.parse(localStorage.getItem("fValueSellCard"))
     : 1;
   const [fValue, setFromValue] = useState(fValueL);
 
-  const [fTitle, setFTitle] = useState('You give');
-  const [tTitle, setTTitle] = useState('You get');
+  const [fTitle, setFTitle] = useState("You give");
+  const [tTitle, setTTitle] = useState("You get");
   //=============={Exchange1of4}=======================================
 
-  const userAddressL = localStorage.getItem('userAddress')
-    ? JSON.parse(localStorage.getItem('userAddress'))
+  const userAddressL = localStorage.getItem("userAddress")
+    ? JSON.parse(localStorage.getItem("userAddress"))
     : null;
 
   const [userAddress, setUserAddress] = useState(userAddressL);
 
   //=============={Exchange3of4}=======================================
 
-  const telegramL = localStorage.getItem('telegram')
-    ? JSON.parse(localStorage.getItem('telegram'))
+  const telegramL = localStorage.getItem("telegram")
+    ? JSON.parse(localStorage.getItem("telegram"))
     : null;
 
   const [telegram, setTelegram] = useState(telegramL);
 
-  const paymentMethodL = localStorage.getItem('paymentMethod')
-    ? JSON.parse(localStorage.getItem('paymentMethod'))
+  const paymentMethodL = localStorage.getItem("paymentMethod")
+    ? JSON.parse(localStorage.getItem("paymentMethod"))
     : paymentOptions[0];
 
   const [paymentMethod, setPaymentMethod] = useState(paymentMethodL);
 
-  const countryL = localStorage.getItem('country')
-    ? JSON.parse(localStorage.getItem('country'))
+  const countryL = localStorage.getItem("country")
+    ? JSON.parse(localStorage.getItem("country"))
     : cities[0]?.country;
 
-  const cityDataL = localStorage.getItem('cityData')
-    ? JSON.parse(localStorage.getItem('cityData'))
+  const cityDataL = localStorage.getItem("cityData")
+    ? JSON.parse(localStorage.getItem("cityData"))
     : null;
-  const cityL = localStorage.getItem('city')
-    ? JSON.parse(localStorage.getItem('city'))
+  const cityL = localStorage.getItem("city")
+    ? JSON.parse(localStorage.getItem("city"))
     : null;
 
   const [country, setCountry] = useState(countryL);
@@ -190,8 +190,8 @@ export const SellCardHome = (props) => {
     country: country,
   });
 
-  const providerL = localStorage.getItem('provider')
-    ? JSON.parse(localStorage.getItem('provider'))
+  const providerL = localStorage.getItem("provider")
+    ? JSON.parse(localStorage.getItem("provider"))
     : providers[0];
   // const [provider, setProvider] = useState(providers[0]); // important
   const [provider, setProvider] = useState(providerL); // important
@@ -210,19 +210,19 @@ export const SellCardHome = (props) => {
   //======================================={BANK INFO}==================================================
   //====================================================================================================
 
-  const fullNameL = localStorage.getItem('fullName')
-    ? JSON.parse(localStorage.getItem('fullName'))
+  const fullNameL = localStorage.getItem("fullName")
+    ? JSON.parse(localStorage.getItem("fullName"))
     : null;
 
-  const bankNameL = localStorage.getItem('bankName')
-    ? JSON.parse(localStorage.getItem('bankName'))
+  const bankNameL = localStorage.getItem("bankName")
+    ? JSON.parse(localStorage.getItem("bankName"))
     : null;
-  const cardNumberL = localStorage.getItem('cardNumber')
-    ? JSON.parse(localStorage.getItem('cardNumber'))
+  const cardNumberL = localStorage.getItem("cardNumber")
+    ? JSON.parse(localStorage.getItem("cardNumber"))
     : null;
 
-  const phoneL = localStorage.getItem('phone')
-    ? JSON.parse(localStorage.getItem('phone'))
+  const phoneL = localStorage.getItem("phone")
+    ? JSON.parse(localStorage.getItem("phone"))
     : null;
 
   const [fullName, setFullName] = useState(fullNameL);
@@ -236,25 +236,25 @@ export const SellCardHome = (props) => {
 
   useEffect(() => {
     if (fullName) {
-      localStorage.setItem('fullName', JSON.stringify(fullName));
+      localStorage.setItem("fullName", JSON.stringify(fullName));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bankName]);
   useEffect(() => {
     if (bankName) {
-      localStorage.setItem('bankName', JSON.stringify(bankName));
+      localStorage.setItem("bankName", JSON.stringify(bankName));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bankName]);
   useEffect(() => {
     if (cardNumber) {
-      localStorage.setItem('cardNumber', JSON.stringify(cardNumber));
+      localStorage.setItem("cardNumber", JSON.stringify(cardNumber));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cardNumber]);
   useEffect(() => {
     if (phone) {
-      localStorage.setItem('phone', JSON.stringify(phone));
+      localStorage.setItem("phone", JSON.stringify(phone));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phone]);
@@ -271,7 +271,7 @@ export const SellCardHome = (props) => {
   useEffect(() => {
     if (percentageProgress) {
       localStorage.setItem(
-        'percentageProgressSellCard',
+        "percentageProgressSellCard",
         JSON.stringify(percentageProgress)
       );
       setPercentageProgressHome(percentageProgress);
@@ -285,14 +285,14 @@ export const SellCardHome = (props) => {
       setAllTokensFrom(allTokensFromL);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [allTokensFromL]);
 
   useEffect(() => {
     if (allTokensToL) {
       setAllTokensTo(allTokensToL);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [allTokensToL]);
   useEffect(() => {
     if (allTokensFromL && !fToken) {
       setFromToken(allTokensFromL[0]);
@@ -308,7 +308,7 @@ export const SellCardHome = (props) => {
   }, [allTokensToL]);
 
   useEffect(() => {
-    localStorage.setItem('prevLocation', JSON.stringify(location?.pathname));
+    localStorage.setItem("prevLocation", JSON.stringify(location?.pathname));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -329,7 +329,7 @@ export const SellCardHome = (props) => {
 
   useEffect(() => {
     if (country) {
-      localStorage.setItem('country', JSON.stringify(country));
+      localStorage.setItem("country", JSON.stringify(country));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -337,7 +337,7 @@ export const SellCardHome = (props) => {
 
   useEffect(() => {
     if (cityData) {
-      localStorage.setItem('cityData', JSON.stringify(cityData));
+      localStorage.setItem("cityData", JSON.stringify(cityData));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -345,7 +345,7 @@ export const SellCardHome = (props) => {
 
   useEffect(() => {
     if (city) {
-      localStorage.setItem('city', JSON.stringify(city));
+      localStorage.setItem("city", JSON.stringify(city));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -353,7 +353,7 @@ export const SellCardHome = (props) => {
 
   useEffect(() => {
     if (telegram) {
-      localStorage.setItem('telegram', JSON.stringify(telegram));
+      localStorage.setItem("telegram", JSON.stringify(telegram));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -361,7 +361,7 @@ export const SellCardHome = (props) => {
   useEffect(() => {
     if (transactionRates) {
       localStorage.setItem(
-        'transactionRatesSellCard',
+        "transactionRatesSellCard",
         JSON.stringify(transactionRates)
       );
     }
@@ -371,7 +371,7 @@ export const SellCardHome = (props) => {
 
   useEffect(() => {
     if (fToken) {
-      localStorage.setItem('fTokenSellCard', JSON.stringify(fToken));
+      localStorage.setItem("fTokenSellCard", JSON.stringify(fToken));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -379,7 +379,7 @@ export const SellCardHome = (props) => {
 
   useEffect(() => {
     if (tToken) {
-      localStorage.setItem('tTokenSellCard', JSON.stringify(tToken));
+      localStorage.setItem("tTokenSellCard", JSON.stringify(tToken));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -387,7 +387,7 @@ export const SellCardHome = (props) => {
 
   useEffect(() => {
     if (fValue) {
-      localStorage.setItem('fValueSellCard', JSON.stringify(fValue));
+      localStorage.setItem("fValueSellCard", JSON.stringify(fValue));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -395,7 +395,7 @@ export const SellCardHome = (props) => {
 
   useEffect(() => {
     if (userAddress) {
-      localStorage.setItem('userAddress', JSON.stringify(userAddress));
+      localStorage.setItem("userAddress", JSON.stringify(userAddress));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -403,7 +403,7 @@ export const SellCardHome = (props) => {
 
   useEffect(() => {
     if (paymentMethod) {
-      localStorage.setItem('paymentMethod', JSON.stringify(paymentMethod));
+      localStorage.setItem("paymentMethod", JSON.stringify(paymentMethod));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -420,7 +420,7 @@ export const SellCardHome = (props) => {
   }, [activeInterval]);
 
   useEffect(() => {
-    if (exchangeRateInfo === '0.000') {
+    if (exchangeRateInfo === "0.000") {
       setActiveInterval(initailInterval + delay);
 
       setTimeout(() => {
@@ -468,10 +468,10 @@ export const SellCardHome = (props) => {
   }, [fToken, tToken]);
 
   useEffect(() => {
-    if (exchangeRateInfo === '0.000') {
+    if (exchangeRateInfo === "0.000") {
       setLoadingExchangeRate(true);
       setLoading(true);
-      console.log({ loading: 'loading prices please hold' });
+      console.log({ loading: "loading prices please hold" });
     } else {
       setLoadingExchangeRate(false);
       setLoading(false);
@@ -497,7 +497,7 @@ export const SellCardHome = (props) => {
 
       // setExchangeRateInfo(response?.exchangeRate);
 
-      if (response.exchangeRate === 'undefined') {
+      if (response.exchangeRate === "undefined") {
         // set is loading as true
         //too many requests
         return;
@@ -505,7 +505,7 @@ export const SellCardHome = (props) => {
       if (response.exchangeRate) {
         // set is loading as true
         setExchangeRateInfo(response?.exchangeRate);
-        setRetryMessage('');
+        setRetryMessage("");
       }
       if (response.message) {
         setRetryMessage(response?.message);
@@ -523,7 +523,7 @@ export const SellCardHome = (props) => {
   const priceDataException = async () => {
     if (
       fValue === 0 ||
-      fValue === '0' ||
+      fValue === "0" ||
       fValue === null ||
       fValue === undefined
     ) {
@@ -532,7 +532,7 @@ export const SellCardHome = (props) => {
 
     if (
       Number(exchangeRateInfo) === 0 ||
-      exchangeRateInfo === '0.000' ||
+      exchangeRateInfo === "0.000" ||
       exchangeRateInfo === null ||
       exchangeRateInfo === undefined
     ) {

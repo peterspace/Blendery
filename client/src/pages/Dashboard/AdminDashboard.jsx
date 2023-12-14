@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { Navigate, useLocation } from "react-router-dom";
 
-import { DashboardMenuAdmin } from '../../components/DashboardMenuAdmin';
+import { DashboardMenuAdmin } from "../../components/DashboardMenuAdmin";
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from "react-redux";
 import {
   getTransactionByTxIdService,
   updateOneBlockchainTransactionByIdService,
@@ -16,41 +16,42 @@ import {
   getAdminBuyCard,
   getAdminSellCash,
   getAdminSellCard,
-} from '../../services/apiService';
-import { getTransactionByTxIdInternal } from '../../redux/features/transaction/transactionSlice';
-import AdminRecord from '../Tanstack/AdminRecord';
-import { ColumnsAdminRecords } from '../Tanstack/ColumnsAdminRecords';
-import { CardUpdateInfo } from '../../components/CardUpdateInfo';
+} from "../../services/apiService";
+import { getTransactionByTxIdInternal } from "../../redux/features/transaction/transactionSlice";
+import AdminRecord from "../Tanstack/AdminRecord";
+import { ColumnsAdminRecords } from "../Tanstack/ColumnsAdminRecords";
+import { CardUpdateInfo } from "../../components/CardUpdateInfo";
+import CircularProgress from "../../components/CircularProgress";
 
 const menu = [
   {
-    name: 'Bitcoin',
-    id: 'bitcoin', //coingeko id
+    name: "Bitcoin",
+    id: "bitcoin", //coingeko id
     logoUrl:
-      'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1547033579',
-    symbol: 'BTC',
-    amount: '1.21',
+      "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1547033579",
+    symbol: "BTC",
+    amount: "1.21",
     date: `$31, 688`,
     status: true,
   },
   {
-    name: 'Ethereum',
+    name: "Ethereum",
     logoUrl:
-      'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880',
-    id: 'ethereum', //coingeko id
-    symbol: 'ETH',
-    amount: '3.25',
+      "https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880",
+    id: "ethereum", //coingeko id
+    symbol: "ETH",
+    amount: "3.25",
     date: `$5,150.37`,
     status: true,
   },
 
   {
-    name: 'Tron',
+    name: "Tron",
     logoUrl:
-      'https://assets.coingecko.com/coins/images/1094/large/tron-logo.png?1547035066',
-    id: 'tron', //coingeko id
-    symbol: 'TRX',
-    amount: '1500',
+      "https://assets.coingecko.com/coins/images/1094/large/tron-logo.png?1547035066",
+    id: "tron", //coingeko id
+    symbol: "TRX",
+    amount: "1500",
     date: `$1,499.67`,
     status: false,
   },
@@ -68,8 +69,8 @@ export const AdminDashboard = (props) => {
     (state) => state.transaction?.transactionByTxIdInternal
   );
 
-  const isUpdating = localStorage.getItem('isUpdating')
-    ? JSON.parse(localStorage.getItem('isUpdating'))
+  const isUpdating = localStorage.getItem("isUpdating")
+    ? JSON.parse(localStorage.getItem("isUpdating"))
     : false;
 
   /********************************************************************************************************************** */
@@ -83,11 +84,9 @@ export const AdminDashboard = (props) => {
   const [refetchTxData, setRefetchTxData] = useState(false);
   const [refetchAdminData, setRefetchAdminData] = useState(false);
 
-  const transactions = localStorage.getItem('transactions')
-    ? JSON.parse(localStorage.getItem('transactions'))
+  const transactions = localStorage.getItem("transactions")
+    ? JSON.parse(localStorage.getItem("transactions"))
     : null;
-
-  console.log({ transactions: transactions });
 
   //=========================={Admin}=======================================================
   const [allTransactions, setAllTransactions] = useState();
@@ -105,33 +104,25 @@ export const AdminDashboard = (props) => {
 
   const [allSellCardTransactionsAdmin, setAllSellCardTransactionsAdmin] =
     useState();
-  //============{Admin: transactions by services and subservices}============
-  console.log({ allExchangeTransactionsAdmin: allExchangeTransactionsAdmin });
-  console.log({ allBuyCashTransactionsAdmin: allBuyCashTransactionsAdmin });
-  console.log({ allBuyCardTransactionsAdmin: allBuyCardTransactionsAdmin });
-  console.log({ allSellCashTransactionsAdmin: allSellCashTransactionsAdmin });
-  console.log({ allSellCardTransactionsAdmin: allSellCardTransactionsAdmin });
-  // const [isUpdatingd, setisUpdatingd] = useState(false);
 
   //=========={Pages}================================================================
-  const pageL = localStorage.getItem('page')
-    ? JSON.parse(localStorage.getItem('page'))
-    : 'Exchange';
+  const pageL = localStorage.getItem("page")
+    ? JSON.parse(localStorage.getItem("page"))
+    : "Exchange";
   const [page, setPage] = useState(pageL);
-  console.log({ page: page });
   //=========={Pages}================================================================
 
   //========================================={LOCATION}===================================================
 
   //======================================================================================================
   useEffect(() => {
-    localStorage.setItem('prevLocation', JSON.stringify(location?.pathname));
+    localStorage.setItem("prevLocation", JSON.stringify(location?.pathname));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   //======================================================================================================
   useEffect(() => {
     if (page) {
-      localStorage.setItem('page', JSON.stringify(page));
+      localStorage.setItem("page", JSON.stringify(page));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -261,7 +252,7 @@ export const AdminDashboard = (props) => {
   //====================================================================================================
 
   return (
-    <div className="flex gap-[64px]">
+    <div className="flex gap-5 bg-[#F3F3F3]">
       <DashboardMenuAdmin
         setPage={setPage}
         mode={mode}
@@ -269,60 +260,90 @@ export const AdminDashboard = (props) => {
         page={page}
       />
       {!isUpdating && (
-        <div className="container mx-auto p-1">
-          {page === 'Exchange' && allExchangeTransactionsAdmin && (
-            <AdminRecord
-              columns={ColumnsAdminRecords}
-              data={allExchangeTransactionsAdmin}
-              mode={mode}
-              setMode={setMode}
-            />
-          )}
-          {page === 'Defi' && allDefiTransactionsAdmin && (
-            <AdminRecord
-              columns={ColumnsAdminRecords}
-              data={allDefiTransactionsAdmin}
-              mode={mode}
-              setMode={setMode}
-            />
-          )}
-          {page === 'Buy (Cash)' && allBuyCashTransactionsAdmin && (
-            <AdminRecord
-              columns={ColumnsAdminRecords}
-              data={allBuyCashTransactionsAdmin}
-              mode={mode}
-              setMode={setMode}
-            />
-          )}
-          {page === 'Buy (Card)' && allBuyCardTransactionsAdmin && (
-            <AdminRecord
-              columns={ColumnsAdminRecords}
-              data={allBuyCardTransactionsAdmin}
-              mode={mode}
-              setMode={setMode}
-            />
-          )}
-          {page === 'Sell (Cash)' && allSellCashTransactionsAdmin && (
-            <AdminRecord
-              columns={ColumnsAdminRecords}
-              data={allSellCashTransactionsAdmin}
-              mode={mode}
-              setMode={setMode}
-            />
-          )}
-          {page === 'Sell (Card)' && allSellCardTransactionsAdmin && (
-            <AdminRecord
-              columns={ColumnsAdminRecords}
-              data={allSellCardTransactionsAdmin}
-              mode={mode}
-              setMode={setMode}
-            />
-          )}
+        <div className="w-[78%]">
+          {page === "Exchange" &&
+            (allExchangeTransactionsAdmin ? (
+              <AdminRecord
+                columns={ColumnsAdminRecords}
+                data={allExchangeTransactionsAdmin}
+                mode={mode}
+                setMode={setMode}
+              />
+            ) : (
+              <div className="w-full h-full flex justify-center items-center">
+                <CircularProgress />
+              </div>
+            ))}
+          {page === "Defi" &&
+            (allDefiTransactionsAdmin ? (
+              <AdminRecord
+                columns={ColumnsAdminRecords}
+                data={allDefiTransactionsAdmin}
+                mode={mode}
+                setMode={setMode}
+              />
+            ) : (
+              <div className="w-full h-full flex justify-center items-center">
+                <CircularProgress />
+              </div>
+            ))}
+          {page === "Buy (Cash)" &&
+            (allBuyCashTransactionsAdmin ? (
+              <AdminRecord
+                columns={ColumnsAdminRecords}
+                data={allBuyCashTransactionsAdmin}
+                mode={mode}
+                setMode={setMode}
+              />
+            ) : (
+              <div className="w-full h-full flex justify-center items-center">
+                <CircularProgress />
+              </div>
+            ))}
+          {page === "Buy (Card)" &&
+            (allBuyCardTransactionsAdmin ? (
+              <AdminRecord
+                columns={ColumnsAdminRecords}
+                data={allBuyCardTransactionsAdmin}
+                mode={mode}
+                setMode={setMode}
+              />
+            ) : (
+              <div className="w-full h-full flex justify-center items-center">
+                <CircularProgress />
+              </div>
+            ))}
+          {page === "Sell (Cash)" &&
+            (allSellCashTransactionsAdmin ? (
+              <AdminRecord
+                columns={ColumnsAdminRecords}
+                data={allSellCashTransactionsAdmin}
+                mode={mode}
+                setMode={setMode}
+              />
+            ) : (
+              <div className="w-full h-full flex justify-center items-center">
+                <CircularProgress />
+              </div>
+            ))}
+          {page === "Sell (Card)" &&
+            (allSellCardTransactionsAdmin ? (
+              <AdminRecord
+                columns={ColumnsAdminRecords}
+                data={allSellCardTransactionsAdmin}
+                mode={mode}
+                setMode={setMode}
+              />
+            ) : (
+              <div className="w-full h-full flex justify-center items-center">
+                <CircularProgress />
+              </div>
+            ))}
         </div>
       )}
 
       {isUpdating && txData && (
-        <section className={`container mx-auto p-2`}>
+        <section className={`container p-2`}>
           <CardUpdateInfo mode={mode} setRefetchTxData={setRefetchTxData} />
         </section>
       )}

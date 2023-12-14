@@ -52,10 +52,6 @@ function TokenModal(props) {
   }, [filteredTokens]);
 
   useEffect(() => {
-    console.log("isNotCrypto>>", isNotCrypto);
-  }, [isNotCrypto]);
-
-  useEffect(() => {
     handleSearchToken();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm]);

@@ -206,21 +206,17 @@ function App() {
 
   return (
     <div
-      className={`flex flex-col justify-between w-full h-screen text-left text-sm text-gray-400 font-montserrat ${
+      className={`flex flex-col min-h-screen w-full h-screen text-left text-sm text-gray-400 ${
         mode === true ? "bg-white" : "bg-bgDarkMode"
       }`}
     >
       {" "}
       <BrowserRouter>
         <ToastContainer />
-        <div className="h-[50px]">
+        <div>
           <Header mode={mode} setMode={setMode} user={user} />
         </div>
-        <div
-          className={`relative overflow-auto ${
-            mode === true ? "bg-white" : "bg-bgDarkMode"
-          }`}
-        >
+        <div className={`${mode === true ? "bg-white" : "bg-bgDarkMode"}`}>
           <Routes>
             <Route path="/resetpassword/:resetToken" element={<Reset />} />
             <Route

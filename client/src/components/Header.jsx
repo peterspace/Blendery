@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
-import { Logout } from '../redux/features/user/userSlice';
-import { BsFillMoonStarsFill, BsMoonStars } from 'react-icons/bs'; // Bitcoin
-import { useDispatch } from 'react-redux';
-const tabs = ['Home', 'Exchange', 'Buy', 'Sell', 'Defi'];
-const modes = ['light', 'dark'];
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Logout } from "../redux/features/user/userSlice";
+import { BsFillMoonStarsFill, BsMoonStars } from "react-icons/bs"; // Bitcoin
+import { useDispatch } from "react-redux";
+const tabs = ["Home", "Exchange", "Buy", "Sell", "Defi"];
+import { TbLogout, TbLogin } from "react-icons/tb";
+
 export const Header = (props) => {
   const { mode, setMode, user } = props;
 
-  const isApp = true;
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
@@ -25,7 +24,7 @@ export const Header = (props) => {
 
   useEffect(() => {
     if (isLogin) {
-      navigate('/auth');
+      navigate("/auth");
       setIsLogin(false);
     }
 
@@ -34,7 +33,7 @@ export const Header = (props) => {
 
   useEffect(() => {
     if (isRedirectExchange) {
-      navigate('/exchange');
+      navigate("/exchange");
       setIsRedirectExchange(false);
     }
 
@@ -43,7 +42,7 @@ export const Header = (props) => {
 
   useEffect(() => {
     if (isRedirectBuy) {
-      navigate('/buyCard');
+      navigate("/buyCard");
       setIsRedirectBuy(true);
     }
 
@@ -52,7 +51,7 @@ export const Header = (props) => {
 
   useEffect(() => {
     if (isRedirectSell) {
-      navigate('/sellCard');
+      navigate("/sellCard");
       setIsRedirectSell(true);
     }
 
@@ -61,7 +60,7 @@ export const Header = (props) => {
 
   useEffect(() => {
     if (isRedirectDefi) {
-      navigate('/defi');
+      navigate("/defi");
       setIsRedirectDefi(false);
     }
 
@@ -71,7 +70,7 @@ export const Header = (props) => {
   useEffect(() => {
     if (isRedirectHome) {
       newFunc();
-      navigate('/');
+      navigate("/");
       setIsRedirectHome(false);
     }
 
@@ -81,7 +80,7 @@ export const Header = (props) => {
   useEffect(() => {
     if (isRedirectDashboard) {
       newFunc();
-      navigate('/dashboard');
+      navigate("/dashboard");
       setIsRedirectDashboard(false);
     }
 
@@ -89,22 +88,22 @@ export const Header = (props) => {
   }, [isRedirectDashboard]);
 
   async function newFunc() {
-    localStorage.removeItem('fTokenE');
-    localStorage.removeItem('tTokenE');
-    localStorage.removeItem('telegram');
-    localStorage.removeItem('userAddress');
-    localStorage.removeItem('benderyAddress');
-    localStorage.removeItem('country');
-    localStorage.removeItem('cityData');
-    localStorage.removeItem('city');
-    localStorage.removeItem('paymentMethod');
-    localStorage.removeItem('txInfo');
-    localStorage.removeItem('percentageProgress');
-    localStorage.removeItem('blockchainNetworkE');
-    localStorage.removeItem('provider');
-    localStorage.removeItem('service');
-    localStorage.removeItem('subService');
-    navigate('/');
+    localStorage.removeItem("fTokenE");
+    localStorage.removeItem("tTokenE");
+    localStorage.removeItem("telegram");
+    localStorage.removeItem("userAddress");
+    localStorage.removeItem("benderyAddress");
+    localStorage.removeItem("country");
+    localStorage.removeItem("cityData");
+    localStorage.removeItem("city");
+    localStorage.removeItem("paymentMethod");
+    localStorage.removeItem("txInfo");
+    localStorage.removeItem("percentageProgress");
+    localStorage.removeItem("blockchainNetworkE");
+    localStorage.removeItem("provider");
+    localStorage.removeItem("service");
+    localStorage.removeItem("subService");
+    navigate("/");
   }
 
   const handleLogout = () => {
@@ -113,92 +112,65 @@ export const Header = (props) => {
     // window.location.replace('/');
   };
 
-  const isHome = (
-    <>
-      <div className="flex flex-col justify-between h-[10vh]">
-        <div className="flex flex-col md:flex-row gap-[32px] md:justify-between md:gap-0 mt-[8px] w-screen">
-          <div className="flex flex-col md:flex-row gap-[32px] ml-[20px]">
+  return (
+    <div className="flex w-full h-[68px] px-10 justify-between items-center bg-white box-border select-none">
+      <div className="flex items-center">
+        <div
+          className="text-[#111111] text-11xl leading-8 font-bold cursor-pointer"
+          onClick={() => {
+            setIsRedirectHome(true);
+            setActiveTab(tabs[0]);
+          }}
+        >
+          Blendery
+        </div>
+      </div>
+      <div className="flex space-x-6 items-center">
+        <div
+          className="cursor-pointer flex justify-center"
+          onClick={() => {
+            setMode((prev) => !prev);
+          }}
+        >
+          {mode === true ? (
+            <BsMoonStars size={18} color={"#111111"} />
+          ) : (
+            <BsFillMoonStarsFill size={18} color={"#4f46e5"} />
+          )}
+        </div>
+        <div className="text-base text-[#111111] font-normal cursor-pointer">
+          Support
+        </div>
+        {user?.token ? (
+          <>
             <div
-              className="cursor-pointer text-smi text-mediumseagreen-200 leading-[24px] text-center inline-block"
+              className="text-base text-[#111111] font-normal cursor-pointer"
               onClick={() => {
-                setIsRedirectHome(true);
-                setActiveTab(tabs[0]);
+                setIsRedirectDashboard(true);
               }}
             >
-              Blendery
+              Dashboard
             </div>
-            {isApp ? null : (
-              <div className="flex flex-col md:flex-row gap-[32px] ml-[20px]">
-                <div className="cursor-pointer leading-[24px] text-center inline-block">
-                  Personal
-                </div>
-                <div className="cursor-pointer text-smi leading-[24px] text-center inline-block]">
-                  Business
-                </div>
-              </div>
-            )}
-          </div>
-          <div className="flex flex-col md:flex-row gap-[32px] mr-[20px]">
-            <div className="cursor-pointer text-smi leading-[24px] text-center inline-block">
-              Support
+            <div
+              className="flex text-base text-[#111111] font-normal cursor-pointer"
+              onClick={() => {
+                handleLogout();
+              }}
+            >
+              <div className="mr-2">Logout</div>
+              <TbLogout size={20} />
             </div>
-
-            {user?.token ? (
-              <>
-                <div
-                  className="cursor-pointer text-smi leading-[24px] text-center inline-block"
-                  onClick={() => {
-                    setIsRedirectDashboard(true);
-                  }}
-                >
-                  Dashboard
-                </div>
-                <div
-                  className="cursor-pointer text-smi leading-[24px] text-center inline-block"
-                  onClick={() => {
-                    handleLogout();
-                  }}
-                >
-                  Logout
-                </div>
-                <div
-                  className="cursor-pointer flex justify-center h-[24px] items-center"
-                  onClick={() => {
-                    setMode((prev) => !prev);
-                  }}
-                >
-                  {mode === true ? (
-                    <BsMoonStars size={18} color={'#404b51'} />
-                  ) : (
-                    <BsFillMoonStarsFill size={18} color={'#4f46e5'} />
-                  )}
-                </div>
-              </>
-            ) : (
-              <div
-                className="cursor-pointer text-smi leading-[24px] text-center inline-block"
-                onClick={() => {
-                  setIsLogin(true);
-                  // use localStorage
-                }}
-              >
-                Login
-              </div>
-            )}
+          </>
+        ) : (
+          <div
+            className="flex text-base text-[#111111] font-normal cursor-pointer"
+            onClick={() => setIsLogin(true)}
+          >
+            <div className="mr-2">Login</div>
+            <TbLogin size={20} />
           </div>
-        </div>
-        <div
-          className={`flex w-full h-px ${
-            mode === true ? 'bg-lightslategray-300' : 'bg-gray-100'
-          }`}
-        />
+        )}
       </div>
-    </>
-  );
-
-  return (
-    <div className="flex flex-col bg-white md:flex-row justify-center h-[10vh]">
-      <div className="flex flex-row">{isHome}</div>
     </div>
   );
 };

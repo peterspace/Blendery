@@ -1,51 +1,51 @@
 /* eslint-disable react/jsx-key */
-import { useEffect, useMemo, useState, memo } from "react";
+import { useEffect, useMemo, useState, memo } from 'react';
 import {
   useGlobalFilter,
   usePagination,
   useRowSelect,
   useSortBy,
   useTable,
-} from "react-table";
-import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+} from 'react-table';
+import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import {
   AiOutlineDoubleRight,
   AiOutlineDoubleLeft,
   AiOutlineRight,
   AiOutlineLeft,
-} from "react-icons/ai";
-import { MdOutlineMoreHoriz } from "react-icons/md";
-import { IoCopyOutline } from "react-icons/io5";
+} from 'react-icons/ai';
+import { MdOutlineMoreHoriz } from 'react-icons/md';
+import { IoCopyOutline } from 'react-icons/io5';
 
-import { Button } from "../components/ui/button";
-import { DownloadToExcel } from "../components/lib/XlsxAdmin";
-import { IoSearch } from "react-icons/io5";
-import { CiEdit } from "react-icons/ci";
-import { BsInfoSquare } from "react-icons/bs";
+import { Button } from '../components/ui/button';
+import { DownloadToExcel } from '../components/lib/XlsxAdmin';
+import { IoSearch } from 'react-icons/io5';
+import { CiEdit } from 'react-icons/ci';
+import { BsInfoSquare } from 'react-icons/bs';
 
-import { PiExportBold } from "react-icons/pi";
-import DebouncedInput from "../components/ui/DebouncedInput";
-import { statuses } from "../../../constants/statuses";
-import Popover from "../../../components/Popover";
+import { PiExportBold } from 'react-icons/pi';
+import DebouncedInput from '../components/ui/DebouncedInput';
+import { statuses } from '../../../constants/statuses';
+import Popover from '../../../components/Popover';
 
 const AdminTransactionsTable = ({ data, tableData, theme, setTheme }) => {
   const [pageNumber, setPageNumber] = useState(1);
   const [isGoToPageDisabled, setIsGoToPageDisabled] = useState(false);
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
   const [status, setStatus] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
 
   const columns = useMemo(() => {
     const baseColumns = [
       {
-        Header: "Order №",
-        accessor: "orderNo",
-        sortType: "basic",
+        Header: 'Order №',
+        accessor: 'orderNo',
+        sortType: 'basic',
       },
       {
-        Header: "Status",
-        accessor: "status",
-        sortType: "basic",
+        Header: 'Status',
+        accessor: 'status',
+        sortType: 'basic',
         Cell: ({ row }) => {
           const { status } = row.values;
           return (
@@ -59,31 +59,31 @@ const AdminTransactionsTable = ({ data, tableData, theme, setTheme }) => {
         },
       },
       {
-        Header: "From",
-        accessor: "from",
-        sortType: "basic",
+        Header: 'From',
+        accessor: 'from',
+        sortType: 'basic',
       },
       {
-        Header: "To",
-        accessor: "to",
-        sortType: "basic",
+        Header: 'To',
+        accessor: 'to',
+        sortType: 'basic',
       },
       {
-        Header: "Pin",
-        accessor: "pin",
-        sortType: "basic",
+        Header: 'Pin',
+        accessor: 'pin',
+        sortType: 'basic',
         Cell: ({ value }) => (value ? <div>{value}</div> : <div>-</div>),
       },
       {
-        Header: "Dispatcher ID",
-        accessor: "dispatcherId",
-        sortType: "basic",
+        Header: 'Dispatcher ID',
+        accessor: 'dispatcherId',
+        sortType: 'basic',
         Cell: ({ value }) => (value ? <div>{value}</div> : <div>-</div>),
       },
       {
-        Header: "Time left",
-        accessor: "timeLeft",
-        sortType: "basic",
+        Header: 'Time left',
+        accessor: 'timeLeft',
+        sortType: 'basic',
         Cell: ({ value }) => {
           const timeToLeft = renderTimeToLeft(value);
           return (
@@ -94,11 +94,12 @@ const AdminTransactionsTable = ({ data, tableData, theme, setTheme }) => {
         },
       },
       {
-        accessor: "id",
+        accessor: 'id',
         Cell: ({ value }) => {
           const getSelectedRowData = data?.find((item) => item._id === value);
-          const { userAddress, blenderyAddress, _id } = getSelectedRowData;
-
+          const { userAddress, blenderyAddress, _id, orderNo } =
+            getSelectedRowData;
+          const transactionInfo = getSelectedRowData;
           const copyToClipboard = (value) => {
             navigator.clipboard.writeText(value);
           };
@@ -109,7 +110,7 @@ const AdminTransactionsTable = ({ data, tableData, theme, setTheme }) => {
                 content={
                   <div className="flex flex-col text-[#111] font-normal">
                     <div
-                      onClick={() => copyToClipboard(_id)}
+                      onClick={() => copyToClipboard(orderNo)}
                       className="flex items-center p-2 gap-2 hover:bg-[#F6F6F6] cursor-pointer transition-all"
                     >
                       <IoCopyOutline size={24} />
@@ -129,7 +130,16 @@ const AdminTransactionsTable = ({ data, tableData, theme, setTheme }) => {
                       <IoCopyOutline size={24} />
                       <div>Copy blendery address</div>
                     </div>
-                    <div className="flex items-center p-2 gap-2 hover:bg-[#F6F6F6] cursor-pointer transition-all">
+                    <div
+                      className="flex items-center p-2 gap-2 hover:bg-[#F6F6F6] cursor-pointer transition-all"
+                      onClick={() => {
+                        localStorage.setItem(
+                          'txDataUpdate',
+                          JSON.stringify(transactionInfo)
+                        );
+                        localStorage.setItem('isUpdate', JSON.stringify(true));
+                      }}
+                    >
                       <CiEdit size={24} />
                       <div>Update</div>
                     </div>
@@ -208,7 +218,7 @@ const AdminTransactionsTable = ({ data, tableData, theme, setTheme }) => {
   };
 
   const handleToggleDropdown = () => {
-    setSearchTerm("");
+    setSearchTerm('');
     setIsStatusDropdownOpen(!isStatusDropdownOpen);
   };
 
@@ -226,7 +236,7 @@ const AdminTransactionsTable = ({ data, tableData, theme, setTheme }) => {
     const timeDifference = targetDate - currentTime;
 
     if (timeDifference <= 0) {
-      return (timeLeftFormatted = "00:00:00");
+      return (timeLeftFormatted = '00:00:00');
     }
 
     const hours = Math.floor(timeDifference / (1000 * 60 * 60));
@@ -235,9 +245,9 @@ const AdminTransactionsTable = ({ data, tableData, theme, setTheme }) => {
     );
     const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
 
-    timeLeftFormatted = `${String(hours).padStart(2, "0")}:${String(
+    timeLeftFormatted = `${String(hours).padStart(2, '0')}:${String(
       minutes
-    ).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    ).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 
     return timeLeftFormatted;
   };
@@ -250,7 +260,7 @@ const AdminTransactionsTable = ({ data, tableData, theme, setTheme }) => {
             <div className="flex justify-between">
               <div className="relative flex items-center gap-1">
                 <div className="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-600">
-                  <IoSearch color={"#4f46e5"} size={20} />
+                  <IoSearch color={'#4f46e5'} size={20} />
                 </div>
 
                 <DebouncedInput
@@ -259,7 +269,7 @@ const AdminTransactionsTable = ({ data, tableData, theme, setTheme }) => {
                   onFocus={() => {
                     if (status) {
                       setStatus(null);
-                      setGlobalFilter("");
+                      setGlobalFilter('');
                     }
                   }}
                   className="w-80 h-10 py-4 px-2 pl-10 pr-2 bg-white rounded-lg border border-solid border-[#E7E7E7] shadow-md outline-none box-border"
@@ -297,7 +307,7 @@ const AdminTransactionsTable = ({ data, tableData, theme, setTheme }) => {
                         </>
                       ) : (
                         <div className="flex w-full items-center justify-between">
-                          <span className="text-[#B4B4B4]">{"Status"}</span>
+                          <span className="text-[#B4B4B4]">{'Status'}</span>
                           {isStatusDropdownOpen ? (
                             <FaChevronUp size={16} />
                           ) : (
@@ -363,7 +373,7 @@ const AdminTransactionsTable = ({ data, tableData, theme, setTheme }) => {
                       {...column.getHeaderProps()}
                       className="px-6 py-4 text-base leading-6 font-medium text-[#636060]"
                     >
-                      <div className="flex">{column.render("Header")}</div>
+                      <div className="flex">{column.render('Header')}</div>
                     </th>
                   ))}
                 </tr>
@@ -380,7 +390,7 @@ const AdminTransactionsTable = ({ data, tableData, theme, setTheme }) => {
                           {...cell.getCellProps()}
                           className="whitespace-nowrap px-6 py-3"
                         >
-                          {cell.render("Cell")}
+                          {cell.render('Cell')}
                         </td>
                       );
                     })}
@@ -399,13 +409,13 @@ const AdminTransactionsTable = ({ data, tableData, theme, setTheme }) => {
             disabled={!canPreviousPage}
             className={`${
               !canPreviousPage
-                ? "cursor-not-allowed border border-solid border-[#BAB9C1]"
-                : "border border-solid border-[#5046E5]"
+                ? 'cursor-not-allowed border border-solid border-[#BAB9C1]'
+                : 'border border-solid border-[#5046E5]'
             } flex h-10 w-10 items-center justify-center rounded-lg p-2 m-0 shadow-none bg-none bg-transparent active:bg-transparent active:shadow-none`}
           >
             <AiOutlineDoubleLeft
               size={16}
-              color={!canPreviousPage ? "#BAB9C1" : "#5046E5"}
+              color={!canPreviousPage ? '#BAB9C1' : '#5046E5'}
             />
           </button>
           <button
@@ -413,13 +423,13 @@ const AdminTransactionsTable = ({ data, tableData, theme, setTheme }) => {
             disabled={!canPreviousPage}
             className={`${
               !canPreviousPage
-                ? "cursor-not-allowed border border-solid border-[#BAB9C1]"
-                : "border border-solid border-[#5046E5]"
+                ? 'cursor-not-allowed border border-solid border-[#BAB9C1]'
+                : 'border border-solid border-[#5046E5]'
             } ml-2 flex h-10 w-10 items-center justify-center rounded-lg p-2 m-0 shadow-none bg-none bg-transparent active:bg-transparent active:shadow-none`}
           >
             <AiOutlineLeft
               size={16}
-              color={!canPreviousPage ? "#BAB9C1" : "#5046E5"}
+              color={!canPreviousPage ? '#BAB9C1' : '#5046E5'}
             />
           </button>
           <span className="mx-6 text-base font-medium text-[#2C2C2C] ">
@@ -430,13 +440,13 @@ const AdminTransactionsTable = ({ data, tableData, theme, setTheme }) => {
             disabled={!canNextPage}
             className={` ${
               !canNextPage
-                ? "cursor-not-allowed border border-solid border-[#BAB9C1]"
-                : "border border-solid border-[#5046E5]"
+                ? 'cursor-not-allowed border border-solid border-[#BAB9C1]'
+                : 'border border-solid border-[#5046E5]'
             } m-0 mr-2 flex h-10 w-10 items-center justify-center rounded-lg p-2 shadow-none bg-none bg-transparent active:bg-transparent active:shadow-none`}
           >
             <AiOutlineRight
               size={16}
-              color={!canNextPage ? "#BAB9C1" : "#5046E5"}
+              color={!canNextPage ? '#BAB9C1' : '#5046E5'}
             />
           </button>
           <button
@@ -444,13 +454,13 @@ const AdminTransactionsTable = ({ data, tableData, theme, setTheme }) => {
             disabled={!canNextPage}
             className={`${
               !canNextPage
-                ? "cursor-not-allowed border border-solid border-[#BAB9C1]"
-                : "border border-solid border-[#5046E5]"
+                ? 'cursor-not-allowed border border-solid border-[#BAB9C1]'
+                : 'border border-solid border-[#5046E5]'
             } m-0 flex h-10 w-10 items-center justify-center rounded-lg p-2 shadow-none bg-none bg-transparent active:bg-transparent active:shadow-none`}
           >
             <AiOutlineDoubleRight
               size={16}
-              color={!canNextPage ? "#BAB9C1" : "#5046E5"}
+              color={!canNextPage ? '#BAB9C1' : '#5046E5'}
             />
           </button>
 
@@ -469,8 +479,8 @@ const AdminTransactionsTable = ({ data, tableData, theme, setTheme }) => {
               onClick={handleGoToPage}
               className={`m-0 ml-2 flex h-[40px] w-fit items-center justify-center rounded-md px-4 py-[10px] text-base font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 active:bg-[#5046E5] active:shadow-none ${
                 isGoToPageDisabled
-                  ? "cursor-not-allowed bg-[#BAB9C1] text-[#E1E1E1]"
-                  : "bg-[#5046E5] text-white"
+                  ? 'cursor-not-allowed bg-[#BAB9C1] text-[#E1E1E1]'
+                  : 'bg-[#5046E5] text-white'
               }`}
             >
               Go

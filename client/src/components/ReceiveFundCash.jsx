@@ -8,7 +8,7 @@ import {
 } from '../services/apiService';
 
 export const ReceiveFundCash = (props) => {
-  const { txData, setRefetchTxData } = props;
+  const { txData, setRefetchTxData, transactionRates } = props;
   const [showpin, setshowPin] = useState(false);
   const [blockChainData, setBlockChainData] = useState();
 
@@ -17,6 +17,15 @@ export const ReceiveFundCash = (props) => {
       id: txData?._id,
       status: 'Paid',
       percentageProgress: 4,
+      youSend: transactionRates?.youSend,
+      youGet: transactionRates?.youGet,
+      serviceFee: transactionRates?.serviceFee,
+      networkFee: transactionRates?.networkFee,
+      processingFee: transactionRates?.processingFee,
+      exchangeRate: transactionRates?.exchangeRate,
+      tValue: transactionRates?.tValue,
+      amount: transactionRates?.amount,
+      directValue: transactionRates?.directValue,
     };
     const response = await updateTransactionsAutomatically(userData);
 
@@ -79,9 +88,12 @@ export const ReceiveFundCash = (props) => {
                 blockchain: {txData?.fToken?.chain}
               </div>
               <div className="flex flex-row gap-2 mt-2">
-                <div className="cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]" onClick={() => {
-                  navigator.clipboard.writeText(txData?.blenderyAddress);
-                }}>
+                <div
+                  className="cursor-pointer flex flex-row justify-center items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-[70%]"
+                  onClick={() => {
+                    navigator.clipboard.writeText(txData?.blenderyAddress);
+                  }}
+                >
                   <div className="flex flex-row gap-2">
                     <RxCopy size={15} color="#ffffff" />
                     <div className="leading-[20px] inline-block">

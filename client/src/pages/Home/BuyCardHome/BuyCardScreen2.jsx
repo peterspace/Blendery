@@ -115,6 +115,7 @@ export const BuyCardScreen2 = (props) => {
                 service={service}
                 fValue={fValue}
                 fToken={fToken}
+                tToken={tToken}
                 fullName={fullName}
                 setFullName={setFullName}
                 bankName={bankName}

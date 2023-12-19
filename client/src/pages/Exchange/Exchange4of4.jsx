@@ -5,12 +5,7 @@ import { Timer } from '../../components/Timer';
 import { ConfirmFund } from '../../components/ConfirmFund';
 
 export const Exchange4of4 = (props) => {
-  const {
-    percentageProgress,
-    fTitle,
-    tTitle,
-    txData,
-  } = props;
+  const { percentageProgress, fTitle, tTitle, txData } = props;
 
   return (
     <div className="flex flex-col xl:flex-row justify-center">
@@ -27,10 +22,7 @@ export const Exchange4of4 = (props) => {
           </div>
 
           <div className="flex flex-col justify-start items-start xl:justify-center xl:items-center mt-6 xl:mt-0 gap-4">
-            <ConfirmFund
-              txData={txData}
-
-            />
+            <ConfirmFund txData={txData} />
           </div>
 
           <div className="flex-col xl:flex-row h-[374px]">
@@ -39,7 +31,12 @@ export const Exchange4of4 = (props) => {
                 <Timer txData={txData} />
               </div>
 
-              <Details fTitle={fTitle} tTitle={tTitle} txData={txData} />
+              <Details
+                fTitle={fTitle}
+                tTitle={tTitle}
+                txData={txData}
+                transactionRates={null}
+              />
             </div>
           </div>
         </div>

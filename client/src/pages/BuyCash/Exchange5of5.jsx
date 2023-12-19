@@ -5,13 +5,7 @@ import { Timer } from '../../components/Timer';
 import { VerifiedFundCash } from '../../components/VerifiedFundCash';
 
 export const Exchange5of5 = (props) => {
-  const {
-    percentageProgress,
-    fTitle,
-    tTitle,
-    txData,
-  } = props;
-
+  const { percentageProgress, fTitle, tTitle, txData } = props;
 
   return (
     <div className="flex flex-col xl:flex-row justify-center">
@@ -28,16 +22,19 @@ export const Exchange5of5 = (props) => {
           </div>
 
           <div className="flex flex-col justify-start items-start xl:justify-center xl:items-center mt-6 xl:mt-0 gap-4">
-            <VerifiedFundCash
-              txData={txData}
-            />
+            <VerifiedFundCash txData={txData} />
           </div>
 
           <div className="flex-col xl:flex-row h-[374px]">
             <div className="mb-[16px]">
               <Timer txData={txData} />
             </div>
-            <Details fTitle={fTitle} tTitle={tTitle} txData={txData} />
+            <Details
+              fTitle={fTitle}
+              tTitle={tTitle}
+              txData={txData}
+              transactionRates={null}
+            />
           </div>
         </div>
       ) : null}

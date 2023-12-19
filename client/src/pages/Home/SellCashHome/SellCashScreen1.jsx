@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
-import { BsCreditCard } from "react-icons/bs";
-import { BsCashStack } from "react-icons/bs";
-import { getTokenListExchange } from "../../../redux/features/token/tokenSlice";
-import { useDispatch } from "react-redux";
-import TokenModal from "../../../components/TokenModal";
+import { useState, useEffect } from 'react';
+import { BsCreditCard } from 'react-icons/bs';
+import { BsCashStack } from 'react-icons/bs';
+import { getTokenListExchange } from '../../../redux/features/token/tokenSlice';
+import { useDispatch } from 'react-redux';
+import TokenModal from '../../../components/TokenModal';
 
 export const SellCashScreen1 = (props) => {
   const {
@@ -127,14 +127,9 @@ export const SellCashScreen1 = (props) => {
   //====================================================================================
 
   async function nextFunc() {
-    if (paymentMethod === "cash") {
-      setService("sell");
-      setPercentageProgress(2);
-    }
-    if (paymentMethod === "card") {
-      setService("sell");
-      setPercentageProgress(2);
-    }
+    setService("sell");
+    setSubService("sellCash");
+    setPercentageProgress(2);
   }
 
   function openFromTokenModal() {
@@ -151,18 +146,17 @@ export const SellCashScreen1 = (props) => {
         <div className="flex flex-col w-[300px] md:w-[452px] gap-[8px]">
           <div className="grid grid-cols-2 gap-2 mt-2 rounded-lg shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] p-1 bg-gray-100 outline outline-lightslategray-300 outline-[1px]">
             <div
-              className={`flex flex-row justify-center items-center h-[49px] cursor-pointer focus:outline-none rounded
-                ${
-                  paymentMethod === "card"
-                    ? `text-white bg-bgPrimary hover:bg-bgPrimaryHover  focus:ring-4 focus:ring-blue-300 font-medium dark:bg-blue-600 dark:hover:bg-bgPrimary dark:focus:ring-bgPrimaryHover`
-                    : `text-bgPrimary bg-white border border-gray-200 hover:bg-gray-100 hover:text-bgPrimary focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700`
-                }
-                  `}
+              className={`${
+                paymentMethod === 'card'
+                  ? `flex flex-row justify-center items-center h-[49px] cursor-pointer text-white bg-bgPrimary hover:bg-bgPrimaryHover focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded dark:bg-blue-600 dark:hover:bg-bgPrimary dark:focus:ring-bgPrimaryHover`
+                  : `flex flex-row justify-center items-center h-[49px] cursor-pointer text-bgPrimary focus:outline-none bg-white rounded border border-gray-200 hover:bg-gray-100 hover:text-bgPrimary focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700`
+              }`}
               onClick={() => {
                 setPaymentMethod(paymentOptions[0]);
-                setSubService("sellCard");
+                setService('sell');
+                setSubService('sellCard');
                 localStorage.setItem(
-                  "paymentMethod",
+                  'paymentMethod',
                   JSON.stringify(paymentOptions[0])
                 );
               }}
@@ -174,18 +168,17 @@ export const SellCashScreen1 = (props) => {
             </div>
 
             <div
-              className={`flex flex-row justify-center items-center h-[49px] cursor-pointer focus:outline-none
-                ${
-                  paymentMethod === "cash"
-                    ? `text-white bg-bgPrimary hover:bg-bgPrimaryHover focus:ring-4 focus:ring-blue-300 font-medium rounded dark:bg-blue-600 dark:hover:bg-bgPrimary dark:focus:ring-bgPrimaryHover`
-                    : `text-bgPrimary  bg-white rounded border border-gray-200 hover:bg-gray-100 hover:text-bgPrimary focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700`
-                }
-                  `}
+              className={`${
+                paymentMethod === 'cash'
+                  ? `flex flex-row justify-center items-center h-[49px] cursor-pointer text-white bg-bgPrimary hover:bg-bgPrimaryHover focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded dark:bg-blue-600 dark:hover:bg-bgPrimary dark:focus:ring-bgPrimaryHover`
+                  : `flex flex-row justify-center items-center h-[49px] cursor-pointer text-bgPrimary focus:outline-none bg-white rounded border border-gray-200 hover:bg-gray-100 hover:text-bgPrimary focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700`
+              }`}
               onClick={() => {
                 setPaymentMethod(paymentOptions[1]);
-                setSubService("sellCash");
+                setService('sell');
+                setSubService('sellCash');
                 localStorage.setItem(
-                  "paymentMethod",
+                  'paymentMethod',
                   JSON.stringify(paymentOptions[1])
                 );
               }}
@@ -250,8 +243,8 @@ export const SellCashScreen1 = (props) => {
             ) : (
               <div className="flex flex-row justify-between">
                 <div className="h-3 py-2">
-                  1 {fToken?.symbol.toUpperCase()} ~{" "}
-                  {loadingExchangeRate ? "fetching rates" : exchangeRate}{" "}
+                  1 {fToken?.symbol.toUpperCase()} ~{' '}
+                  {loadingExchangeRate ? 'fetching rates' : exchangeRate}{' '}
                   {tToken?.symbol.toUpperCase()}
                 </div>
                 {/* <div className="h-3 py-2">{isToLoading
@@ -272,7 +265,7 @@ export const SellCashScreen1 = (props) => {
                     placeholder="0.1"
                     // value={`~ ${tValue}`}
                     // value={`~ ${1.675}`}
-                    value={loading ? "loading" : `~ ${tValue}`}
+                    value={loading ? 'loading' : `~ ${tValue}`}
                     disabled={true}
                   />
                 </div>
@@ -307,7 +300,7 @@ export const SellCashScreen1 = (props) => {
           </div>
         </div>
 
-        {paymentMethod === "cash" ? (
+        {paymentMethod === 'cash' ? (
           <div className="flex flex-col w-[300px] md:w-[452px] gap-[8px]">
             <div className="flex flex-row bg-bgSecondary rounded h-[62px] justify-between">
               <div className="w-[300px] md:w-[452px]">
@@ -386,9 +379,9 @@ export const SellCashScreen1 = (props) => {
             </div>
           </div>
         )}
-        {paymentMethod === "card" ? (
+        {paymentMethod === 'card' ? (
           <>
-            {country === "Russia" ? (
+            {country === 'Russia' ? (
               <div
                 className="flex flex-row justify-center items-center h-[49px] cursor-pointer text-white bg-bgPrimary hover:bg-bgPrimaryHover focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded dark:bg-blue-600 dark:hover:bg-bgPrimary dark:focus:ring-bgPrimaryHover"
                 onClick={nextFunc}
@@ -423,7 +416,7 @@ export const SellCashScreen1 = (props) => {
         allTokens={allTokensFrom}
         service={service}
         isNotCrypto={false}
-        title={"Select Token"}
+        title={'Select Token'}
       />
 
       {/* To Token Modal */}
@@ -435,7 +428,7 @@ export const SellCashScreen1 = (props) => {
         allTokens={allTokensTo}
         service={service}
         isNotCrypto={true}
-        title={"Select Currency"}
+        title={'Select Currency'}
       />
     </>
   );

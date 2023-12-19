@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useConnect } from "wagmi";
 import { TokenCardNetworks } from "./TokenCardNetworks";
 import { networksOptions } from "../constants";
 import { TokenCard } from "./TokenCard";
@@ -14,6 +15,8 @@ import {
   updateChain,
 } from "../redux/features/swap/swapSlice";
 import TokenModal from "./TokenModal";
+import WalletModal from "./WalletModal";
+import SlippageModal from "./SlippageModal";
 
 //android small = w-[320px]/ 352px
 //iphone = w-[340px]/ 372px
@@ -54,6 +57,11 @@ export const EstimatorDefi = (props) => {
   const { switchNetwork } = useSwitchNetwork();
   const { isConnected } = useAccount();
   const { disconnect } = useDisconnect();
+  const { connect, connectors } = useConnect();
+  const [activeConnection, setActiveConnection] = useState(
+    connectors && connectors[0]
+  );
+  console.log({ activeConnection: activeConnection });
 
   //================{CARDS}==================
   const [isNetworkPage, setIsNetworkPage] = useState(false);
@@ -67,6 +75,8 @@ export const EstimatorDefi = (props) => {
   const [isFromTokenModalOpen, setIsFromTokenModalOpen] = useState(false);
   const [isToTokenModalOpen, setToTokenModalOpen] = useState(false);
   const [isNetworkModalOpen, setIsNetworkModalOpen] = useState(false);
+  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
+  const [isSlippageModalOpen, setIsSlippageModalOpen] = useState(false);
 
   // console.log({ checkChain: checkChain });
 
@@ -191,6 +201,14 @@ export const EstimatorDefi = (props) => {
     setIsNetworkModalOpen(true);
   }
 
+  function openWalletModal() {
+    setIsWalletModalOpen(true);
+  }
+
+  function openSlippageModal() {
+    setIsSlippageModalOpen(true);
+  }
+
   const estimator = (
     <div className="flex justify-center rounded-lg bg-white shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[320px] xs:w-[340px] md:w-[500px] p-4">
       {isNetworkPage === false &&
@@ -208,9 +226,10 @@ export const EstimatorDefi = (props) => {
               <div className="flex flex-row">
                 <div
                   className="cursor-pointer flex flex-row justify-center items-center hover:opacity-90 text-white rounded p-2"
-                  onClick={() => {
-                    setIsSlippagePage(true);
-                  }}
+                  // onClick={() => {
+                  //   setIsSlippagePage(true);
+                  // }}
+                  onClick={openSlippageModal}
                 >
                   <IoMdSettings size={24} color="#4f46e5" />
                 </div>
@@ -427,9 +446,10 @@ export const EstimatorDefi = (props) => {
           {!isConnected && (
             <div
               className="flex flex-row justify-center items-center h-[49px] cursor-pointer text-white bg-bgPrimary hover:bg-bgPrimaryHover focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded dark:bg-blue-600 dark:hover:bg-bgPrimary dark:focus:ring-bgPrimaryHover"
-              onClick={() => {
-                setIsWalletPage(true);
-              }}
+              // onClick={() => {
+              //   setIsWalletPage(true);
+              // }}
+              onClick={openWalletModal}
             >
               Connect Wallet
             </div>
@@ -481,20 +501,33 @@ export const EstimatorDefi = (props) => {
           title={"Select Token"}
         />
 
-        {isNetworkPage === false &&
-        isFromTokenPage === false &&
-        isWalletPage === true &&
-        isSlippagePage === false &&
-        isToTokenPage === false ? (
-          <ConnectWalletCard setIsTokenPage={setIsWalletPage} />
-        ) : null}
-        {isNetworkPage === false &&
+        {/* Wallet Modal */}
+        <WalletModal
+          isTokenModalOpen={isWalletModalOpen}
+          setIsTokenModalOpen={setIsWalletModalOpen}
+          filteredTokens={connectors}
+          setToken={setActiveConnection}
+          allTokens={connectors}
+          service={service}
+          title={"Select Wallet"}
+        />
+        {/* Slippage Modal */}
+        <SlippageModal
+          isTokenModalOpen={isSlippageModalOpen}
+          setIsTokenModalOpen={setIsSlippageModalOpen}
+          filteredTokens={null}
+          setToken={null}
+          allTokens={null}
+          service={service}
+          title={"Settings"}
+        />
+        {/* {isNetworkPage === false &&
         isFromTokenPage === false &&
         isWalletPage === false &&
         isSlippagePage === true &&
         isToTokenPage === false ? (
           <SlippageCard setIsTokenPage={setIsSlippagePage} />
-        ) : null}
+        ) : null} */}
       </>
     </div>
   );

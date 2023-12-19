@@ -45,6 +45,9 @@ export const EstimatorBuyCard = (props) => {
   const [isFromTokenModalOpen, setIsFromTokenModalOpen] = useState(false);
   const [isToTokenModalOpen, setToTokenModalOpen] = useState(false);
 
+  const min = 15000;
+  const max = 150000;
+
   //============================================{Token selection}==============================
   useEffect(() => {
     if (allTokensFrom) {
@@ -93,6 +96,13 @@ export const EstimatorBuyCard = (props) => {
     setFromValue(ev.target.value);
   }
 
+  // function onFromValueChanged(ev) {
+  //   const value = Math.max(min, Math.min(max, Number(ev.target.value)));
+
+  //   setFromValue(value);
+  // }
+
+
   function openFromTokenModal() {
     setIsFromTokenModalOpen(true);
   }
@@ -100,6 +110,8 @@ export const EstimatorBuyCard = (props) => {
   function openToTokenModal() {
     setToTokenModalOpen(true);
   }
+
+
 
   const estimator = (
     <div className="flex justify-center rounded-lg bg-white shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[320px] xs:w-[340px] md:w-[500px] p-4">

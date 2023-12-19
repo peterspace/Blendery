@@ -4,12 +4,7 @@ import { DetailsCard } from '../../components/DetailsCard';
 import { ConfirmFundCard } from '../../components/ConfirmFundCard';
 
 export const Exchange4of4 = (props) => {
-  const {
-    percentageProgress,
-    fTitle,
-    tTitle,
-    txData,
-  } = props;
+  const { percentageProgress, fTitle, tTitle, txData } = props;
   return (
     <div className="flex flex-col xl:flex-row justify-center">
       {txData ? (
@@ -29,7 +24,12 @@ export const Exchange4of4 = (props) => {
           </div>
 
           <div className="flex-col xl:flex-row h-[374px]">
-            <DetailsCard fTitle={fTitle} tTitle={tTitle} txData={txData} />
+            <DetailsCard
+              fTitle={fTitle}
+              tTitle={tTitle}
+              txData={txData}
+              transactionRates={null}
+            />
           </div>
         </div>
       ) : null}

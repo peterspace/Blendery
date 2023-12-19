@@ -25,6 +25,7 @@ const {
   orderCompleted,
   getTokenExchangeRate,
   getTransactionRate,
+  updateTransactionRatesById,
   //====={transactions by services and subservices}===========================
   getUserExchange,
   getUserDefi,
@@ -64,6 +65,9 @@ const {
 
 const {
   updateOneBlockchainTransactionById,
+  updateOnePaidTransactionById,
+  getMasterWallets,
+  getMasterWalletsAdmin,
 } = require('../controllers/hdWalletController.js');
 //updateOneBlockchainTransactionById
 
@@ -119,6 +123,7 @@ router.post('/orderConfirmation', orderConfirmation);
 router.post('/orderCompleted', orderCompleted);
 router.post('/getTokenExchangeRate', getTokenExchangeRate);
 router.post('/getTransactionRate', getTransactionRate);
+router.route('/updateTransactionRatesById').patch(updateTransactionRatesById);
 
 //============{transactions by services and subservices}============
 
@@ -141,11 +146,16 @@ router.route('/getAdminBuyCard').get(protect, isAdmin, getAdminBuyCard);
 router.route('/getAdminSellCash').get(protect, isAdmin, getAdminSellCash);
 router.route('/getAdminSellCard').get(protect, isAdmin, getAdminSellCard);
 
-//======================================================================
+//==============================={frpm hdWallets}=======================================
 router.patch(
   '/updateOneBlockchainTransactionById',
   updateOneBlockchainTransactionById
 );
+router.patch('/updateOnePaidTransactionById', updateOnePaidTransactionById);
+router.get('/getMasterWallets', getMasterWallets);
+router
+  .route('/getMasterWalletsAdmin')
+  .get(protect, isAdmin, getMasterWalletsAdmin); // admin protected route
 
 //============================{STORE}======================================================
 router.post('/createStore', protect, createStore);

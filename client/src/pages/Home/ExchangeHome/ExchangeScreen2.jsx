@@ -72,6 +72,7 @@ export const ExchangeScreen2 = (props) => {
             userAddress={userAddress}
             service={service}
             fToken={fToken}
+            tToken={tToken}
             fValue={fValue}
           />
         </div>

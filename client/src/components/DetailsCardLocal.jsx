@@ -65,7 +65,7 @@ export const DetailsCardLocal = (props) => {
               {tTitle}
             </div>
             <div className="font-bold text-lg leading-[24px] text-darkslategray-200">
-              {tValue} {tToken?.symbol}
+              {youGet} {tToken?.symbol}
             </div>
           </div>
         </div>

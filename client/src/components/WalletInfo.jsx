@@ -10,6 +10,7 @@ export const WalletInfo = (props) => {
     service,
     fValue,
     fToken,
+    tToken,
   } = props;
 
   const { values, handleChange, handleSubmit, touched, errors } = useFormik({
@@ -53,17 +54,43 @@ export const WalletInfo = (props) => {
           </div>
 
           <div className="flex flex-col w-[320px] xs:w-[340px] md:w-[452px] gap-[8px]">
-            <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between">
+            <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between mb-5">
               <div className="md:w-[452px] w-[320px] xs:w-[340px]">
                 <div className="ml-2 mt-2 text-xs leading-[18px] text-darkslategray-200">
-                  Recipient address
+                  Sending address
+                </div>
+                <input
+                  id="senderAddress"
+                  name="senderAddress"
+                  type="text"
+                  className="ml-2 text-[12px] md:text-[16px] leading-[24px] text-darkslategray-200 inline-block w-[90%] outline-none bg-whitesmoke-100 placeholder-darkgray-100"
+                  placeholder={`Enter your ${fToken?.symbol.toUpperCase()} sending address`}
+                  // value={values.senderAddress}
+                  // onChange={handleChange}
+                />
+                <div>
+                  {/* {touched.senderAddress && errors.senderAddress ? (
+                    <div className="mt-4 text-[#ef4444]">
+                      {errors.senderAddress}
+                    </div>
+                  ) : null} */}
+                </div>
+              </div>
+              <div className="cursor-pointer mr-2 flex justify-center items-center w-[18px] h-[64px] overflow-hidden">
+                <MdQrCodeScanner size={15} />
+              </div>
+            </div>
+            <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between mb-5">
+              <div className="md:w-[452px] w-[320px] xs:w-[340px]">
+                <div className="ml-2 mt-2 text-xs leading-[18px] text-darkslategray-200">
+                  Receiving address
                 </div>
                 <input
                   id="recipientAddress"
                   name="recipientAddress"
                   type="text"
                   className="ml-2 text-[12px] md:text-[16px] leading-[24px] text-darkslategray-200 inline-block w-[90%] outline-none bg-whitesmoke-100 placeholder-darkgray-100"
-                  placeholder="0x05301d500C789bd5..."
+                  placeholder={`Enter your ${tToken?.symbol.toUpperCase()} receiving address`}
                   value={values.recipientAddress}
                   onChange={handleChange}
                 />

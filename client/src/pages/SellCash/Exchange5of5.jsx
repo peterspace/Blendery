@@ -45,7 +45,7 @@ export const Exchange5of5 = (props) => {
             <div className="mb-[16px]">
               <Timer txData={txData} />
             </div>
-            <DetailsCash fTitle={fTitle} tTitle={tTitle} txData={txData} />
+            <DetailsCash fTitle={fTitle} tTitle={tTitle} txData={txData} transactionRates={null}/>
           </div>
         </div>
       ) : null}

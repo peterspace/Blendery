@@ -6,7 +6,10 @@ import { Exchange5of5 } from './Exchange5of5';
 import { Footer } from '../../components/Footer';
 import { useDispatch, useSelector } from 'react-redux';
 import { getTransactionByTxIdInternal } from '../../redux/features/transaction/transactionSlice';
-import { getTransactionByTxIdService } from '../../services/apiService';
+import {
+  getTransactionByTxIdService,
+  updateOnePaidTransactionByIdService,
+} from '../../services/apiService';
 
 export const BuyCash = (props) => {
   const { mode, user, service, subService, setTxInfo, txInfo } = props;
@@ -28,6 +31,24 @@ export const BuyCash = (props) => {
   const [refetchTxData, setRefetchTxData] = useState(false);
   const [fTitle, setFTitle] = useState('You give');
   const [tTitle, setTTitle] = useState('You get');
+
+  const isReceivedL = localStorage.getItem("isReceivedBuyCash")
+  ? JSON.parse(localStorage.getItem("isReceivedBuyCash"))
+  : true;
+
+const [isReceived, setIsReceived] = useState(isReceivedL);
+console.log({ isReceived: isReceived });
+
+const [paymentResult, setPaymentResult] = useState();
+console.log({ paymentResult: paymentResult });
+
+useEffect(() => {
+  if (isReceived) {
+    localStorage.setItem("isReceivedBuyCash", JSON.stringify(isReceived));
+  }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [isReceived]);
   //====================================================================================================
 
   useEffect(() => {
@@ -51,6 +72,42 @@ export const BuyCash = (props) => {
       setTxInfo(response);
     }
   };
+
+
+
+  //====================={Pay user automatically}====================================
+  // useEffect(() => {
+  //   if (txData?.status === 'Received') {
+  //     updatePaidTransaction();
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [txData]);
+
+  // async function updatePaidTransaction() {
+  //   const userData = {
+  //     id: txData?._id,
+  //   };
+  //   await updateOnePaidTransactionByIdService(userData);
+  // }
+
+    //====================={Pay user automatically}====================================
+    useEffect(() => {
+      if (txData?.status === "Received" && isReceived) {
+        updatePaidTransaction();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [txData, isReceived]);
+  
+    async function updatePaidTransaction() {
+      const userData = {
+        id: txData?._id,
+      };
+      const response = await updateOnePaidTransactionByIdService(userData);
+      if (response) {
+        setPaymentResult(response);
+        setIsReceived(false);
+      }
+    }
 
   if (!user?.token) {
     return <Navigate to="/auth" />;

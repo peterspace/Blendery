@@ -10,6 +10,7 @@ export const CashInfo = (props) => {
     service,
     fValue,
     fToken,
+    tToken,
     telegram,
     setTelegram,
   } = props;
@@ -63,60 +64,65 @@ export const CashInfo = (props) => {
           </div>
 
           <div className="flex flex-col w-[320px] xs:w-[340px] md:w-[452px] gap-3">
-            {/* <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between">
-            <div className="md:w-[452px] w-[320px] xs:w-[340px]">
-              <div className="ml-2 mt-2 text-xs leading-[18px] text-darkslategray-200">
-                City
-              </div>
-              <div className="ml-2 flex flex-row gap-[8px] items-center w-[320px] xs:w-[340px] md:w-[452px] mt-[13px]">
-                <div className="mr-4 w-[320px] xs:w-[340px] md:w-[452px]">
-                  <select
-                    name="city"
-                    className={`[border:none] outline-none w-full text-[12px] md:text-[16px] leading-[24px] text-darkslategray-200 inline-block bg-[transparent]`}
-                    value={city}
-                    onChange={(ev) => setCity(ev.target.value)}
-                  >
-                    {cities &&
-                      cities.map((city, index) => (
-                        <option key={index} value={city?.name}>
-                          {city?.name}
-                        </option>
-                      ))}
-                  </select>
+
+            {service === 'buy' && (
+              <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between mb-5">
+                <div className="md:w-[452px] w-[320px] xs:w-[340px]">
+                  <div className="ml-2 mt-2 text-xs leading-[18px] text-darkslategray-200">
+                    Receiving wallet address
+                  </div>
+                  <input
+                    id="recipientAddress"
+                    name="recipientAddress"
+                    type="text"
+                    className="ml-2 text-[12px] md:text-[16px] leading-[24px] text-darkslategray-200 inline-block w-[90%] outline-none bg-whitesmoke-100 placeholder-darkgray-100"
+                    placeholder={`Enter your ${tToken?.symbol.toUpperCase()} receiving address`}
+                    value={values.recipientAddress}
+                    onChange={handleChange}
+                  />
+                  <div>
+                    {touched.recipientAddress && errors.recipientAddress ? (
+                      <div className="mt-4 text-[#ef4444]">
+                        {errors.recipientAddress}
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+                <div className="cursor-pointer mr-2 flex justify-center items-center w-[18px] h-[64px] overflow-hidden">
+                  <MdQrCodeScanner size={15} />
                 </div>
               </div>
-            </div>
-            <div className="cursor-pointer mr-2 flex justify-center items-center w-[18px] h-[64px] overflow-hidden">
-              <MdQrCodeScanner size={15} />
-            </div>
-          </div> */}
-            <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between mb-5">
-              <div className="md:w-[452px] w-[320px] xs:w-[340px]">
-                <div className="ml-2 mt-2 text-xs leading-[18px] text-darkslategray-200">
-                  Recipient address
+            )}
+
+            {service === 'sell' && (
+              <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between mb-5">
+                <div className="md:w-[452px] w-[320px] xs:w-[340px]">
+                  <div className="ml-2 mt-2 text-xs leading-[18px] text-darkslategray-200">
+                    Sending address
+                  </div>
+                  <input
+                    id="recipientAddress"
+                    name="recipientAddress"
+                    type="text"
+                    className="ml-2 text-[12px] md:text-[16px] leading-[24px] text-darkslategray-200 inline-block w-[90%] outline-none bg-whitesmoke-100 placeholder-darkgray-100"
+                    placeholder={`Enter your ${fToken?.symbol.toUpperCase()} sending address`}
+                    value={values.recipientAddress}
+                    onChange={handleChange}
+                  />
+                  <div>
+                    {touched.recipientAddress && errors.recipientAddress ? (
+                      <div className="mt-4 text-[#ef4444]">
+                        {errors.recipientAddress}
+                      </div>
+                    ) : null}
+                  </div>
                 </div>
-                <input
-                  id="recipientAddress"
-                  name="recipientAddress"
-                  type="text"
-                  className="ml-2 text-[12px] md:text-[16px] leading-[24px] text-darkslategray-200 inline-block w-[90%] outline-none bg-whitesmoke-100 placeholder-darkgray-100"
-                  placeholder="0x05301d500C789bd5..."
-                  value={values.recipientAddress}
-                  onChange={handleChange}
-                  // onChange={(e) => setUserAddress(e.target.value)}
-                />
-                <div>
-                  {touched.recipientAddress && errors.recipientAddress ? (
-                    <div className="mt-4 text-[#ef4444]">
-                      {errors.recipientAddress}
-                    </div>
-                  ) : null}
+                <div className="cursor-pointer mr-2 flex justify-center items-center w-[18px] h-[64px] overflow-hidden">
+                  <MdQrCodeScanner size={15} />
                 </div>
               </div>
-              <div className="cursor-pointer mr-2 flex justify-center items-center w-[18px] h-[64px] overflow-hidden">
-                <MdQrCodeScanner size={15} />
-              </div>
-            </div>
+            )}
+
             <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between mb-5">
               <div className="">
                 <div className="ml-2 mt-2 text-xs leading-[18px] text-darkslategray-200">

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 export const DetailsCash = (props) => {
-  const { fTitle, tTitle, txData } = props;
+  const { fTitle, tTitle, txData, transactionRates } = props;
   const details = (
     <div className="flex justify-center rounded-lg bg-white shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[276px] p-4">
       <div className="flex flex-col gap-[24px]">
@@ -31,7 +31,10 @@ export const DetailsCash = (props) => {
               Exchange rate
             </div>
             <div className="font-bold text-lg leading-[24px] text-darkslategray-200">
-              {txData?.exchangeRate} {txData?.tToken?.symbol.toUpperCase()}
+              {transactionRates
+                ? transactionRates?.exchangeRate
+                : txData?.exchangeRate}{' '}
+              {txData?.tToken?.symbol.toUpperCase()}
             </div>
           </div>
           <div className="ml-2">
@@ -39,7 +42,10 @@ export const DetailsCash = (props) => {
               Service fee (0.25%)
             </div>
             <div className="font-bold text-lg leading-[24px] text-darkslategray-200">
-              {txData?.serviceFee} {txData?.tToken?.symbol.toUpperCase()}
+              {transactionRates
+                ? transactionRates?.serviceFee
+                : txData?.serviceFee}{' '}
+              {txData?.tToken?.symbol.toUpperCase()}
             </div>
           </div>
           <div className="ml-2">
@@ -47,7 +53,10 @@ export const DetailsCash = (props) => {
               Processing fee
             </div>
             <div className="font-bold text-lg leading-[24px] text-darkslategray-200">
-              {txData?.networkFee} {txData?.tToken?.symbol.toUpperCase()}
+              {transactionRates
+                ? transactionRates?.networkFee
+                : txData?.networkFee}{' '}
+              {txData?.tToken?.symbol.toUpperCase()}
             </div>
           </div>
           <div className="flex bg-lightslategray-300 w-[276px] h-px" />
@@ -56,7 +65,8 @@ export const DetailsCash = (props) => {
               {tTitle}
             </div>
             <div className="font-bold text-lg leading-[24px] text-darkslategray-200">
-              {txData?.tValue} {txData?.tToken?.symbol.toUpperCase()}
+              {transactionRates ? transactionRates?.tValue : txData?.tValue}{' '}
+              {txData?.tToken?.symbol.toUpperCase()}
             </div>
           </div>
         </div>

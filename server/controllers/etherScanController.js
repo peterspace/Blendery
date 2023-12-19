@@ -68,7 +68,14 @@ const getNativeTransactionToBlendery = async (blenderyAddress, value) => {
 
     let transaction = {};
 
-    let l = allData[0];
+    let allIndex = allData.length;
+
+    let lastIndex = allIndex - 1;
+    let l = allData[lastIndex]; // last/most recent transaction received
+
+
+    // let l = allData[0]; // first transaction
+
     let amount = l.value;
     let valueFormatted = ethers.utils.formatEther(amount.toString()).toString();
 
@@ -177,7 +184,12 @@ const getERC20TransactionToBlendery = async (
 
     let transaction = {};
 
-    let l = allData[0];
+    let allIndex = allData.length;
+
+    let lastIndex = allIndex - 1;
+    let l = allData[lastIndex]; // last/most recent transaction received
+
+    // let l = allData[0]; // first transaction
     let amount = l.value;
     let decimals = l.tokenDecimal;
     let valueFormatted = ethers.utils

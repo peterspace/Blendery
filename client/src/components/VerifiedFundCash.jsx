@@ -55,6 +55,7 @@ export const VerifiedFundCash = (props) => {
     localStorage.removeItem('percentageProgress');
     localStorage.removeItem('blockchainNetworkE');
     localStorage.removeItem('provider');
+    localStorage.removeItem('isReceivedBuyCash');
     dispatch(getTransactionByTxIdInternal(null));
     navigate('/');
   }

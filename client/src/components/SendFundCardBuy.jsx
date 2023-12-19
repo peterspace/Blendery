@@ -30,14 +30,32 @@ export const Providers = (props) => {
 };
 
 export const SendFundCardBuy = (props) => {
-  const { txData } = props;
+  const { txData, transactionRates } = props;
 
   //========{begin to monitor transaction after this click}=========================
+  // const updateTransaction = async () => {
+  //   const userData = {
+  //     id: txData?._id,
+  //     status: 'Paid',
+  //     percentageProgress: 4,
+  //   };
+  //   await updateTransactionsAutomatically(userData);
+  // };
+
   const updateTransaction = async () => {
     const userData = {
       id: txData?._id,
       status: 'Paid',
       percentageProgress: 4,
+      youSend: transactionRates?.youSend,
+      youGet: transactionRates?.youGet,
+      serviceFee: transactionRates?.serviceFee,
+      networkFee: transactionRates?.networkFee,
+      processingFee: transactionRates?.processingFee,
+      exchangeRate: transactionRates?.exchangeRate,
+      tValue: transactionRates?.tValue,
+      amount: transactionRates?.amount,
+      directValue: transactionRates?.directValue,
     };
     await updateTransactionsAutomatically(userData);
   };
@@ -129,9 +147,20 @@ export const SendFundCardBuy = (props) => {
           }}
         >
           <span className="flex flex-row ml-6">
-            {txData?.blenderyCardNumber}
+          Card Number: {txData?.blenderyCardNumber}
           </span>
           <RxCopy size={15} color="#ffffff" />
+        </div>
+
+        <div
+          className="cursor-pointer flex flex-row justify-center gap-2 items-center bg-bgPrimary hover:opacity-90 text-white h-[49px] shrink-0 rounded w-full"
+          // onClick={() => {
+          //   navigator.clipboard.writeText(txData?.blenderyCardNumber);
+          // }}
+        >
+          <span className="flex flex-row ml-6">
+           Card Holder Name: Jason Mayor
+          </span>
         </div>
 
         <div className="flex bg-lightslategray-300 md:w-[452px] w-[370px] h-px" />

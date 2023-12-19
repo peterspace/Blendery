@@ -60,7 +60,6 @@ export const VerifiedReceiveFundCash = (props) => {
       localStorage.removeItem('blockchainNetworkE');
       localStorage.removeItem('provider');
     dispatch(getTransactionByTxIdInternal(null));
-
     navigate('/');
   }
 

@@ -17,8 +17,7 @@ const blockchainUrlMainnet =
 const blockchainUrlTest = '';
 const blockchainUrlEndpoint = blockchainUrlMainnet;
 
-const blockchainUrlBitcoinMainnet =
-'https://blockstream.info/tx';
+const blockchainUrlBitcoinMainnet = 'https://blockstream.info/tx';
 const blockchainUrlBitcoinTest = 'https://blockstream.info/testnet/tx';
 const blockchainUrlBitcoinEndpoint = blockchainUrlBitcoinTest;
 //==============================================={Etherscan native}==================================================
@@ -252,17 +251,17 @@ const getBitcoinNativeTransactionToBlenderyWithUserAddress = async (
   }
 };
 
-const getBitcoinNativeTransactionToBlenderyWithOutUserAddress = async (
+const getBitcoinNativeTransactionToBlenderyWithOutUserAddress1 = async (
   blenderyAddress,
   value
 ) => {
   let expectedValue = value;
 
-  console.log({expectedValue: expectedValue})
+  console.log({ expectedValue: expectedValue });
 
   let targetData = [];
   let newResult = await getSpecificReceivedTransactions(blenderyAddress); //4
-  console.log({newResult: newResult})
+  console.log({ newResult: newResult });
 
   if (newResult.length > 0) {
     newResult?.map(async (m) => {
@@ -274,6 +273,37 @@ const getBitcoinNativeTransactionToBlenderyWithOutUserAddress = async (
   }
   if (targetData.length > 0) {
     return targetData[0];
+  }
+};
+
+const getBitcoinNativeTransactionToBlenderyWithOutUserAddress = async (
+  blenderyAddress,
+  value
+) => {
+  let expectedValue = value;
+
+  console.log({ expectedValue: expectedValue });
+
+  let targetData = [];
+  let newResult = await getSpecificReceivedTransactions(blenderyAddress); //4
+  console.log({ newResult: newResult });
+
+  if (newResult.length > 0) {
+    newResult?.map(async (m) => {
+      if (m?.amount === expectedValue) {
+        console.log({ expectedTxnew: m });
+        targetData.push(m);
+      }
+    });
+  }
+  if (targetData.length > 0) {
+    let allIndex = targetData.length;
+
+    let lastIndex = allIndex - 1;
+
+    return targetData[lastIndex]; // last/most recent transaction received
+
+    // return targetData[0];
   }
 };
 
@@ -338,3 +368,122 @@ module.exports = {
   getBitcoinNativeTransactionToBlenderyWithUserAddress,
   getBitcoinNativeTransactionToBlenderyWithOutUserAddress,
 };
+
+//getBitcoinNativeTransactionToBlenderyWithOutUserAddress
+//==============================================================================================
+// Server Running on port 4000
+// {
+//   newResult: [
+//     {
+//       txId: '14b34592a230baa434c391ed05cf97e9911629ff4f38afcc535b8696d448fa98',
+//       toAddress: 'mwZDqNNGFJLxEGWq2nHtqgUH1nm1dW2TYk',
+//       amountRaw: 4167182,
+//       amount: 0.04167182,
+//       blockchainUrl: 'https://blockstream.info/testnet/tx/14b34592a230baa434c391ed05cf97e9911629ff4f38afcc535b8696d448fa98'
+//     },
+//     {
+//       txId: '4d4a068798617b5017a7f48ab555f744e452cea22c8beb2f2ed6b27cc89456e3',
+//       toAddress: 'mwZDqNNGFJLxEGWq2nHtqgUH1nm1dW2TYk',
+//       amountRaw: 10000,
+//       amount: 0.0001,
+//       blockchainUrl: 'https://blockstream.info/testnet/tx/4d4a068798617b5017a7f48ab555f744e452cea22c8beb2f2ed6b27cc89456e3'
+//     },
+//     {
+//       txId: '8d8ae60cca75cd99f101ed1ecdb30d29073635e18028a39edd59658aca88170e',
+//       toAddress: 'mwZDqNNGFJLxEGWq2nHtqgUH1nm1dW2TYk',
+//       amountRaw: 5145518,
+//       amount: 0.05145518,
+//       blockchainUrl: 'https://blockstream.info/testnet/tx/8d8ae60cca75cd99f101ed1ecdb30d29073635e18028a39edd59658aca88170e'
+//     },
+//     {
+//       txId: 'd20c30e3663b8590babac0369babcee40f98d77ee246b4339186c802e4d8a5ce',
+//       toAddress: 'mwZDqNNGFJLxEGWq2nHtqgUH1nm1dW2TYk',
+//       amountRaw: 10000,
+//       amount: 0.0001,
+//       blockchainUrl: 'https://blockstream.info/testnet/tx/d20c30e3663b8590babac0369babcee40f98d77ee246b4339186c802e4d8a5ce'
+//     },
+//     {
+//       txId: '001c0541c448ad5203b82c4726c33fff176a9925c55039ca9dd46633faad4739',
+//       toAddress: 'mwZDqNNGFJLxEGWq2nHtqgUH1nm1dW2TYk',
+//       amountRaw: 2458,
+//       amount: 0.00002458,
+//       blockchainUrl: 'https://blockstream.info/testnet/tx/001c0541c448ad5203b82c4726c33fff176a9925c55039ca9dd46633faad4739'
+//     },
+//     {
+//       txId: 'd347ef9d8600b94720e84d5657e2b146acbcd96ec417845b817fe5e8235babf5',
+//       toAddress: 'mwZDqNNGFJLxEGWq2nHtqgUH1nm1dW2TYk',
+//       amountRaw: 3715,
+//       amount: 0.00003715,
+//       blockchainUrl: 'https://blockstream.info/testnet/tx/d347ef9d8600b94720e84d5657e2b146acbcd96ec417845b817fe5e8235babf5'
+//     },
+//     {
+//       txId: '3574728a269f852e403fd7c3759affa09dd326a9b28c4acf76e5ebf78da6d23a',
+//       toAddress: 'mwZDqNNGFJLxEGWq2nHtqgUH1nm1dW2TYk',
+//       amountRaw: 4972,
+//       amount: 0.00004972,
+//       blockchainUrl: 'https://blockstream.info/testnet/tx/3574728a269f852e403fd7c3759affa09dd326a9b28c4acf76e5ebf78da6d23a'
+//     },
+//     {
+//       txId: 'f98d1676b7bf6600e6331b880c8f8fe0534f2aaaa086e00bc6c0a34988a0dd33',
+//       toAddress: 'mwZDqNNGFJLxEGWq2nHtqgUH1nm1dW2TYk',
+//       amountRaw: 6229,
+//       amount: 0.00006229,
+//       blockchainUrl: 'https://blockstream.info/testnet/tx/f98d1676b7bf6600e6331b880c8f8fe0534f2aaaa086e00bc6c0a34988a0dd33'
+//     },
+//     {
+//       txId: 'cd5fae1389a17e2991d0329be79763db89fa19c92eccc2b2dd7f60b03f1f4186',
+//       toAddress: 'mwZDqNNGFJLxEGWq2nHtqgUH1nm1dW2TYk',
+//       amountRaw: 8743,
+//       amount: 0.00008743,
+//       blockchainUrl: 'https://blockstream.info/testnet/tx/cd5fae1389a17e2991d0329be79763db89fa19c92eccc2b2dd7f60b03f1f4186'
+//     },
+//     {
+//       txId: 'ad6f20b93731b3d1f16d0589c916bcc64f784bd221deaa885fd7f57a34596e04',
+//       toAddress: 'mwZDqNNGFJLxEGWq2nHtqgUH1nm1dW2TYk',
+//       amountRaw: 7486,
+//       amount: 0.00007486,
+//       blockchainUrl: 'https://blockstream.info/testnet/tx/ad6f20b93731b3d1f16d0589c916bcc64f784bd221deaa885fd7f57a34596e04'
+//     },
+//     {
+//       txId: '5229ff374b04b0aa69f34b608c6ec1f2fda712b73e6cd1a29699b8b0f2ad911a',
+//       toAddress: 'mwZDqNNGFJLxEGWq2nHtqgUH1nm1dW2TYk',
+//       amountRaw: 10000,
+//       amount: 0.0001,
+//       blockchainUrl: 'https://blockstream.info/testnet/tx/5229ff374b04b0aa69f34b608c6ec1f2fda712b73e6cd1a29699b8b0f2ad911a'
+//     }
+//   ]
+// }
+// {
+//   expectedTxnew: {
+//     txId: '4d4a068798617b5017a7f48ab555f744e452cea22c8beb2f2ed6b27cc89456e3',
+//     toAddress: 'mwZDqNNGFJLxEGWq2nHtqgUH1nm1dW2TYk',
+//     amountRaw: 10000,
+//     amount: 0.0001,
+//     blockchainUrl: 'https://blockstream.info/testnet/tx/4d4a068798617b5017a7f48ab555f744e452cea22c8beb2f2ed6b27cc89456e3'
+//   }
+// }
+// {
+//   expectedTxnew: {
+//     txId: 'd20c30e3663b8590babac0369babcee40f98d77ee246b4339186c802e4d8a5ce',
+//     toAddress: 'mwZDqNNGFJLxEGWq2nHtqgUH1nm1dW2TYk',
+//     amountRaw: 10000,
+//     amount: 0.0001,
+//     blockchainUrl: 'https://blockstream.info/testnet/tx/d20c30e3663b8590babac0369babcee40f98d77ee246b4339186c802e4d8a5ce'
+//   }
+// }
+// {
+//   expectedTxnew: {
+//     txId: '5229ff374b04b0aa69f34b608c6ec1f2fda712b73e6cd1a29699b8b0f2ad911a',
+//     toAddress: 'mwZDqNNGFJLxEGWq2nHtqgUH1nm1dW2TYk',
+//     amountRaw: 10000,
+//     amount: 0.0001,
+//     blockchainUrl: 'https://blockstream.info/testnet/tx/5229ff374b04b0aa69f34b608c6ec1f2fda712b73e6cd1a29699b8b0f2ad911a'
+//   }
+// }
+// {
+//   txId: '5229ff374b04b0aa69f34b608c6ec1f2fda712b73e6cd1a29699b8b0f2ad911a',
+//   toAddress: 'mwZDqNNGFJLxEGWq2nHtqgUH1nm1dW2TYk',
+//   amountRaw: 10000,
+//   amount: 0.0001,
+//   blockchainUrl: 'https://blockstream.info/testnet/tx/5229ff374b04b0aa69f34b608c6ec1f2fda712b73e6cd1a29699b8b0f2ad911a'
+// }

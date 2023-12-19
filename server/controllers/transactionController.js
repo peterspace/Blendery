@@ -1,27 +1,22 @@
-const asyncHandler = require('express-async-handler');
-const jwt = require('jsonwebtoken');
-const dotenv = require('dotenv').config();
-const { ethers } = require('ethers');
+const asyncHandler = require("express-async-handler");
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv").config();
+const { ethers } = require("ethers");
+const User = require("../models/User.js");
+const Transaction = require("../models/transactionModel");
+const Store = require("../models/store.js");
+const StoreRecovery = require("../models/StoreRecovery.js");
+const sendEmail = require("../utils/sendEmail");
+const otpGenerator = require("otp-generator");
 
-const User = require('../models/User.js');
-// const Manager = require('../models/ManagerModel');
-
-const Transaction = require('../models/transactionModel');
-const Store = require('../models/store.js');
-const StoreRecovery = require('../models/StoreRecovery.js');
-const sendEmail = require('../utils/sendEmail');
-const otpGenerator = require('otp-generator');
-const TokenBucketRateLimiter = require('./TokenBucketRateLimiter.js');
-const { RateLimiter } = require('limiter');
-
-const axios = require('axios');
+const axios = require("axios");
 
 const {
   parseEther,
   formatEther,
   parseUnits,
   formatUnits,
-} = require('@ethersproject/units');
+} = require("@ethersproject/units");
 
 const {
   addBitcoinHDWalletAdmin,
@@ -30,16 +25,16 @@ const {
   montitorBlockchainTransactionInternal,
   checkBlockchain,
   checkOneBlockchainTransaction,
-} = require('../controllers/hdWalletController.js');
+  addTransactionWalletBitcoin,
+  addTransactionWalletEVM,
+  addTransactionWalletTron,
+} = require("../controllers/hdWalletController.js");
 
 let fee = process.env.SWAP_FEE;
 let dexAddress = process.env.DEX_ADDRESS;
 const token = process.env.ONE_INCH_TOKEN;
-const version = 'v5.2';
+const version = "v5.2";
 
-//============={HTML MESSAGE TEMPLATES}====================================================
-// mongoose return unnecessary data with object so convert it into json
-// const { password, ...rest } = Object.assign({}, user.toJSON());
 /**************************************************************************************************************
  **************************************************************************************************************
 
@@ -51,22 +46,7 @@ const version = 'v5.2';
 
 //====={Montor all blockchain transactions at intervals : default here is every minute}========================
 //======{Pooling works and should be used for fetching and updating all current market data per set intervals}=================
-const poolRequestForAllBlockchainTransactions = async () => {
-  const intervalId = setInterval(() => {
-    montitorBlockchainTransactionInternal();
-  }, 60000); // check after every minute
 
-  return () => {
-    clearInterval(intervalId);
-  };
-};
-
-// poolRequestForAllBlockchainTransactions()
-
-// Generate Token
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-};
 // Generate OTP
 const generateOrderId = async () => {
   // 8 digits AlphaNumeric OPT
@@ -121,218 +101,16 @@ const generateAgentId = async () => {
   return newOTP;
 };
 
-//====={Create new user if walletAddress does not exist}===================
-/**
- * Initially
- * No txId
- * no dedicated managerId
- * status is "Pending"
- *
- */
 
-//test getAmount
-
-const newBTC = {
-  _id: '652c68058a1e328256fef032',
-  id: 'bitcoin',
-  symbol: 'btc',
-  name: 'Bitcoin',
-  image:
-    'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
-  current_price: 28464,
-  market_cap: '556277822255',
-  market_cap_rank: '1',
-  fully_diluted_valuation: '598508496249',
-  total_volume: '12387633223',
-  high_24h: '28564',
-  low_24h: '28188',
-  price_change_24h: '150.42',
-  price_change_percentage_24h: '0.53127',
-  market_cap_change_24h: '2995519371',
-  market_cap_change_percentage_24h: '0.54141',
-  circulating_supply: '19518243',
-  total_supply: '21000000',
-  max_supply: '21000000',
-  ath: '69045',
-  ath_change_percentage: '-58.73882',
-  ath_date: '2021-11-10T14:24:11.849Z',
-  atl: '67.81',
-  atl_change_percentage: '41913.13777',
-  atl_date: '2013-07-06T00:00:00.000Z',
-  roi: null,
-  last_updated: '2023-10-19T14:04:02.303Z',
-  updatedAt: '2023-10-19T14:20:05.661Z',
-  chain: 'Bitcoin',
-  // chain:'Tron'
-};
-
-const newETH = {
-  _id: '652c68058a1e328256fef036',
-  id: 'tether',
-  symbol: 'usdt',
-  name: 'Tether',
-  image:
-    'https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661',
-  current_price: 1,
-  market_cap: '83834650426',
-  market_cap_rank: '3',
-  fully_diluted_valuation: '83834650426',
-  total_volume: '15153190047',
-  high_24h: '1.002',
-  low_24h: '0.997953',
-  price_change_24h: '-0.000101133801949649',
-  price_change_percentage_24h: '-0.01011',
-  market_cap_change_24h: '48584980',
-  market_cap_change_percentage_24h: '0.05799',
-  circulating_supply: '83814882993.8953',
-  total_supply: '83814882993.8953',
-  max_supply: null,
-  ath: '1.32',
-  ath_change_percentage: '-24.39439',
-  ath_date: '2018-07-24T00:00:00.000Z',
-  atl: '0.572521',
-  atl_change_percentage: '74.72446',
-  atl_date: '2015-03-02T00:00:00.000Z',
-  roi: null,
-  last_updated: '2023-10-19T14:00:00.872Z',
-  address: '0xdac17f958d2ee523a2206206994597c13d831ec7',
-  decimals: 6,
-  chainId: '1',
-  type: 'ERC20',
-  updatedAt: '2023-10-22T10:05:05.529Z',
-  chain: 'Ethereum',
-};
-
-const newTron = {
-  id: 'tron',
-  symbol: 'trx',
-  name: 'TRON',
-  image:
-    'https://assets.coingecko.com/coins/images/1094/large/tron-logo.png?1696502193',
-  current_price: 0.089211,
-  market_cap: '7940706751',
-  market_cap_rank: 11,
-  fully_diluted_valuation: '7940715780',
-  total_volume: '249767521',
-  high_24h: '0.089511',
-  low_24h: '0.088464',
-  price_change_24h: '-0.000081448537954873',
-  price_change_percentage_24h: '-0.09122',
-  market_cap_change_24h: '-580879.8217954636',
-  market_cap_change_percentage_24h: '-0.00731',
-  circulating_supply: '88903131082.5918',
-  total_supply: '88902827407.8873',
-  max_supply: null,
-  ath: 0.231673,
-  ath_change_percentage: '-61.47436',
-  ath_date: '2018-01-05T00:00:00.000Z',
-  atl: 0.00180434,
-  atl_change_percentage: '4846.59129',
-  atl_date: '2017-11-12T00:00:00.000Z',
-  roi: {
-    times: 45.95294465386169,
-    currency: 'usd',
-    percentage: 4595.29446538617,
-  },
-  last_updated: {
-    $date: '2023-10-19T14:04:00.135Z',
-  },
-  updatedAt: {
-    $date: '2023-10-22T12:09:00.190Z',
-  },
-  chain: 'Tron',
-};
-
-const getTokenAmount1 = asyncHandler(async (token, value) => {
-  let amount; // fValue formatted to transaction decimals
-  let amountFixed;
-  let estimatedGas; // to be completed
-  if (token?.chain === 'Bitcoin') {
-    const satoshiToSend = Number(value) * 1e8; // check || 1e9
-    amount = satoshiToSend;
-  }
-
-  if (token?.chain === 'Ethereum') {
-    // amount = ethers.utils.parseUnits(value.toString(), Number(token?.decimals)); // Example: 1 ETH or 1 token (adjust as needed)
-    amount = ethers.utils
-      .parseUnits(value.toString(), token?.decimals.toString())
-      .toString(); // Gives fully formatted value and not hex value
-
-    // amountFixed = Number(amount).toFixed(3);
-  }
-
-  if (token?.chain === 'Tron') {
-    // Amount in SUN (TRX)
-    // const amount = 1000000; // Example: 1 TRX or 1,000,000 SUN (adjust as needed)
-    const amountInSUN = Number(value) * 1e6;
-
-    amount = amountInSUN;
-  }
-
-  // amountFixed = Number(amount).toFixed(3);
-
-  const response = {
-    amount,
-    // estimatedGas,
-    estimatedGas: 0.001, // testing
-    // amountFixed,
-  };
-
-  // console.log({ response: response });
-  return response;
-});
-
-// getTokenAmount(newBTC, '1')
-// getTokenAmount(newETH, '1')
-// getTokenAmount(newTron, '1')
-
-async function getHDWalletBitcoin() {
-  // main logic
-
-  //testing
-  // const response = {
-  //   address: '0x0ae21D71E104ED05D7a15fD7a1ACe66A21E0CC5E',
-  // };
-
-  const response = await addBitcoinHDWalletAdmin();
-
-  return response;
-}
-
-async function getHDWalletEthereum() {
-  // main logic
-
-  //testing
-  // const response = {
-  //   address: '0x0ae21D71E104ED05D7a15fD7a1ACe66A21E0CC5E',
-  // };
-
-  const response = await addEVMHDWalletAdmin();
-
-  return response;
-}
-
-async function getHDWalletTron() {
-  // main logic
-
-  //testing
-  // const response = {
-  //   address: '0x0ae21D71E104ED05D7a15fD7a1ACe66A21E0CC5E',
-  // };
-
-  const response = await addTronHDWalletAdmin();
-
-  return response;
-}
-
+//===={Transaction wallets are not assigned from pre-created wallets}==========
 const getTransactionWallet = async (chain) => {
   let blenderyAddress;
 
   switch (chain) {
     //MAINNETS
     //Arbitrum
-    case 'Bitcoin':
-      const walletBTC = await addBitcoinHDWalletAdmin();
+    case "Bitcoin":
+      const walletBTC = await addTransactionWalletBitcoin();
 
       if (walletBTC) {
         blenderyAddress = walletBTC?.address;
@@ -340,8 +118,8 @@ const getTransactionWallet = async (chain) => {
 
       break;
 
-    case 'Ethereum':
-      const walletETH = await addEVMHDWalletAdmin();
+    case "Ethereum":
+      const walletETH = await addTransactionWalletEVM();
 
       if (walletETH) {
         blenderyAddress = walletETH?.address;
@@ -349,8 +127,8 @@ const getTransactionWallet = async (chain) => {
 
       break;
 
-    case 'Tron':
-      const walletTRX = await addTronHDWalletAdmin();
+    case "Tron":
+      const walletTRX = await addTransactionWalletTron();
 
       if (walletTRX) {
         blenderyAddress = walletTRX?.address;
@@ -359,7 +137,7 @@ const getTransactionWallet = async (chain) => {
       break;
 
     default:
-      console.warn('Please choose a chain!');
+      console.warn("Please choose a chain!");
       break;
   }
 
@@ -370,16 +148,13 @@ const getTransactionWallet = async (chain) => {
   return response;
 };
 
-// getTransactionWallet('Bitcoin')
-// getTransactionWallet('Ethereum')
-// getTransactionWallet('Tron')
 const createTransaction1 = asyncHandler(async (req, res) => {
   // generate newOrder number
   console.log({ calling: true });
   const user = await User.findById(req.user._id); // get userId from "protect middleware"
   if (!user) {
     res.status(400);
-    throw new Error('User not found, please login');
+    throw new Error("User not found, please login");
   }
   const newOrderId = await generateOrderId();
 
@@ -412,7 +187,7 @@ const createTransaction1 = asyncHandler(async (req, res) => {
   let pin;
   let agentId;
 
-  if (service === 'exchange' && subService === 'exchange') {
+  if (service === "exchange" && subService === "exchange") {
     console.log({ status: true });
     // console.log({ userExists: userExists });
 
@@ -427,8 +202,8 @@ const createTransaction1 = asyncHandler(async (req, res) => {
       service,
       subService, // new to be added to frontend
       percentageProgress,
-      chain: fToken?.chain ? fToken?.chain : '',
-      chainId: fToken?.chainId ? fToken?.chainId : '',
+      chain: fToken?.chain ? fToken?.chain : "",
+      chainId: fToken?.chainId ? fToken?.chainId : "",
       //======{generated data}=================
       orderNo: newOrderId,
       txId: newOrderId,
@@ -449,7 +224,7 @@ const createTransaction1 = asyncHandler(async (req, res) => {
     }
   }
 
-  if (service === 'defi' && subService === 'defi') {
+  if (service === "defi" && subService === "defi") {
     // console.log({ userExists: userExists });
 
     const savedTransaction = await Transaction.create({
@@ -461,8 +236,8 @@ const createTransaction1 = asyncHandler(async (req, res) => {
       service,
       subService, // new to be added to frontend
       percentageProgress,
-      chain: fToken?.chain ? fToken?.chain : '',
-      chainId: fToken?.chainId ? fToken?.chainId : '',
+      chain: fToken?.chain ? fToken?.chain : "",
+      chainId: fToken?.chainId ? fToken?.chainId : "",
       //======{generated data}=================
       orderNo: newOrderId,
       txId: newOrderId,
@@ -481,7 +256,7 @@ const createTransaction1 = asyncHandler(async (req, res) => {
     }
   }
 
-  if (service === 'buy' && subService === 'buyCash') {
+  if (service === "buy" && subService === "buyCash") {
     pin = await generatePin();
     agentId = await generateAgentId();
     // const blenderyAddress = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'; // test address
@@ -499,7 +274,7 @@ const createTransaction1 = asyncHandler(async (req, res) => {
       city,
       telegram,
       chain: tToken?.chain,
-      chainId: tToken?.chainId ? tToken?.chainId : '',
+      chainId: tToken?.chainId ? tToken?.chainId : "",
       //======{generated data}=================
       location: city, // to find meeting point between dispatcher and user
       orderNo: newOrderId,
@@ -522,7 +297,7 @@ const createTransaction1 = asyncHandler(async (req, res) => {
     }
   }
 
-  if (service === 'buy' && subService === 'buyCard') {
+  if (service === "buy" && subService === "buyCard") {
     pin = await generatePin();
     agentId = await generateAgentId();
     // const blenderyAddress = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'; // test address
@@ -540,8 +315,8 @@ const createTransaction1 = asyncHandler(async (req, res) => {
       country,
       city,
       // telegram, // not required
-      chain: fToken?.chain ? fToken?.chain : '',
-      chainId: tToken?.chainId ? tToken?.chainId : '',
+      chain: fToken?.chain ? fToken?.chain : "",
+      chainId: tToken?.chainId ? tToken?.chainId : "",
       //======{generated data}=================
       location: city, // to choose between yandexPay or Stripe
       orderNo: newOrderId,
@@ -565,7 +340,7 @@ const createTransaction1 = asyncHandler(async (req, res) => {
     }
   }
 
-  if (service === 'sell' && subService === 'sellCash') {
+  if (service === "sell" && subService === "sellCash") {
     pin = await generatePin();
     agentId = await generateAgentId();
     // const blenderyAddress = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'; // test address
@@ -581,8 +356,8 @@ const createTransaction1 = asyncHandler(async (req, res) => {
       percentageProgress,
       country,
       telegram,
-      chain: fToken?.chain ? fToken?.chain : '',
-      chainId: fToken?.chainId ? fToken?.chainId : '',
+      chain: fToken?.chain ? fToken?.chain : "",
+      chainId: fToken?.chainId ? fToken?.chainId : "",
       //======{generated data}=================
       location: city,
       orderNo: newOrderId,
@@ -604,7 +379,7 @@ const createTransaction1 = asyncHandler(async (req, res) => {
       res.status(200).json(savedTransaction);
     }
   }
-  if (service === 'sell' && subService === 'sellCard') {
+  if (service === "sell" && subService === "sellCard") {
     pin = await generatePin();
     agentId = await generateAgentId();
     // const blenderyAddress = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'; // test address
@@ -621,8 +396,8 @@ const createTransaction1 = asyncHandler(async (req, res) => {
       country,
       city,
       // telegram, // not required
-      chain: fToken?.chain ? fToken?.chain : '',
-      chainId: fToken?.chainId ? fToken?.chainId : '',
+      chain: fToken?.chain ? fToken?.chain : "",
+      chainId: fToken?.chainId ? fToken?.chainId : "",
       //======{generated data}=================
       location: city, // to choose between yandexPay or Stripe
       orderNo: newOrderId,
@@ -648,13 +423,13 @@ const createTransaction1 = asyncHandler(async (req, res) => {
   }
 });
 
-const createTransaction = asyncHandler(async (req, res) => {
+const createTransaction2 = asyncHandler(async (req, res) => {
   // generate newOrder number
   console.log({ calling: true });
   const user = await User.findById(req.user._id); // get userId from "protect middleware"
   if (!user) {
     res.status(400);
-    throw new Error('User not found, please login');
+    throw new Error("User not found, please login");
   }
   const newOrderId = await generateOrderId();
 
@@ -691,7 +466,7 @@ const createTransaction = asyncHandler(async (req, res) => {
   let pin;
   let agentId;
 
-  if (service === 'exchange' && subService === 'exchange') {
+  if (service === "exchange" && subService === "exchange") {
     console.log({ status: true });
     // console.log({ userExists: userExists });
 
@@ -706,8 +481,8 @@ const createTransaction = asyncHandler(async (req, res) => {
       service,
       subService, // new to be added to frontend
       percentageProgress,
-      chain: fToken?.chain ? fToken?.chain : '',
-      chainId: fToken?.chainId ? fToken?.chainId : '',
+      chain: fToken?.chain ? fToken?.chain : "",
+      chainId: fToken?.chainId ? fToken?.chainId : "",
       //======{generated data}=================
       orderNo: newOrderId,
       txId: newOrderId,
@@ -729,7 +504,7 @@ const createTransaction = asyncHandler(async (req, res) => {
     }
   }
 
-  if (service === 'defi' && subService === 'defi') {
+  if (service === "defi" && subService === "defi") {
     // console.log({ userExists: userExists });
 
     const savedTransaction = await Transaction.create({
@@ -741,8 +516,8 @@ const createTransaction = asyncHandler(async (req, res) => {
       service,
       subService, // new to be added to frontend
       percentageProgress,
-      chain: fToken?.chain ? fToken?.chain : '',
-      chainId: fToken?.chainId ? fToken?.chainId : '',
+      chain: fToken?.chain ? fToken?.chain : "",
+      chainId: fToken?.chainId ? fToken?.chainId : "",
       //======{generated data}=================
       orderNo: newOrderId,
       txId: newOrderId,
@@ -761,7 +536,7 @@ const createTransaction = asyncHandler(async (req, res) => {
     }
   }
 
-  if (service === 'buy' && subService === 'buyCash') {
+  if (service === "buy" && subService === "buyCash") {
     pin = await generatePin();
     agentId = await generateAgentId();
     // const blenderyAddress = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'; // test address
@@ -779,7 +554,7 @@ const createTransaction = asyncHandler(async (req, res) => {
       city,
       telegram,
       chain: tToken?.chain,
-      chainId: tToken?.chainId ? tToken?.chainId : '',
+      chainId: tToken?.chainId ? tToken?.chainId : "",
       //======{generated data}=================
       location: city, // to find meeting point between dispatcher and user
       orderNo: newOrderId,
@@ -802,7 +577,7 @@ const createTransaction = asyncHandler(async (req, res) => {
     }
   }
 
-  if (service === 'buy' && subService === 'buyCard') {
+  if (service === "buy" && subService === "buyCard") {
     pin = await generatePin();
     agentId = await generateAgentId();
     // const blenderyAddress = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'; // test address
@@ -820,8 +595,8 @@ const createTransaction = asyncHandler(async (req, res) => {
       country,
       city,
       // telegram, // not required
-      chain: fToken?.chain ? fToken?.chain : '',
-      chainId: tToken?.chainId ? tToken?.chainId : '',
+      chain: fToken?.chain ? fToken?.chain : "",
+      chainId: tToken?.chainId ? tToken?.chainId : "",
       //======{generated data}=================
       location: city, // to choose between yandexPay or Stripe
       orderNo: newOrderId,
@@ -849,7 +624,7 @@ const createTransaction = asyncHandler(async (req, res) => {
     }
   }
 
-  if (service === 'sell' && subService === 'sellCash') {
+  if (service === "sell" && subService === "sellCash") {
     pin = await generatePin();
     agentId = await generateAgentId();
     // const blenderyAddress = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'; // test address
@@ -865,8 +640,8 @@ const createTransaction = asyncHandler(async (req, res) => {
       percentageProgress,
       country,
       telegram,
-      chain: fToken?.chain ? fToken?.chain : '',
-      chainId: fToken?.chainId ? fToken?.chainId : '',
+      chain: fToken?.chain ? fToken?.chain : "",
+      chainId: fToken?.chainId ? fToken?.chainId : "",
       //======{generated data}=================
       location: city,
       orderNo: newOrderId,
@@ -888,7 +663,7 @@ const createTransaction = asyncHandler(async (req, res) => {
       res.status(200).json(savedTransaction);
     }
   }
-  if (service === 'sell' && subService === 'sellCard') {
+  if (service === "sell" && subService === "sellCard") {
     pin = await generatePin();
     agentId = await generateAgentId();
     // const blenderyAddress = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'; // test address
@@ -905,8 +680,291 @@ const createTransaction = asyncHandler(async (req, res) => {
       country,
       city,
       // telegram, // not required
-      chain: fToken?.chain ? fToken?.chain : '',
-      chainId: fToken?.chainId ? fToken?.chainId : '',
+      chain: fToken?.chain ? fToken?.chain : "",
+      chainId: fToken?.chainId ? fToken?.chainId : "",
+      //======{generated data}=================
+      location: city, // to choose between yandexPay or Stripe
+      orderNo: newOrderId,
+      txId: newOrderId,
+      blenderyAddress,
+      timeLeft: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours
+      dispatcherId: `A${agentId}`, // A2562
+      pin,
+      youSend,
+      youGet,
+      serviceFee,
+      networkFee,
+      exchangeRate,
+      tValue,
+      amount,
+      provider,
+      providerUrl,
+      fullName,
+      bankName,
+      cardNumber,
+      phone,
+    });
+
+    if (savedTransaction) {
+      res.status(200).json(savedTransaction);
+    }
+  }
+});
+
+const createTransaction = asyncHandler(async (req, res) => {
+  // generate newOrder number
+  console.log({ calling: true });
+  const user = await User.findById(req.user._id); // get userId from "protect middleware"
+  if (!user) {
+    res.status(400);
+    throw new Error("User not found, please login");
+  }
+  const newOrderId = await generateOrderId();
+
+  const {
+    // userId,
+    fToken,
+    tToken,
+    fValue,
+    userAddress,
+    service,
+    subService, // new to be added to frontend
+    percentageProgress,
+    country,
+    city,
+    telegram,
+    youSend,
+    youGet,
+    serviceFee,
+    networkFee,
+    processingFee,
+    exchangeRate,
+    tValue,
+    amount,
+    provider,
+    providerUrl,
+    fullName,
+    bankName,
+    cardNumber,
+    phone,
+  } = req.body;
+
+  console.log({ userData: req.body });
+
+  let pin;
+  let agentId;
+
+  if (service === "exchange" && subService === "exchange") {
+    console.log({ status: true });
+    // console.log({ userExists: userExists });
+
+    // const blenderyAddress = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'; // test address
+    const { blenderyAddress } = await getTransactionWallet(fToken?.chain); // fToken is crypto and the sending token
+    const savedTransaction = await Transaction.create({
+      user: user?._id,
+      fToken,
+      tToken,
+      fValue,
+      userAddress,
+      service,
+      subService, // new to be added to frontend
+      percentageProgress,
+      chain: fToken?.chain ? fToken?.chain : "",
+      chainId: fToken?.chainId ? fToken?.chainId : "",
+      //======{generated data}=================
+      orderNo: newOrderId,
+      txId: newOrderId,
+      blenderyAddress,
+      timeLeft: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours
+      youSend,
+      youGet,
+      serviceFee,
+      networkFee,
+      // processingFee,// not required
+      exchangeRate,
+      tValue,
+      amount,
+    });
+    // console.log()
+
+    if (savedTransaction) {
+      res.status(200).json(savedTransaction);
+    }
+  }
+
+  if (service === "defi" && subService === "defi") {
+    // console.log({ userExists: userExists });
+
+    const savedTransaction = await Transaction.create({
+      user: user?._id,
+      fToken,
+      tToken,
+      fValue,
+      userAddress,
+      service,
+      subService, // new to be added to frontend
+      percentageProgress,
+      chain: fToken?.chain ? fToken?.chain : "",
+      chainId: fToken?.chainId ? fToken?.chainId : "",
+      //======{generated data}=================
+      orderNo: newOrderId,
+      txId: newOrderId,
+      // blenderyAddress,
+      youSend,
+      youGet,
+      serviceFee,
+      networkFee,
+      exchangeRate,
+      tValue,
+      amount,
+    });
+
+    if (savedTransaction) {
+      res.status(200).json(savedTransaction);
+    }
+  }
+
+  if (service === "buy" && subService === "buyCash") {
+    pin = await generatePin();
+    agentId = await generateAgentId();
+    const savedTransaction = await Transaction.create({
+      user: user?._id,
+      fToken,
+      tToken,
+      fValue,
+      userAddress,
+      service,
+      subService, // new to be added to frontend
+      percentageProgress,
+      country,
+      city,
+      telegram,
+      chain: tToken?.chain,
+      chainId: tToken?.chainId ? tToken?.chainId : "",
+      //======{generated data}=================
+      location: city, // to find meeting point between dispatcher and user
+      orderNo: newOrderId,
+      txId: newOrderId,
+      // blenderyAddress,
+      timeLeft: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours
+      dispatcherId: `A${agentId}`, // A2562
+      pin,
+      youSend,
+      youGet,
+      serviceFee,
+      networkFee,
+      exchangeRate,
+      tValue,
+      amount,
+    });
+
+    if (savedTransaction) {
+      res.status(200).json(savedTransaction);
+    }
+  }
+
+  if (service === "buy" && subService === "buyCard") {
+    pin = await generatePin();
+    agentId = await generateAgentId();
+    const savedTransaction = await Transaction.create({
+      user: user?._id,
+      fToken,
+      tToken,
+      fValue,
+      userAddress,
+      service,
+      subService, // new to be added to frontend
+      percentageProgress,
+      country,
+      city,
+      // telegram, // not required
+      chain: fToken?.chain ? fToken?.chain : "",
+      chainId: tToken?.chainId ? tToken?.chainId : "",
+      //======{generated data}=================
+      location: city, // to choose between yandexPay or Stripe
+      orderNo: newOrderId,
+      txId: newOrderId,
+      // blenderyAddress,
+      timeLeft: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours
+      dispatcherId: `A${agentId}`, // A2562
+      pin,
+      youSend,
+      youGet,
+      processingFee,
+      exchangeRate,
+      tValue,
+      amount,
+      provider,
+      providerUrl,
+      fullName,
+      bankName,
+      cardNumber,
+      phone,
+    });
+
+    if (savedTransaction) {
+      res.status(200).json(savedTransaction);
+    }
+  }
+
+  if (service === "sell" && subService === "sellCash") {
+    pin = await generatePin();
+    agentId = await generateAgentId();
+    // const blenderyAddress = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'; // test address
+    const { blenderyAddress } = await getTransactionWallet(fToken?.chain); // fToken is crypto
+    const savedTransaction = await Transaction.create({
+      user: user?._id,
+      fToken,
+      tToken,
+      fValue,
+      userAddress,
+      service,
+      subService, // new to be added to frontend
+      percentageProgress,
+      country,
+      telegram,
+      chain: fToken?.chain ? fToken?.chain : "",
+      chainId: fToken?.chainId ? fToken?.chainId : "",
+      //======{generated data}=================
+      location: city,
+      orderNo: newOrderId,
+      txId: newOrderId,
+      blenderyAddress,
+      timeLeft: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours
+      dispatcherId: `A${agentId}`, // A2562
+      pin,
+      youSend,
+      youGet,
+      serviceFee,
+      networkFee,
+      exchangeRate,
+      tValue,
+      amount,
+    });
+
+    if (savedTransaction) {
+      res.status(200).json(savedTransaction);
+    }
+  }
+  if (service === "sell" && subService === "sellCard") {
+    pin = await generatePin();
+    agentId = await generateAgentId();
+    // const blenderyAddress = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'; // test address
+    const { blenderyAddress } = await getTransactionWallet(fToken?.chain); // fToken is crypto
+    const savedTransaction = await Transaction.create({
+      user: user?._id,
+      fToken,
+      tToken,
+      fValue,
+      userAddress,
+      service,
+      subService, // new to be added to frontend
+      percentageProgress,
+      country,
+      city,
+      // telegram, // not required
+      chain: fToken?.chain ? fToken?.chain : "",
+      chainId: fToken?.chainId ? fToken?.chainId : "",
       //======{generated data}=================
       location: city, // to choose between yandexPay or Stripe
       orderNo: newOrderId,
@@ -960,68 +1018,68 @@ const updateTransactionById = asyncHandler(async (req, res) => {
   // let updatedTimeLeft;
   //==={Is Active}==================
   if (timeLeft > currentTime) {
-    updatedTimeStatus = 'Active';
+    updatedTimeStatus = "Active";
   }
   //==={Is Expired}==================
   if (timeLeft < currentTime) {
-    updatedTimeStatus = 'Expired';
+    updatedTimeStatus = "Expired";
   }
 
-  const blockchainUrlBitcoinMainnet = 'https://blockstream.info/tx';
-  const blockchainUrlBitcoinTest = 'https://blockstream.info/testnet/tx';
+  const blockchainUrlBitcoinMainnet = "https://blockstream.info/tx";
+  const blockchainUrlBitcoinTest = "https://blockstream.info/testnet/tx";
   const blockchainUrlBitcoinEndpoint = blockchainUrlBitcoinTest;
   const blockchainUrlBitcoin = `${blockchainUrlBitcoinEndpoint}/${hashOut}`;
 
-  const tronblockchainUrlMainnet = 'https://tronscan.org/#/transaction'; // goerli test net
-  const tronblockchainUrlNile = 'https://nile.tronscan.org/#/transaction'; // goerli test net
+  const tronblockchainUrlMainnet = "https://tronscan.org/#/transaction"; // goerli test net
+  const tronblockchainUrlNile = "https://nile.tronscan.org/#/transaction"; // goerli test net
   const tronblockchainUrlEndpoint = tronblockchainUrlNile;
   const blockchainUrlTron = `${tronblockchainUrlEndpoint}/${hashOut}`;
 
-  const blockchainUrlEthereumMainnet = 'https://etherscan.io/tx'; // goerli test net
-  const blockchainUrlEthereumGoerli = 'https://goerli.etherscan.io/tx'; // goerli test net
+  const blockchainUrlEthereumMainnet = "https://etherscan.io/tx"; // goerli test net
+  const blockchainUrlEthereumGoerli = "https://goerli.etherscan.io/tx"; // goerli test net
   const blockchainUrlEthereumEndpoint = blockchainUrlEthereumGoerli;
   const blockchainUrlEthereum = `${blockchainUrlEthereumEndpoint}/${hashOut}`;
-  let blockchainUrl = '';
+  let blockchainUrl = "";
   let chain;
 
   if (hashOut) {
-    if (service === 'buy' && subService === 'buyCash') {
-      chain = transaction?.tToken?.chain ? transaction?.tToken?.chain : '';
-      if (chain === 'Bitcoin') {
+    if (service === "buy" && subService === "buyCash") {
+      chain = transaction?.tToken?.chain ? transaction?.tToken?.chain : "";
+      if (chain === "Bitcoin") {
         blockchainUrl = blockchainUrlBitcoin;
       }
-      if (chain === 'Tron') {
+      if (chain === "Tron") {
         blockchainUrl = blockchainUrlTron;
       }
-      if (chain === 'Ethereum') {
+      if (chain === "Ethereum") {
         blockchainUrl = blockchainUrlEthereum;
       }
       //
     }
 
-    if (service === 'buy' && subService === 'buyCard') {
-      chain = transaction?.tToken?.chain ? transaction?.tToken?.chain : '';
+    if (service === "buy" && subService === "buyCard") {
+      chain = transaction?.tToken?.chain ? transaction?.tToken?.chain : "";
 
-      if (chain === 'Bitcoin') {
+      if (chain === "Bitcoin") {
         blockchainUrl = blockchainUrlBitcoin;
       }
-      if (chain === 'Tron') {
+      if (chain === "Tron") {
         blockchainUrl = blockchainUrlTron;
       }
-      if (chain === 'Ethereum') {
+      if (chain === "Ethereum") {
         blockchainUrl = blockchainUrlEthereum;
       }
     }
 
-    if (service === 'exchange' && subService === 'exchange') {
-      chain = transaction?.tToken?.chain ? transaction?.tToken?.chain : '';
-      if (chain === 'Bitcoin') {
+    if (service === "exchange" && subService === "exchange") {
+      chain = transaction?.tToken?.chain ? transaction?.tToken?.chain : "";
+      if (chain === "Bitcoin") {
         blockchainUrl = blockchainUrlBitcoin;
       }
-      if (chain === 'Tron') {
+      if (chain === "Tron") {
         blockchainUrl = blockchainUrlTron;
       }
-      if (chain === 'Ethereum') {
+      if (chain === "Ethereum") {
         blockchainUrl = blockchainUrlEthereum;
       }
     }
@@ -1032,7 +1090,7 @@ const updateTransactionById = asyncHandler(async (req, res) => {
   // const status = 'Completed';
 
   let percentageProgress;
-  if (status === 'Completed') {
+  if (status === "Completed") {
     percentageProgress = 5;
   } else {
     percentageProgress = progress;
@@ -1070,18 +1128,18 @@ const updateTransactionById2 = asyncHandler(async (req, res) => {
   // const transaction = await Transaction.findById(req.body.id);
 
   const blockchainUrlBitcoinMainnet =
-    'https://www.blockchain.com/explorer/transactions/btc';
-  const blockchainUrlBitcoinTest = '';
+    "https://www.blockchain.com/explorer/transactions/btc";
+  const blockchainUrlBitcoinTest = "";
   const blockchainUrlBitcoinEndpoint = blockchainUrlBitcoinMainnet;
   const blockchainUrlBitcoin = `${blockchainUrlBitcoinEndpoint}/${req.body.hash}`;
 
-  const tronblockchainUrlMainnet = 'https://tronscan.org/#/transaction'; // goerli test net
-  const tronblockchainUrlNile = 'https://nile.tronscan.org/#/transaction'; // goerli test net
+  const tronblockchainUrlMainnet = "https://tronscan.org/#/transaction"; // goerli test net
+  const tronblockchainUrlNile = "https://nile.tronscan.org/#/transaction"; // goerli test net
   const tronblockchainUrlEndpoint = tronblockchainUrlNile;
   const blockchainUrlTron = `${tronblockchainUrlEndpoint}/${req.body.hash}`;
 
-  const blockchainUrlEthereumMainnet = 'https://etherscan.io/tx'; // goerli test net
-  const blockchainUrlEthereumGoerli = 'https://etherscan.io/tx'; // goerli test net
+  const blockchainUrlEthereumMainnet = "https://etherscan.io/tx"; // goerli test net
+  const blockchainUrlEthereumGoerli = "https://etherscan.io/tx"; // goerli test net
   const blockchainUrlEthereumEndpoint = blockchainUrlEthereumGoerli;
   const blockchainUrlEthereum = `${blockchainUrlEthereumEndpoint}/${req.body.hash}`;
 
@@ -1090,39 +1148,39 @@ const updateTransactionById2 = asyncHandler(async (req, res) => {
   const service = req.body.service;
   const subService = req.body.subService;
 
-  if (service === 'buy' && subService === 'buyCash') {
-    if (chain === 'Bitcoin') {
+  if (service === "buy" && subService === "buyCash") {
+    if (chain === "Bitcoin") {
       blockchainUrl = blockchainUrlBitcoin;
     }
-    if (chain === 'Tron') {
+    if (chain === "Tron") {
       blockchainUrl = blockchainUrlTron;
     }
-    if (chain === 'Ethereum') {
+    if (chain === "Ethereum") {
       blockchainUrl = blockchainUrlEthereum;
     }
     //
   }
 
-  if (service === 'buy' && subService === 'buyCard') {
-    if (chain === 'Bitcoin') {
+  if (service === "buy" && subService === "buyCard") {
+    if (chain === "Bitcoin") {
       blockchainUrl = blockchainUrlBitcoin;
     }
-    if (chain === 'Tron') {
+    if (chain === "Tron") {
       blockchainUrl = blockchainUrlTron;
     }
-    if (chain === 'Ethereum') {
+    if (chain === "Ethereum") {
       blockchainUrl = blockchainUrlEthereum;
     }
   }
 
-  if (service === 'exchange' && subService === 'exchange') {
-    if (chain === 'Bitcoin') {
+  if (service === "exchange" && subService === "exchange") {
+    if (chain === "Bitcoin") {
       blockchainUrl = blockchainUrlBitcoin;
     }
-    if (chain === 'Tron') {
+    if (chain === "Tron") {
       blockchainUrl = blockchainUrlTron;
     }
-    if (chain === 'Ethereum') {
+    if (chain === "Ethereum") {
       blockchainUrl = blockchainUrlEthereum;
     }
   }
@@ -1178,7 +1236,7 @@ const getUserTransactions = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
 
   const response = await Transaction.find({ user: req.user.id }).populate(
-    'message'
+    "message"
   );
   // console.log({ response: response });
 
@@ -1196,7 +1254,7 @@ const getOneUserTransaction = asyncHandler(async (req, res) => {
   const transaction = await Transaction.findOne({
     user: user._id,
     _id: id,
-  }).populate('message');
+  }).populate("message");
   // await updateBlockChainTransactionsAutomaticallyInternal(transaction?._id);
 
   // res.json(
@@ -1212,14 +1270,14 @@ const getOneUserTransaction = asyncHandler(async (req, res) => {
 const getUserExchange = asyncHandler(async (req, res) => {
   const userTransactions = await Transaction.find({
     user: req.user.id,
-  }).populate('message');
+  }).populate("message");
   let response = [];
 
   userTransactions?.map(async (transaction) => {
     // await updateBlockChainTransactionsAutomaticallyInternal(transaction?._id);
     let service = transaction.service;
     let subService = transaction.subService;
-    if (service === 'exchange' && subService === 'exchange') {
+    if (service === "exchange" && subService === "exchange") {
       response.push(transaction);
     }
   });
@@ -1228,14 +1286,14 @@ const getUserExchange = asyncHandler(async (req, res) => {
 const getUserDefi = asyncHandler(async (req, res) => {
   const userTransactions = await Transaction.find({
     user: req.user.id,
-  }).populate('message');
+  }).populate("message");
   let response = [];
 
   userTransactions?.map(async (transaction) => {
     // await updateBlockChainTransactionsAutomaticallyInternal(transaction?._id);
     let service = transaction.service;
     let subService = transaction.subService;
-    if (service === 'defi' && subService === 'defi') {
+    if (service === "defi" && subService === "defi") {
       response.push(transaction);
     }
   });
@@ -1245,14 +1303,14 @@ const getUserDefi = asyncHandler(async (req, res) => {
 const getUserBuyCash = asyncHandler(async (req, res) => {
   const userTransactions = await Transaction.find({
     user: req.user.id,
-  }).populate('message');
+  }).populate("message");
   let response = [];
 
   userTransactions?.map(async (transaction) => {
     // await updateBlockChainTransactionsAutomaticallyInternal(transaction?._id);
     let service = transaction.service;
     let subService = transaction.subService;
-    if (service === 'buy' && subService === 'buyCash') {
+    if (service === "buy" && subService === "buyCash") {
       response.push(transaction);
     }
   });
@@ -1262,14 +1320,14 @@ const getUserBuyCash = asyncHandler(async (req, res) => {
 const getUserBuyCard = asyncHandler(async (req, res) => {
   const userTransactions = await Transaction.find({
     user: req.user.id,
-  }).populate('message');
+  }).populate("message");
   let response = [];
 
   userTransactions?.map(async (transaction) => {
     // await updateBlockChainTransactionsAutomaticallyInternal(transaction?._id);
     let service = transaction.service;
     let subService = transaction.subService;
-    if (service === 'buy' && subService === 'buyCard') {
+    if (service === "buy" && subService === "buyCard") {
       response.push(transaction);
     }
   });
@@ -1279,14 +1337,14 @@ const getUserBuyCard = asyncHandler(async (req, res) => {
 const getUserSellCash = asyncHandler(async (req, res) => {
   const userTransactions = await Transaction.find({
     user: req.user.id,
-  }).populate('message');
+  }).populate("message");
   let response = [];
 
   userTransactions?.map(async (transaction) => {
     // await updateBlockChainTransactionsAutomaticallyInternal(transaction?._id);
     let service = transaction.service;
     let subService = transaction.subService;
-    if (service === 'sell' && subService === 'sellCash') {
+    if (service === "sell" && subService === "sellCash") {
       response.push(transaction);
     }
   });
@@ -1296,14 +1354,14 @@ const getUserSellCash = asyncHandler(async (req, res) => {
 const getUserSellCard = asyncHandler(async (req, res) => {
   const userTransactions = await Transaction.find({
     user: req.user.id,
-  }).populate('message');
+  }).populate("message");
   let response = [];
 
   userTransactions?.map(async (transaction) => {
     // await updateBlockChainTransactionsAutomaticallyInternal(transaction?._id);
     let service = transaction.service;
     let subService = transaction.subService;
-    if (service === 'sell' && subService === 'sellCard') {
+    if (service === "sell" && subService === "sellCard") {
       response.push(transaction);
     }
   });
@@ -1314,14 +1372,14 @@ const getUserSellCard = asyncHandler(async (req, res) => {
 
 const getAdminExchange1 = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id); // get userId from "protect middleware"
-  const userTransactions = await Transaction.find().populate('message');
+  const userTransactions = await Transaction.find().populate("message");
   let response = [];
 
   userTransactions?.map(async (transaction) => {
     // await updateBlockChainTransactionsAutomaticallyInternal(transaction?._id);
     let service = transaction.service;
     let subService = transaction.subService;
-    if (service === 'exchange' && subService === 'exchange') {
+    if (service === "exchange" && subService === "exchange") {
       response.push(transaction);
     }
   });
@@ -1339,15 +1397,15 @@ const updateTimeLeftAutomatically = asyncHandler(async (id) => {
   // let updatedTimeLeft;
   //==={Is Active}==================
   if (timeLeft > currentTime) {
-    updatedTimeStatus = 'Active';
+    updatedTimeStatus = "Active";
   }
   //==={Is Expired}==================
   if (timeLeft < currentTime) {
-    updatedTimeStatus = 'Expired';
+    updatedTimeStatus = "Expired";
   }
 
-  if (transactionDoc?.status === 'Completed') {
-    updatedTimeStatus = 'Completed';
+  if (transactionDoc?.status === "Completed") {
+    updatedTimeStatus = "Completed";
   }
 
   //===================================================================================================================================
@@ -1360,14 +1418,14 @@ const updateTimeLeftAutomatically = asyncHandler(async (id) => {
 });
 const getAdminExchange = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id); // get userId from "protect middleware"
-  const userTransactions = await Transaction.find().populate('message');
+  const userTransactions = await Transaction.find().populate("message");
   let response = [];
 
   userTransactions?.map(async (transaction) => {
     // await updateBlockChainTransactionsAutomaticallyInternal(transaction?._id);
     let service = transaction.service;
     let subService = transaction.subService;
-    if (service === 'exchange' && subService === 'exchange') {
+    if (service === "exchange" && subService === "exchange") {
       updateTimeLeftAutomatically(transaction?._id);
       response.push(transaction);
     }
@@ -1376,14 +1434,14 @@ const getAdminExchange = asyncHandler(async (req, res) => {
 });
 const getAdminDefi = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id); // get userId from "protect middleware"
-  const userTransactions = await Transaction.find().populate('message');
+  const userTransactions = await Transaction.find().populate("message");
   let response = [];
 
   userTransactions?.map(async (transaction) => {
     // await updateBlockChainTransactionsAutomaticallyInternal(transaction?._id);
     let service = transaction.service;
     let subService = transaction.subService;
-    if (service === 'defi' && subService === 'defi') {
+    if (service === "defi" && subService === "defi") {
       response.push(transaction);
     }
   });
@@ -1392,14 +1450,14 @@ const getAdminDefi = asyncHandler(async (req, res) => {
 
 const getAdminBuyCash = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id); // get userId from "protect middleware"
-  const userTransactions = await Transaction.find().populate('message');
+  const userTransactions = await Transaction.find().populate("message");
   let response = [];
 
   userTransactions?.map(async (transaction) => {
     // await updateBlockChainTransactionsAutomaticallyInternal(transaction?._id);
     let service = transaction.service;
     let subService = transaction.subService;
-    if (service === 'buy' && subService === 'buyCash') {
+    if (service === "buy" && subService === "buyCash") {
       updateTimeLeftAutomatically(transaction?._id);
       response.push(transaction);
     }
@@ -1409,14 +1467,14 @@ const getAdminBuyCash = asyncHandler(async (req, res) => {
 
 const getAdminBuyCard = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id); // get userId from "protect middleware"
-  const userTransactions = await Transaction.find().populate('message');
+  const userTransactions = await Transaction.find().populate("message");
   let response = [];
 
   userTransactions?.map(async (transaction) => {
     // await updateBlockChainTransactionsAutomaticallyInternal(transaction?._id);
     let service = transaction.service;
     let subService = transaction.subService;
-    if (service === 'buy' && subService === 'buyCard') {
+    if (service === "buy" && subService === "buyCard") {
       updateTimeLeftAutomatically(transaction?._id);
 
       response.push(transaction);
@@ -1427,14 +1485,14 @@ const getAdminBuyCard = asyncHandler(async (req, res) => {
 
 const getAdminSellCash = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id); // get userId from "protect middleware"
-  const userTransactions = await Transaction.find().populate('message');
+  const userTransactions = await Transaction.find().populate("message");
   let response = [];
 
   userTransactions?.map(async (transaction) => {
     // await updateBlockChainTransactionsAutomaticallyInternal(transaction?._id);
     let service = transaction.service;
     let subService = transaction.subService;
-    if (service === 'sell' && subService === 'sellCash') {
+    if (service === "sell" && subService === "sellCash") {
       updateTimeLeftAutomatically(transaction?._id);
       response.push(transaction);
     }
@@ -1444,14 +1502,14 @@ const getAdminSellCash = asyncHandler(async (req, res) => {
 
 const getAdminSellCard = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id); // get userId from "protect middleware"
-  const userTransactions = await Transaction.find().populate('message');
+  const userTransactions = await Transaction.find().populate("message");
   let response = [];
 
   userTransactions?.map(async (transaction) => {
     // await updateBlockChainTransactionsAutomaticallyInternal(transaction?._id);
     let service = transaction.service;
     let subService = transaction.subService;
-    if (service === 'sell' && subService === 'sellCard') {
+    if (service === "sell" && subService === "sellCard") {
       updateTimeLeftAutomatically(transaction?._id);
       response.push(transaction);
     }
@@ -1487,15 +1545,15 @@ const getTransactionByTxId = asyncHandler(async (req, res) => {
 
   console.log({ txId: txId });
 
-  res.json(await Transaction.findById(txId).populate('message'));
+  res.json(await Transaction.findById(txId).populate("message"));
 });
 
 // not required
 const getAllTransactionsByUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id); // get managers userId from "protect middleware"
   const { userId } = req.params;
-  if (user.role === 'User') {
-    res.json(await Transaction.find({ userId: userId }).populate('user'));
+  if (user.role === "User") {
+    res.json(await Transaction.find({ userId: userId }).populate("user"));
   }
 });
 
@@ -1530,7 +1588,7 @@ const updateUserTransaction = asyncHandler(async (req, res) => {
   let updatedTransaction;
   if (
     transactionDoc &&
-    manager.role === 'Admin' &&
+    manager.role === "Admin" &&
     // currentManagerId === transactionDoc?.manager.toString()){
     currentManagerId === transactionDoc?.manager
   ) {
@@ -1580,7 +1638,7 @@ const updateUserTransaction = asyncHandler(async (req, res) => {
   });
 });
 
-const updateTransactionsAutomatically = asyncHandler(async (req, res) => {
+const updateTransactionsAutomatically1 = asyncHandler(async (req, res) => {
   const {
     id, // new transaction mongodb id ==> transaction?._id
     country,
@@ -1601,11 +1659,11 @@ const updateTransactionsAutomatically = asyncHandler(async (req, res) => {
   // let updatedTimeLeft;
   //==={Is Active}==================
   if (timeLeft > currentTime) {
-    updatedTimeStatus = 'Active';
+    updatedTimeStatus = "Active";
   }
   //==={Is Expired}==================
   if (timeLeft < currentTime) {
-    updatedTimeStatus = 'Expired';
+    updatedTimeStatus = "Expired";
   }
   // also, start transaction monitoring on blockchain from here
   //blockchainMonitoring()
@@ -1625,6 +1683,71 @@ const updateTransactionsAutomatically = asyncHandler(async (req, res) => {
     res.status(200).json(response);
   }
 });
+
+const updateTransactionsAutomatically = asyncHandler(async (req, res) => {
+  const {
+    id, // new transaction mongodb id ==> transaction?._id
+    country,
+    city,
+    state,
+    service,
+    status, // new status ==> // pending, paid, completed, cancel, active, inActive
+    percentageProgress,
+    youSend,
+    youGet,
+    serviceFee,
+    networkFee,
+    processingFee,
+    exchangeRate,
+    tValue,
+    amount,
+    directValue,
+  } = req.body;
+
+  const transactionDoc = await Transaction.findById(id);
+
+  let timeLeft = new Date(transactionDoc?.timeLeft).getTime();
+  let currentTime = new Date(Date.now()).getTime();
+
+  let updatedTimeStatus;
+
+  // let updatedTimeLeft;
+  //==={Is Active}==================
+  if (timeLeft > currentTime) {
+    updatedTimeStatus = "Active";
+  }
+  //==={Is Expired}==================
+  if (timeLeft < currentTime) {
+    updatedTimeStatus = "Expired";
+  }
+  // also, start transaction monitoring on blockchain from here
+  //blockchainMonitoring()
+  if (transactionDoc) {
+    transactionDoc.country = country || transactionDoc?.country;
+    transactionDoc.city = city || transactionDoc?.city;
+    transactionDoc.state = state || transactionDoc?.state;
+    transactionDoc.service = service || transactionDoc?.service;
+    transactionDoc.status = status || transactionDoc?.status;
+    transactionDoc.percentageProgress =
+      percentageProgress || transactionDoc?.percentageProgress;
+    transactionDoc.timeStatus = updatedTimeStatus || transactionDoc?.timeStatus;
+    // transactionDoc.timeLeft = updatedTimeStatus === 'Expired' ? 0 : transactionDoc?.timeLeft; // if updatedTime status has expired, set timeleft to 0
+    transactionDoc.youSend = youSend || transactionDoc.youSend;
+    transactionDoc.youGet = youGet || transactionDoc.youGet;
+    transactionDoc.serviceFee = serviceFee || transactionDoc.serviceFee;
+    transactionDoc.networkFee = networkFee || transactionDoc.networkFee;
+    transactionDoc.processingFee =
+      processingFee || transactionDoc.processingFee;
+    transactionDoc.exchangeRate = exchangeRate || transactionDoc.exchangeRate;
+    transactionDoc.tValue = tValue || transactionDoc.tValue;
+    transactionDoc.amount = amount || transactionDoc.amount;
+    // transaction.directValue = directValue
+  }
+  const response = await transactionDoc.save();
+  if (response) {
+    res.status(200).json(response);
+  }
+});
 const updateBlockChainTransaction = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const transactionDoc = await Transaction.findById(id);
@@ -1637,11 +1760,11 @@ const updateBlockChainTransaction = asyncHandler(async (req, res) => {
   // let updatedTimeLeft;
   //==={Is Active}==================
   if (timeLeft > currentTime) {
-    updatedTimeStatus = 'Active';
+    updatedTimeStatus = "Active";
   }
   //==={Is Expired}==================
   if (timeLeft < currentTime) {
-    updatedTimeStatus = 'Expired';
+    updatedTimeStatus = "Expired";
   }
   // also, start transaction monitoring on blockchain from here
   //blockchainMonitoring
@@ -1674,11 +1797,11 @@ async function updateBlockChainTransactionsAutomaticallyInternal(id) {
   // let updatedTimeLeft;
   //==={Is Active}==================
   if (timeLeft > currentTime) {
-    updatedTimeStatus = 'Active';
+    updatedTimeStatus = "Active";
   }
   //==={Is Expired}==================
   if (timeLeft < currentTime) {
-    updatedTimeStatus = 'Expired';
+    updatedTimeStatus = "Expired";
   }
   // also, start transaction monitoring on blockchain from here
   //blockchainMonitoring
@@ -1705,12 +1828,12 @@ const getMyUserTransactionById = asyncHandler(async (req, res) => {
   const manager = await User.findById(req.user._id); // get managers userId from "protect middleware"
   const managerId = manager?._id; // manager's id
   const { id, userId } = req.params;
-  if (manager.role === 'Admin') {
+  if (manager.role === "Admin") {
     res.json(
       await Transaction.find({ manager: managerId, user: userId })
-        .populate('user')
-        .populate('manager')
-        .populate('messages')
+        .populate("user")
+        .populate("manager")
+        .populate("messages")
         .exec()
     );
   }
@@ -1729,7 +1852,7 @@ const getMyTransactions = asyncHandler(async (req, res) => {
   const managerId = manager?._id; // manager's id
 
   let response = await Transaction.find({ manager: managerId }).populate(
-    'user'
+    "user"
   );
   console.log({ response: response });
   res.json(response);
@@ -1759,14 +1882,14 @@ const getMyManagersTransactionById = asyncHandler(async (req, res) => {
   // const user = await Manager.findById(req.user._id); // protected route
   const supervisor = await User.findById(req.user._id); // get managers userId from "protect middleware"
   const { managerId } = req.params; // user's Id
-  if (supervisor.role === 'Admin' && supervisor.level > 2) {
+  if (supervisor.role === "Admin" && supervisor.level > 2) {
     // super admin also has this previledge
     //
     res.json(
       await Transaction.find({ manager: managerId })
-        .populate('user')
-        .populate('manager')
-        .populate('messages')
+        .populate("user")
+        .populate("manager")
+        .populate("messages")
         .exec()
     );
   }
@@ -1786,13 +1909,13 @@ const getOneManagersTransactionByAdmin = asyncHandler(async (req, res) => {
   // const user = await Manager.findById(req.user._id); // protected route
   const admin = await User.findById(req.user._id); // get managers userId from "protect middleware"
   const { id, managerId } = req.params;
-  if (admin.role === 'Admin' && admin.level > 2) {
+  if (admin.role === "Admin" && admin.level > 2) {
     // supervisors below do not have this previledge
     res.json(
       await Transaction.findOne({ manager: managerId, _id: id })
-        .populate('user')
-        .populate('manager')
-        .populate('messages')
+        .populate("user")
+        .populate("manager")
+        .populate("messages")
         .exec()
     );
   }
@@ -1802,12 +1925,12 @@ const getAllManagersTransactionByAdmin = asyncHandler(async (req, res) => {
   // const user = await Manager.findById(req.user._id); // protected route
   const admin = await User.findById(req.user._id); // get managers userId from "protect middleware"
   const { managerId } = req.params;
-  if (admin.role === 'Admin' && admin.level > 2) {
+  if (admin.role === "Admin" && admin.level > 2) {
     res.json(
       await Transaction.findOne({ manager: managerId })
-        .populate('user')
-        .populate('manager')
-        .populate('messages')
+        .populate("user")
+        .populate("manager")
+        .populate("messages")
         .exec()
     );
   }
@@ -1857,7 +1980,7 @@ const getAllManagersTransactionByAdmin = asyncHandler(async (req, res) => {
 
 const getAllTransactions = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id); // get userId from "protect middleware"
-  const response = await Transaction.find().populate('message');
+  const response = await Transaction.find().populate("message");
   if (response) {
     res.status(200).json(response);
   }
@@ -1888,7 +2011,7 @@ const registrationConfirmation = asyncHandler(async (req, res) => {
 
   if (!user) {
     res.status(404);
-    throw new Error('User does not exist');
+    throw new Error("User does not exist");
   }
 
   // Delete token if it exists in DB
@@ -1907,9 +2030,9 @@ const registrationConfirmation = asyncHandler(async (req, res) => {
       <p>Regards...</p>
       <p>Crib Team</p>
     `;
-  const subject = 'Registration Sucessful';
+  const subject = "Registration Sucessful";
 
-  const emailTest = 'peter.space.io@gmail.com';
+  const emailTest = "peter.space.io@gmail.com";
   // const send_to = email;
   const send_to = emailTest;
   const sent_from = process.env.EMAIL_USER;
@@ -1919,7 +2042,7 @@ const registrationConfirmation = asyncHandler(async (req, res) => {
   await sendEmail(subject, message, send_to, sent_from);
   res
     .status(200)
-    .json({ success: true, message: 'your registration was sucessful' });
+    .json({ success: true, message: "your registration was sucessful" });
 });
 
 //==========================={Transaction Notifications}=========================
@@ -1931,10 +2054,10 @@ const transactionConfirmation = asyncHandler(async (req, res) => {
   // const { email, txId, orderType, fromToken, toToken, fromAmount, toAmount } =
   //   req.body;
 
-  if (!email) throw new Error('Sender not found with this email');
-  if (!txId) throw new Error('Order number not found');
+  if (!email) throw new Error("Sender not found with this email");
+  if (!txId) throw new Error("Order number not found");
 
-  const subject = 'Order Confirmation';
+  const subject = "Order Confirmation";
   // const telegramGroupLink = `${process.env.FRONTEND_URL}/account`;
 
   const telegramGroupLink = `${process.env.FRONTEND_URL}/telegram`; // create telegram chatroom with botFather and use link
@@ -1978,7 +2101,7 @@ const transactionConfirmation = asyncHandler(async (req, res) => {
 <p>Govercity Team</p>
 `;
 
-  const emailTest = 'peter.space.io@gmail.com';
+  const emailTest = "peter.space.io@gmail.com";
 
   // const send_to = email; // live production
   const send_to = emailTest; // testing
@@ -1986,7 +2109,7 @@ const transactionConfirmation = asyncHandler(async (req, res) => {
   //  const sent_from = 'noreply@govercity.com',
 
   await sendEmail(subject, message, send_to, sent_from);
-  res.status(200).json({ success: true, message: 'Email sent' });
+  res.status(200).json({ success: true, message: "Email sent" });
 });
 
 //=============================={Order Completed notification email on Transaction page}============================================================
@@ -1994,10 +2117,10 @@ const transactionCompleted = asyncHandler(async (req, res) => {
   const { email, txId, orderType, fromSymbol, toSymbol, fromValue, toValue } =
     req.body;
 
-  if (!email) throw new Error('Sender not found with this email');
-  if (!txId) throw new Error('Order number not found');
+  if (!email) throw new Error("Sender not found with this email");
+  if (!txId) throw new Error("Order number not found");
 
-  const subject = 'Order Completed';
+  const subject = "Order Completed";
 
   //====================================={Example Block}=====================================================
 
@@ -2024,7 +2147,7 @@ const transactionCompleted = asyncHandler(async (req, res) => {
   <p>Govercity Team</p>
   `;
 
-  const emailTest = 'peter.space.io@gmail.com';
+  const emailTest = "peter.space.io@gmail.com";
 
   // const send_to = email; // live production
   const send_to = emailTest; // testing
@@ -2032,7 +2155,7 @@ const transactionCompleted = asyncHandler(async (req, res) => {
   //  const sent_from = 'noreply@govercity.com',
 
   await sendEmail(subject, message, send_to, sent_from);
-  res.status(200).json({ success: true, message: 'Email sent' });
+  res.status(200).json({ success: true, message: "Email sent" });
 });
 
 // Get all transaction between your manager and a single user
@@ -2041,9 +2164,9 @@ const getUserTransactionById = asyncHandler(async (req, res) => {
   const { id } = req.params; // user's Id
   if (user) {
     const transaction = await Transaction.findOne({ user: user?._id, _id: id })
-      .populate('user')
-      .populate('manager')
-      .populate('messages')
+      .populate("user")
+      .populate("manager")
+      .populate("messages")
       .exec();
 
     res.json(transaction);
@@ -2051,62 +2174,38 @@ const getUserTransactionById = asyncHandler(async (req, res) => {
 });
 
 // Get all UserTransactions
-// const getUserInactiveTransactions = asyncHandler(async (req, res) => {
-//   const user = await User.findById(req.user._id);
-//   console.log({ userTx: user });
-
-//   const response = await Transaction.find({ user: user._id, status: 'InActive' })
-//   console.log({ responseTx: response });
-//   res.status(200).json(response);
-//   // res.json(response);
-// });
-
 const getUserInactiveTransactions = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
   // console.log({ userTx: user });
 
   const response = await Transaction.find({
     user: user._id,
-    status: 'InActive',
+    status: "InActive",
   })
-    .populate('user')
+    .populate("user")
     .exec();
   console.log({ responseTx: response });
   res.status(200).json(response);
-  // res.json(response);
 });
 
-// const getUserActiveTransactions = asyncHandler(async (req, res) => {
-//   const user = await User.findById(req.user._id);
-//   // console.log({ userTx: user });
 
-//   const response = await Transaction.find({
-//     user: user._id,
-//     status: 'Active',
-//   })
-//     .populate('user')
-//     .exec();
-//   console.log({ responseTx: response });
-//   res.status(200).json(response);
-//   // res.json(response);
-// });
 
 const getUserActiveTransactions = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
   // console.log({ userTx: user });
 
-  let transactions = await Transaction.find({ status: 'pending' }).populate(
-    'message'
+  let transactions = await Transaction.find({ status: "pending" }).populate(
+    "message"
   );
 
   const response = await Transaction.find({
     user: user._id,
   })
-    .populate('user')
+    .populate("user")
     .exec();
 
   response.map(async (t) => {
-    if (t.status !== 'Pending') {
+    if (t.status !== "Pending") {
       transactions.push(t);
     }
   });
@@ -2114,20 +2213,6 @@ const getUserActiveTransactions = asyncHandler(async (req, res) => {
   res.status(200).json(transactions);
   // res.json(response);
 });
-// const getManagerActiveTransactions = asyncHandler(async (req, res) => {
-//   const user = await User.findById(req.user._id);
-//   // console.log({ userTx: user });
-
-//   const response = await Transaction.find({
-//     manager: user._id,
-//     status: 'Active',
-//   })
-//     .populate('user')
-//     .exec();
-//   console.log({ responseTx: response });
-//   res.status(200).json(response);
-//   // res.json(response);
-// });
 
 const getManagerActiveTransactions = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
@@ -2138,10 +2223,10 @@ const getManagerActiveTransactions = asyncHandler(async (req, res) => {
   const response = await Transaction.find({
     manager: user._id,
   })
-    .populate('user')
+    .populate("user")
     .exec();
   response.map(async (t) => {
-    if (t.status !== 'Pending') {
+    if (t.status !== "Pending") {
       transactions.push(t);
     }
   });
@@ -2156,26 +2241,14 @@ const orderConfirmation = asyncHandler(async (req, res) => {
   const { email, txId, orderType, fromToken, toToken, fromAmount, toAmount } =
     req.body;
 
-  if (!email) throw new Error('Sender not found with this email');
-  if (!txId) throw new Error('Order number not found');
+  if (!email) throw new Error("Sender not found with this email");
+  if (!txId) throw new Error("Order number not found");
 
-  const subject = 'Order Confirmation';
+  const subject = "Order Confirmation";
   // const telegramGroupLink = `${process.env.FRONTEND_URL}/account`;
 
   const telegramGroupLink = `${process.env.FRONTEND_URL}/telegram`; // create telegram chatroom with botFather and use link
 
-  //====={Testing}===============
-  // const message = `
-  // <h2>Hello ${email}</h2>
-
-  // <p>Your request has been receieved and would be processed shortly</p>
-  // <p>Please find your order number: ${txId} and click on the link to continue</p>
-  // <a href=${telegramGroupLink} clicktracking=off>${telegramGroupLink}</a>
-  // <p>Thank you for choosing Govercity</p>
-
-  // <p>Regards...</p>
-  // <p>Govercity Team</p>
-  // `;
 
   //====={Production}===============
 
@@ -2191,19 +2264,8 @@ const orderConfirmation = asyncHandler(async (req, res) => {
   <p>Govercity Team</p>
   `;
 
-  //   const messageExample = `
-  // <h2>Hello User</h2>
 
-  // <p>Your Buy Crypto request to exchange 5USD  to 4.9USDT has been receieved and would be processed shortly</p>
-  // <p>Please find your order number: 204 and click on the link below to continue your transaction</p>
-  // <a href="https://www.telegram.com/goBuy" clicktracking=off>"https://www.telegram.com/goBuy"</a>
-  // <p>Thank you for choosing Govercity</p>
-
-  // <p>Regards...</p>
-  // <p>Govercity Team</p>
-  // `;
-
-  const emailTest = 'peter.space.io@gmail.com';
+  const emailTest = "peter.space.io@gmail.com";
 
   // const send_to = email; // live production
   const send_to = emailTest; // testing
@@ -2211,17 +2273,17 @@ const orderConfirmation = asyncHandler(async (req, res) => {
   //  const sent_from = 'noreply@govercity.com',
 
   await sendEmail(subject, message, send_to, sent_from);
-  res.status(200).json({ success: true, message: 'Email sent' });
+  res.status(200).json({ success: true, message: "Email sent" });
 });
 
 const orderCompleted = asyncHandler(async (req, res) => {
   const { email, txId, orderType, fromSymbol, toSymbol, fromValue, toValue } =
     req.body;
 
-  if (!email) throw new Error('Sender not found with this email');
-  if (!txId) throw new Error('Order number not found');
+  if (!email) throw new Error("Sender not found with this email");
+  if (!txId) throw new Error("Order number not found");
 
-  const subject = 'Order Completed';
+  const subject = "Order Completed";
 
   //====================================={Example Block}=====================================================
 
@@ -2248,7 +2310,7 @@ const orderCompleted = asyncHandler(async (req, res) => {
   <p>Govercity Team</p>
   `;
 
-  const emailTest = 'peter.space.io@gmail.com';
+  const emailTest = "peter.space.io@gmail.com";
 
   // const send_to = email; // live production
   const send_to = emailTest; // testing
@@ -2256,520 +2318,25 @@ const orderCompleted = asyncHandler(async (req, res) => {
   //  const sent_from = 'noreply@govercity.com',
 
   await sendEmail(subject, message, send_to, sent_from);
-  res.status(200).json({ success: true, message: 'Email sent' });
+  res.status(200).json({ success: true, message: "Email sent" });
 });
 
-// /********************************************************************************************************************** */
-// /********************************************************************************************************************** */
-// /*********************************************     BLOCKCHAIN TRANSACTION MONITORING    ******************************* */
-// /********************************************************************************************************************** */
-// /********************************************************************************************************************** */
-// const getNetworkRPC = async (chainId) => {
-//   let networkRPC = '';
-//   // let decimals = '';
 
-//   switch (chainId) {
-//     //MAINNETS
-//     //Arbitrum
-//     case '42161':
-//       networkRPC = 'https://goerli-rollup.arbitrum.io/rpc';
-
-//       break;
-
-//     //Aurora
-//     case '1313161554':
-//       networkRPC = 'https://mainnet.aurora.dev';
-
-//       break;
-
-//     //Avalanche
-//     case '43114':
-//       networkRPC = 'https://api.avax.network/ext/bc/C/rpc';
-
-//       break;
-
-//     //Binance
-//     case '56':
-//       networkRPC = 'https://rpc.ankr.com/bsc';
-
-//       break;
-
-//     //ETH
-//     case '1':
-//       networkRPC = 'https://cloudflare-eth.com';
-
-//       break;
-
-//     //Fantom
-//     case '250':
-//       networkRPC = 'https://rpc.ankr.com/fantom/';
-
-//       break;
-
-//     //Gnosis
-//     case '100':
-//       networkRPC = 'https://rpc.gnosischain.com/';
-
-//       break;
-
-//     //Klaytn
-//     case '8217':
-//       networkRPC = 'https://rpc.ankr.com/klaytn';
-
-//       break;
-
-//     //Optimism
-//     case '10':
-//       networkRPC = 'https://mainnet.optimism.io';
-
-//       break;
-
-//     //Polygon
-//     case '137':
-//       networkRPC = 'https://polygon-rpc.com';
-
-//       break;
-
-//     //================================{TESTNETS}=====================================
-//     //PolygonMumbai
-//     case '80001':
-//       networkRPC = 'https://matic-mumbai.chainstacklabs.com';
-
-//       break;
-
-//     //GoerliEth
-
-//     case '5':
-//       networkRPC = 'https://rpc.ankr.com/eth_goerli';
-
-//       break;
-
-//     //BinanceTestnet
-
-//     case '97':
-//       networkRPC = 'https://data-seed-prebsc-1-s1.binance.org:8545/';
-
-//       break;
-
-//     default:
-//       console.warn('Please choose a token!');
-//       break;
-//   }
-
-//   //========{Formatting networkRPC Output}=================================
-//   let networkRPCToJson = JSON.stringify(networkRPC);
-//   let networkRPCFormatted = networkRPCToJson.replace(
-//     /^["'](.+(?=["']$))["']$/,
-//     '$1'
-//   );
-//   //========{Formatting decimals Output}=================================
-//   // let decimalsToJson = JSON.stringify(decimals);
-//   // let decimalsFormatted = decimalsToJson.replace(
-//   //   /^["'](.+(?=["']$))["']$/,
-//   //   '$1'
-//   // );
-
-//   let response = {
-//     networkRPC: networkRPCFormatted,
-//   };
-
-//   return response;
-
-//   // res.status(200).json({ status: isAvailable, token: userToken });
-// };
-
-// //====={check specific order status on Bitcoin network}========================
-// const orderStatusBitcoin = async (order) => {
-//   let received = false;
-
-//   // Initialize Axios instance for making HTTP requests
-//   // const api = axios.create({
-//   //   baseURL: 'https://blockstream.info/api',
-//   // });
-//   // chainge from testnet in real transactions
-//   let network;
-//   if (order?.networkName === 'Testnet') {
-//     network = bitcoin.networks.testnet;
-//   } else {
-//     network = bitcoin.networks.bitcoin;
-//   }
-//   // Initialize Axios instance for making HTTP requests
-//   const api = axios.create({
-//     baseURL: `https://blockstream.info/${network}/api`,
-//   });
-
-//   // mainnet
-//   // baseURL: 'https://blockstream.info/api',
-//   // testnet
-//   //   baseURL: 'https://blockstream.info/testnet/api',
-
-//   // Check for incoming transactions for each payment address
-//   const paymentStatus = await Promise.all(
-//     order.map(async (record) => {
-//       const address = record.address;
-//       const response = await api.get(`/address/${address}/txs`);
-
-//       const transactions = response.data;
-
-//       // Calculate the total amount received
-//       const totalAmountReceived = transactions.reduce((total, tx) => {
-//         const outputs = tx.vout.filter(
-//           (output) => output.scriptpubkey_address === address
-//         );
-//         const receivedAmount = outputs.reduce(
-//           (amount, output) => amount + output.value,
-//           0
-//         );
-
-//         return total + receivedAmount;
-//       }, 0);
-
-//       if (totalAmountReceived > 0) {
-//         //==========={Update DB status}======================================
-//         order.status = 'paid' || order.status;
-//         await order.save();
-//         return {
-//           status: 'paid',
-//           amount: order?.amount,
-//           address,
-//           totalReceived: totalAmountReceived / 1e8, // Convert from satoshis to BTC
-//         };
-//       } else {
-//         return {
-//           status: 'pending',
-//           amount: order?.amount,
-//           address,
-//           totalReceived: totalAmountReceived / 1e8, // Convert from satoshis to BTC
-//         };
-//       }
-//     })
-//   );
-
-//   return paymentStatus;
-// };
-// //====={check specific order status on Ethereum network}========================
-// const orderStatusEvm = async (order) => {
-//   // const provider = new ethers.providers.JsonRpcProvider('https://mainnet.infura.io/v3/your-infura-project-id'); // Replace with your Infura project ID
-//   const verifyToken = await getNetworkRPC(order?.chainId);
-//   let networkRPC = verifyToken.networkRPC;
-//   const provider = new ethers.providers.JsonRpcProvider(networkRPC); // Replace with your Infura project ID
-
-//   //=================================================================
-//   const receiver = order?.receiver; // Replace with wallet A's address
-//   const sender = order?.sender; // Replace with wallet B's address
-
-//   const tokenAddress = order?.tokenAddress;
-//   const tokenDecimals = order?.tokenDecimals;
-//   const tokenSymbol = order?.tokenSymbol;
-//   const amount = order?.amount;
-//   if (tokenAddress != '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee') {
-//     const expectedAmount = ethers.utils.parseEther(order?.amount); // Replace with the expected amount in Ether
-//     // const expectedAmount = ethers.utils.parseEther('1'); // Replace with the expected amount in Ether
-
-//     // Create a filter to monitor incoming transactions from wallet B to wallet A
-//     const filter = {
-//       address: receiver,
-//       topics: [
-//         ethers.utils.id('Transfer(address,address,uint256)'),
-//         null,
-//         sender,
-//       ],
-//     };
-
-//     provider.on(filter, async (log) => {
-//       try {
-//         const transactionHash = log.transactionHash;
-//         const transaction = await provider.getTransaction(transactionHash);
-
-//         // Check if the transaction value matches the expected amount
-//         if (transaction && transaction.value.eq(expectedAmount)) {
-//           console.log(
-//             `Received ${expectedAmount.toString()} Ether from ${sender} to ${receiver}`
-//           );
-//           // Perform further actions or handle the transaction as needed
-
-//           //==========={Update DB status}======================================
-//           return {
-//             status: 'paid',
-//             from: receiver,
-//             to: sender,
-//             totalReceived: expectedAmount,
-//             isAmountMatched: true,
-//             transactionHash: transactionHash,
-//           };
-//         } else {
-//           return {
-//             status: 'pending',
-//             from: receiver,
-//             to: sender,
-//             totalReceived: transaction.value,
-//             isAmountMatched: false,
-//           };
-//         }
-//       } catch (error) {
-//         console.error('Error processing incoming transaction:', error);
-//       }
-//     });
-//   } else {
-//     // Create a filter to monitor incoming USDT transfers from wallet B to wallet A
-//     // const expectedAmount = ethers.utils.parseUnits('100', 6); // Replace with the expected amount in USDT (e.g., 100 USDT)
-//     const expectedAmount = ethers.utils
-//       .parseUnits(amount.toString(), tokenDecimals.toString())
-//       .toString();
-
-//     const tokenContract = new ethers.Contract(
-//       tokenAddress,
-//       ['transfer(address,uint256)'],
-//       provider
-//     );
-//     tokenContract.on('Transfer', async (from, to, value, event) => {
-//       try {
-//         // Check if the transfer matches the expected amount and destination address
-
-//         if (to === receiver && from === sender && value.eq(expectedAmount)) {
-//           console.log(
-//             `Received ${ethers.utils.formatUnits(
-//               expectedAmount,
-//               tokenDecimals
-//             )} ${tokenSymbol} from ${sender} to ${receiver}`
-//           );
-//           // Perform further actions or handle the transaction as needed
-
-//           //==========={Update DB status}======================================
-//           return { status: 'paid' };
-//         }
-//       } catch (error) {
-//         console.error('Error processing incoming USDT transfer:', error);
-//       }
-//     });
-//   }
-// };
-// //====={check specific order status on tron network}========================
-// const orderStatusTron = async (order) => {
-//   // Initialize Axios instance for making HTTP requests
-//   const api = axios.create({
-//     baseURL: 'https://api.trongrid.io',
-//   });
-
-//   //=================================================================
-
-//   //=================================================================
-//   const receiver = order?.receiver; // Replace with wallet A's address
-//   const sender = order?.sender; // Replace with wallet B's address
-
-//   const tokenAddress = order?.tokenAddress;
-//   const tokenDecimals = order?.tokenDecimals;
-//   const tokenSymbol = order?.tokenSymbol;
-//   const amount = order?.amount;
-
-//   if (tokenSymbol != 'TX') {
-//     // Get transactions sent from wallet B to wallet A
-//     const expectedAmount = Number(amount); // 100 // Replace with the expected amount in TRX
-//     const response = await api.get('/v1/accounts/txs', {
-//       params: {
-//         only_to: receiver,
-//         only_from: sender,
-//       },
-//     });
-
-//     const transactions = response.data.data;
-
-//     // Calculate the total amount received from wallet B to wallet A
-//     const totalAmountReceived = transactions.reduce((total, tx) => {
-//       return total + parseFloat(tx.amount);
-//     }, 0);
-
-//     // Check if the total amount received matches the expected amount
-//     const isAmountMatched = totalAmountReceived === expectedAmount;
-
-//     if (isAmountMatched) {
-//       //==========={Update DB status}======================================
-//       return {
-//         status: 'paid',
-//         from: receiver,
-//         to: sender,
-//         totalReceived: totalAmountReceived / 1e6, // Convert from SUN to TRX
-//         isAmountMatched,
-//       };
-//     } else {
-//       return {
-//         status: 'pending',
-//         from: receiver,
-//         to: sender,
-//         totalReceived: totalAmountReceived / 1e6, // Convert from SUN to TRX
-//         isAmountMatched,
-//       };
-//     }
-//   } else {
-//     // TRON full node endpoint (mainnet or testnet)
-//     // const expectedAmount = Number(amount) * 1000000; // 100 // Replace with the expected amount in SUN (e.g., 1000000 SUN)
-//     const expectedAmount = Number(amount) * 1e6; // 100 // Replace with the expected amount in SUN (e.g., 1000000 SUN)
-
-//     // USDT contract address on TRON (mainnet or testnet)
-//     // const usdtContractAddress = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t'; // Mainnet USDT contract address
-//     const usdtContractAddress = tokenAddress; // Mainnet USDT contract address
-
-//     // Create a filter to monitor incoming USDT transfers from wallet B to wallet A
-//     const eventFilter = {
-//       contractAddress: usdtContractAddress,
-//       eventName: 'Transfer',
-//       result: {
-//         to: receiver,
-//         from: sender,
-//         value: expectedAmount,
-//       },
-//     };
-
-//     // // Subscribe to the event
-//     // tronWeb.getEventResult(eventFilter, (error, events) => {
-//     //   if (error) {
-//     //     console.error('Error retrieving events:', error);
-//     //     return;
-//     //   }
-
-//     //   if (events.length > 0) {
-//     //     console.log(
-//     //       `Received ${expectedAmount} SUN (${tokenSymbol}) from ${sender} to ${receiver}`
-//     //     );
-//     //     // Perform further actions or handle the transaction as needed
-//     //     //==========={Update DB status}======================================
-//     //     return { status: 'paid' };
-//     //   }
-
-//     // });
-
-//     // Subscribe to the event
-//     let result = tronWeb.getEventResult(eventFilter, (error, events) => {
-//       if (error) {
-//         console.error('Error retrieving events:', error);
-//         return;
-//       }
-
-//       if (events.length > 0) {
-//         console.log(
-//           `Received ${expectedAmount} SUN (${tokenSymbol}) from ${sender} to ${receiver}`
-//         );
-//         // Perform further actions or handle the transaction as needed
-//         //==========={Update DB status}======================================
-//         return {
-//           status: 'paid',
-//           from: receiver,
-//           to: sender,
-//           totalReceived: expectedAmount / 1e6, // Convert from SUN to TRX //check
-//           isAmountMatched: true, // check
-//         };
-//       }
-//     });
-//     return result;
-//   }
-// };
-
-// //====={Update transaction by id internally after receiving blockchain update on the transaction status}=========
-// const updateTransactionByIdInternal = async (id, info) => {
-//   const transaction = await Transaction.findById(id);
-
-//   if (transaction) {
-//     transaction.status = info.status || transaction.status;
-//     transaction.totalReceived = info.status || transaction.status;
-//     transaction.isAmountMatched = info.status || transaction.status;
-//   }
-//   const updatedTransaction = await transaction.save();
-//   if (updatedTransaction) {
-//     console.log({ updatedTransaction: updatedTransaction });
-//     return updatedTransaction;
-//   }
-// };
-// const montitorBlockchainTransaction = async (req, res) => {
-//   let transactions = await Transaction.find({ status: 'pending' });
-
-//   transactions.map(async (order) => {
-//     let statusBitcoin = await orderStatusBitcoin(order);
-//     let statusEvm = await orderStatusEvm(order);
-//     let statusTron = await orderStatusTron(order);
-//     if (statusBitcoin.status === 'Paid') {
-//       await updateTransactionByIdInternal(order._id, statusBitcoin);
-//     }
-//     if (statusEvm.status === 'Paid') {
-//       await updateTransactionByIdInternal(order._id, statusEvm);
-//     }
-//     if (statusTron.status === 'Paid') {
-//       await updateTransactionByIdInternal(order._id, statusTron);
-//     }
-//   });
-
-//   res.status(200).json(transactions);
-// };
-// //====={Montor all blockchain transactions at intervals : default here is every minute}========================
-// //======{Pooling works and should be used for fetching and updating all current market data per set intervals}=================
-// const poolRequestForAllBlockchainTransactions = async () => {
-//   const intervalId = setInterval(() => {
-//     montitorBlockchainTransaction();
-//   }, 60000); // check after every minute
-
-//   return () => {
-//     clearInterval(intervalId);
-//   };
-// };
-
-// poolRequestForAllBlockchainTransactions();
-
-// /********************************************************************************************************************** */
-// /********************************************************************************************************************** */
-// /*********************************************     BLOCKCHAIN TRANSACTION MONITORING    ******************************* */
-// /********************************************************************************************************************** */
-// /********************************************************************************************************************** */
-
-const protect = asyncHandler(async () => {
-  try {
-    // const token = req.cookies.token;
-    const token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1MzRmNGYwMWJhMDJjYmJkYzgyY2ZmOCIsImlhdCI6MTY5Nzk3MjQ3MSwiZXhwIjoxNjk4MDU4ODcxfQ.rL7Iug3hYiWBDFpQxxRcgiqfHAAqhOH1QWGYsas82qw';
-    if (!token) {
-      console.log('Not authenticated!');
-    }
-
-    // Verify Token
-    const verified = jwt.verify(token, process.env.JWT_SECRET);
-    console.log({ verified: verified });
-    // Get user id from token
-    const user = await User.findById(verified.id).select('-password');
-    console.log({ user: user });
-
-    if (!user) {
-      console.log('User not found');
-    }
-    // req.user = user;
-    // next();
-  } catch (error) {
-    console.log('Not authorized, please login');
-    // throw new Error('Not ready');
-  }
-});
-
-// protect()
 //=============================================================================================================
 //============={updated transactions rate}=============================================
 
-const geTokenPriceData1 = async (id) => {
-  const url = 'https://api.coingecko.com/api/v3/';
-  const param = `coins/${id}`;
-  const response = await axios.get(url + param);
-  return response.data;
-};
-
-// const geTokenPriceData = async (id) => {
-//   const url = 'https://api.coingecko.com/api/v3/';
-//   const param = `coins/${id}`;
-//   const response = await axios.get(url + param);
-//   // console.log({ fullResponse: response });
-//   // console.log({ fullResponse: response });
-
-//   return response.data;
-// };
-
 const geTokenPriceData = async (id) => {
-  const url = 'https://api.coingecko.com/api/v3/';
-  const param = `coins/${id}`;
+  //==============={Free API}===================================
+  // const url = 'https://api.coingecko.com/api/v3/';
+  // const param = `coins/${id}`;
+
+  //==============={Demo API}===================================
+  // const url = 'https://api.coingecko.com/api/v3/';
+  // const param = `coins/${id}?x_cg_demo_api_key=${process.env.COINGEKO_API_KEY}`;
+  //==============={Pro API}===================================
+  const url = "https://pro-api.coingecko.com/api/v3/";
+  const param = `coins/${id}?x_cg_pro_api_key=${process.env.COINGEKO_API_KEY}`;
+
   try {
     const response = await axios.get(url + param);
     return response.data;
@@ -2778,214 +2345,19 @@ const geTokenPriceData = async (id) => {
 
     return error;
   }
-  // console.log({ fullResponse: response });
-  // console.log({ fullResponse: response });
 };
 
-//=================================={Rate Limit Handling}===============================
-
-function getMillisToSleep(retryHeaderString) {
-  let millisToSleep = Math.round(parseFloat(retryHeaderString) * 1000);
-  if (isNaN(millisToSleep)) {
-    millisToSleep = Math.max(0, new Date(retryHeaderString) - new Date());
-  }
-  return millisToSleep;
-}
-
-getMillisToSleep('4'); // => 4000
-getMillisToSleep('Mon, 29 Mar 2021 04:58:00 GMT'); // => 4000
-
-/**
- * Now we can build out a function that uses
- * the Retry-After header to retry
- * when we encounter a 429 HTTP status code:
- */
-
-async function fetchAndRetryIfNecessary(callAPIFn) {
-  const response = await callAPIFn();
-
-  if (response.status === 429) {
-    const retryAfter = response.headers.get('retry-after');
-    const millisToSleep = getMillisToSleep(retryAfter);
-    await sleep(millisToSleep);
-    return fetchAndRetryIfNecessary(callAPIFn);
-  }
-
-  console.log({ apiResponse: response?.market_data?.current_price?.usd });
-
-  return response;
-}
-
-async function retryApi() {
-  const response = await fetchAndRetryIfNecessary(
-    async () =>
-      // await fetch(apiURL, requestOptions)
-      // await geTokenPriceData(id)
-      await geTokenPriceData('bitcoin')
-  );
-  // console.log(response.status); // => 200
-  console.log({ apiLimitStatus: response.status }); // => 200
-}
-
-// retryApi()
-
-async function fnBucketApi() {
-  const response = await geTokenPriceData('bitcoin');
-  // console.log(response.status); // => 200
-  console.log({ apiResponse: response?.market_data?.current_price?.usd });
-  // console.log({ apiLimitStatus: response.status }); // => 200
-}
-
-async function fnBucketApi1() {
-  const response = await geTokenPriceData('bitcoin');
-  // console.log(response.status); // => 200
-  console.log({
-    apiResponseBitcoin: response?.market_data?.current_price?.usd,
-  });
-  // console.log({ apiLimitStatus: response.status }); // => 200
-}
-
-async function fnBucketApi2() {
-  const response = await geTokenPriceData('ethereum');
-  // console.log(response.status); // => 200
-  console.log({
-    apiResponseEthereum: response?.market_data?.current_price?.usd,
-  });
-  // console.log({ apiLimitStatus: response.status }); // => 200
-}
-
-const tokenBucket = new TokenBucketRateLimiter({
-  // maxRequests: 15,
-  // maxRequestWindowMS: 60000, // max 15 calls within 60 seconds interval
-
-  maxRequests: 10,
-  maxRequestWindowMS: 60000, // max 10 calls within 60 seconds interval
-});
-
-// tokenBucket.acquireToken(() => fnBucketApi());
-
-// const limiter = new RateLimiter({
-//   tokensPerInterval: 150,
-//   interval: "hour",
-//   fireImmediately: true
-// });
-
-// async function requestHandler(request, response) {
-//   // Immediately send 429 header to client when rate limiting is in effect
-//   const remainingRequests = await limiter.removeTokens(1);
-//   if (remainingRequests < 0) {
-//     response.writeHead(429, {'Content-Type': 'text/plain;charset=UTF-8'});
-//     response.end('429 Too Many Requests - your IP is being rate limited');
-//   } else {
-//     await geTokenPriceData('bitcoin')
-//   }
-// }
-
-// const limiter = new RateLimiter({
-//   tokensPerInterval: 10, // we will set backround refetch of 4 calls every minute
-//   interval: 'minute',
-//   fireImmediately: true, // if there is sudden call to the api
-// });
-
-const limiter = new RateLimiter({
-  // tokensPerInterval: 4, // we will set backround refetch of 4 calls every minute
-  tokensPerInterval: 2, // we will set backround refetch of 4 calls every minute
-  interval: 'minute',
-  fireImmediately: true, // if there is sudden call to the api
-});
-
-// console.log({ limiter: limiter });
-
-// async function requestHandler() {
-//   // Immediately send 429 header to client when rate limiting is in effect
-//   const remainingRequests = await limiter.removeTokens(1);
-//   if (remainingRequests < 0) {
-//     console.log('429 Too Many Requests - your IP is being rate limited');
-
-//     // response.writeHead(429, {'Content-Type': 'text/plain;charset=UTF-8'});
-//     // response.end('429 Too Many Requests - your IP is being rate limited');
-//   } else {
-//     await fnBucketApi();
-//   }
-// }
-
-async function requestHandler() {
-  // Immediately send 429 header to client when rate limiting is in effect
-  const remainingRequests = await limiter.removeTokens(1);
-  let errorStatus;
-  if (remainingRequests < 0) {
-    console.log('429 Too Many Requests - your IP is being rate limited');
-    errorStatus = true;
-    return errorStatus;
-
-    // response.writeHead(429, {'Content-Type': 'text/plain;charset=UTF-8'});
-    // response.end('429 Too Many Requests - your IP is being rate limited');
-  } else {
-    await fnBucketApi1();
-    await fnBucketApi2();
-    errorStatus = false;
-    return errorStatus;
-  }
-}
-
-// const checkCoingekoPooling = async () => {
-//   const intervalId = setInterval(() => {
-//     requestHandler();
-//     // }, 6000); // check after every 6 seconds (that should be 10 calls in 60 secons or 1minute )
-//     // }, 15000); // check after every 15 seconds (that should be 4 calls in 60 seconds or 1minute ) // in the case of our use-query hook in frontend
-//   }, 30000); // check after every 30 seconds (that should be 2 calls in 60 seconds or 1minute ) // in the case of our use-query hook in frontend
-
-//   return () => {
-//     clearInterval(intervalId);
-//   };
-// };
-
-// checkCoingekoPooling();
-
-const checkCoingekoPooling = async (status) => {
-  let intervalId = setInterval(async () => {
-    status = await requestHandler();
-    console.log({ status: status });
-    // }, 30000); // normal duration
-  }, 20000); // exceed api limit faster
-  // },1000); // exceed api limit faster
-  if (status) {
-    clearInterval(intervalId); // Stop the interval if the condition holds true
-  }
-};
-
-// checkCoingekoPooling();
-// requestHandler();
-
-async function controlCoingekoFetching() {
-  let status = false;
-  if (!status) {
-    checkCoingekoPooling(status);
-  } else {
-    setTimeout(() => {
-      status = false;
-      console.log('refetching in 60 secons activated');
-      checkCoingekoPooling(status);
-    }, 60000); //after 60 seconds, restart pooling
-  }
-
-  console.log({ updatedStatus: status });
-}
-
-// controlCoingekoFetching();
-
-//=================================={Rate Limit Handling}===============================
 
 const getTokenAmount = async (token, value) => {
   let amount; // fValue formatted to transaction decimals
   let amountFixed;
   let estimatedGas; // to be completed
-  if (token?.chain === 'Bitcoin') {
+  if (token?.chain === "Bitcoin") {
     const satoshiToSend = Number(value) * 1e8; // check || 1e9
     amount = satoshiToSend;
   }
 
-  if (token?.chain === 'Ethereum') {
+  if (token?.chain === "Ethereum") {
     // amount = ethers.utils.parseUnits(value.toString(), Number(token?.decimals)); // Example: 1 ETH or 1 token (adjust as needed)
     amount = parseUnits(
       value.toString(),
@@ -2995,7 +2367,7 @@ const getTokenAmount = async (token, value) => {
     // amountFixed = Number(amount).toFixed(3);
   }
 
-  if (token?.chain === 'Tron') {
+  if (token?.chain === "Tron") {
     // Amount in SUN (TRX)
     // const amount = 1000000; // Example: 1 TRX or 1,000,000 SUN (adjust as needed)
     const amountInSUN = Number(value) * 1e6;
@@ -3015,10 +2387,12 @@ const getTokenAmount = async (token, value) => {
   // console.log({ response: response });
   return response;
 };
-const getTokenExchangeRate1 = asyncHandler(async (req, res) => {
+
+
+const getTokenExchangeRate = asyncHandler(async (req, res) => {
   const { fToken, tToken, service, subService } = req.body;
 
-  if (service === 'defi' && subService === 'defi') {
+  if (service === "defi" && subService === "defi") {
     //=================================================================================================
     const fromPrice = await geTokenPriceData(fToken?.id);
     const fromPriceData = fromPrice?.market_data?.current_price;
@@ -3039,44 +2413,44 @@ const getTokenExchangeRate1 = asyncHandler(async (req, res) => {
 
     res.status(200).json(response);
   }
-  if (service === 'buy' && subService === 'buyCash') {
+  if (service === "buy" && subService === "buyCash") {
     //=================================================================================================
     const toPrice = await geTokenPriceData(tToken?.id);
     const toPriceData = toPrice?.market_data?.current_price;
     //=================================================================================================
 
     let exchangeRate;
-    if (fToken?.symbol === 'usd') {
+    if (fToken?.symbol === "usd") {
       exchangeRate = Number(toPriceData?.usd);
     }
-    if (fToken?.symbol === 'gbp') {
+    if (fToken?.symbol === "gbp") {
       exchangeRate = Number(toPriceData?.gbp);
     }
-    if (fToken?.symbol === 'eur') {
+    if (fToken?.symbol === "eur") {
       exchangeRate = Number(toPriceData?.eur);
     }
-    if (fToken?.symbol === 'rub') {
+    if (fToken?.symbol === "rub") {
       exchangeRate = Number(toPriceData?.rub);
     }
-    if (fToken?.symbol === 'cad') {
+    if (fToken?.symbol === "cad") {
       exchangeRate = Number(toPriceData?.cad);
     }
-    if (fToken?.symbol === 'aed') {
+    if (fToken?.symbol === "aed") {
       exchangeRate = Number(toPriceData?.aed);
     }
-    if (fToken?.symbol === 'jpy') {
+    if (fToken?.symbol === "jpy") {
       exchangeRate = Number(toPriceData?.jpy);
     }
-    if (fToken?.symbol === 'ngn') {
+    if (fToken?.symbol === "ngn") {
       exchangeRate = Number(toPriceData?.ngn);
     }
-    if (fToken?.symbol === 'php') {
+    if (fToken?.symbol === "php") {
       exchangeRate = Number(toPriceData?.php);
     }
-    if (fToken?.symbol === 'chf') {
+    if (fToken?.symbol === "chf") {
       exchangeRate = Number(toPriceData?.chf);
     }
-    if (fToken?.symbol === 'aud') {
+    if (fToken?.symbol === "aud") {
       exchangeRate = Number(toPriceData?.aud);
     }
 
@@ -3091,44 +2465,44 @@ const getTokenExchangeRate1 = asyncHandler(async (req, res) => {
 
     res.status(200).json(response);
   }
-  if (service === 'buy' && subService === 'buyCard') {
+  if (service === "buy" && subService === "buyCard") {
     //=================================================================================================
     const toPrice = await geTokenPriceData(tToken?.id);
     const toPriceData = toPrice?.market_data?.current_price;
     //=================================================================================================
 
     let exchangeRate;
-    if (fToken?.symbol === 'usd') {
+    if (fToken?.symbol === "usd") {
       exchangeRate = Number(toPriceData?.usd);
     }
-    if (fToken?.symbol === 'gbp') {
+    if (fToken?.symbol === "gbp") {
       exchangeRate = Number(toPriceData?.gbp);
     }
-    if (fToken?.symbol === 'eur') {
+    if (fToken?.symbol === "eur") {
       exchangeRate = Number(toPriceData?.eur);
     }
-    if (fToken?.symbol === 'rub') {
+    if (fToken?.symbol === "rub") {
       exchangeRate = Number(toPriceData?.rub);
     }
-    if (fToken?.symbol === 'cad') {
+    if (fToken?.symbol === "cad") {
       exchangeRate = Number(toPriceData?.cad);
     }
-    if (fToken?.symbol === 'aed') {
+    if (fToken?.symbol === "aed") {
       exchangeRate = Number(toPriceData?.aed);
     }
-    if (fToken?.symbol === 'jpy') {
+    if (fToken?.symbol === "jpy") {
       exchangeRate = Number(toPriceData?.jpy);
     }
-    if (fToken?.symbol === 'ngn') {
+    if (fToken?.symbol === "ngn") {
       exchangeRate = Number(toPriceData?.ngn);
     }
-    if (fToken?.symbol === 'php') {
+    if (fToken?.symbol === "php") {
       exchangeRate = Number(toPriceData?.php);
     }
-    if (fToken?.symbol === 'chf') {
+    if (fToken?.symbol === "chf") {
       exchangeRate = Number(toPriceData?.chf);
     }
-    if (fToken?.symbol === 'aud') {
+    if (fToken?.symbol === "aud") {
       exchangeRate = Number(toPriceData?.aud);
     }
 
@@ -3143,44 +2517,44 @@ const getTokenExchangeRate1 = asyncHandler(async (req, res) => {
     console.log({ responseExchangeRate: response });
     res.status(200).json(response);
   }
-  if (service === 'sell' && subService === 'sellCash') {
+  if (service === "sell" && subService === "sellCash") {
     //=================================================================================================
     const fromPrice = await geTokenPriceData(fToken?.id);
     const fromPriceData = fromPrice?.market_data?.current_price;
     //=================================================================================================
 
     let exchangeRate;
-    if (tToken?.symbol === 'usd') {
+    if (tToken?.symbol === "usd") {
       exchangeRate = Number(fromPriceData?.usd);
     }
-    if (tToken?.symbol === 'gbp') {
+    if (tToken?.symbol === "gbp") {
       exchangeRate = Number(fromPriceData?.gbp);
     }
-    if (tToken?.symbol === 'eur') {
+    if (tToken?.symbol === "eur") {
       exchangeRate = Number(fromPriceData?.eur);
     }
-    if (tToken?.symbol === 'rub') {
+    if (tToken?.symbol === "rub") {
       exchangeRate = Number(fromPriceData?.rub);
     }
-    if (tToken?.symbol === 'cad') {
+    if (tToken?.symbol === "cad") {
       exchangeRate = Number(fromPriceData?.cad);
     }
-    if (tToken?.symbol === 'aed') {
+    if (tToken?.symbol === "aed") {
       exchangeRate = Number(fromPriceData?.aed);
     }
-    if (tToken?.symbol === 'jpy') {
+    if (tToken?.symbol === "jpy") {
       exchangeRate = Number(fromPriceData?.jpy);
     }
-    if (tToken?.symbol === 'ngn') {
+    if (tToken?.symbol === "ngn") {
       exchangeRate = Number(fromPriceData?.ngn);
     }
-    if (tToken?.symbol === 'php') {
+    if (tToken?.symbol === "php") {
       exchangeRate = Number(fromPriceData?.php);
     }
-    if (tToken?.symbol === 'chf') {
+    if (tToken?.symbol === "chf") {
       exchangeRate = Number(fromPriceData?.chf);
     }
-    if (tToken?.symbol === 'aud') {
+    if (tToken?.symbol === "aud") {
       exchangeRate = Number(fromPriceData?.aud);
     }
 
@@ -3194,44 +2568,44 @@ const getTokenExchangeRate1 = asyncHandler(async (req, res) => {
 
     res.status(200).json(response);
   }
-  if (service === 'sell' && subService === 'sellCard') {
+  if (service === "sell" && subService === "sellCard") {
     //=================================================================================================
     const fromPrice = await geTokenPriceData(fToken?.id);
     const fromPriceData = fromPrice?.market_data?.current_price;
     //=================================================================================================
 
     let exchangeRate;
-    if (tToken?.symbol === 'usd') {
+    if (tToken?.symbol === "usd") {
       exchangeRate = Number(fromPriceData?.usd);
     }
-    if (tToken?.symbol === 'gbp') {
+    if (tToken?.symbol === "gbp") {
       exchangeRate = Number(fromPriceData?.gbp);
     }
-    if (tToken?.symbol === 'eur') {
+    if (tToken?.symbol === "eur") {
       exchangeRate = Number(fromPriceData?.eur);
     }
-    if (tToken?.symbol === 'rub') {
+    if (tToken?.symbol === "rub") {
       exchangeRate = Number(fromPriceData?.rub);
     }
-    if (tToken?.symbol === 'cad') {
+    if (tToken?.symbol === "cad") {
       exchangeRate = Number(fromPriceData?.cad);
     }
-    if (tToken?.symbol === 'aed') {
+    if (tToken?.symbol === "aed") {
       exchangeRate = Number(fromPriceData?.aed);
     }
-    if (tToken?.symbol === 'jpy') {
+    if (tToken?.symbol === "jpy") {
       exchangeRate = Number(fromPriceData?.jpy);
     }
-    if (tToken?.symbol === 'ngn') {
+    if (tToken?.symbol === "ngn") {
       exchangeRate = Number(fromPriceData?.ngn);
     }
-    if (tToken?.symbol === 'php') {
+    if (tToken?.symbol === "php") {
       exchangeRate = Number(fromPriceData?.php);
     }
-    if (tToken?.symbol === 'chf') {
+    if (tToken?.symbol === "chf") {
       exchangeRate = Number(fromPriceData?.chf);
     }
-    if (tToken?.symbol === 'aud') {
+    if (tToken?.symbol === "aud") {
       exchangeRate = Number(fromPriceData?.aud);
     }
     if (isNaN(exchangeRate)) {
@@ -3244,7 +2618,7 @@ const getTokenExchangeRate1 = asyncHandler(async (req, res) => {
 
     res.status(200).json(response);
   }
-  if (service === 'exchange' && subService === 'exchange') {
+  if (service === "exchange" && subService === "exchange") {
     //=================================================================================================
     const fromPrice = await geTokenPriceData(fToken?.id);
     const fromPriceData = fromPrice?.market_data?.current_price;
@@ -3266,44 +2640,44 @@ const getTokenExchangeRate1 = asyncHandler(async (req, res) => {
     };
     res.status(200).json(response);
   }
-  if (service === 'store' && subService === 'store') {
+  if (service === "store" && subService === "store") {
     //=================================================================================================
     const toPrice = await geTokenPriceData(tToken?.id);
     const toPriceData = toPrice?.market_data?.current_price;
     //=================================================================================================
 
     let exchangeRate;
-    if (fToken?.symbol === 'usd') {
+    if (fToken?.symbol === "usd") {
       exchangeRate = Number(toPriceData?.usd);
     }
-    if (fToken?.symbol === 'gbp') {
+    if (fToken?.symbol === "gbp") {
       exchangeRate = Number(toPriceData?.gbp);
     }
-    if (fToken?.symbol === 'eur') {
+    if (fToken?.symbol === "eur") {
       exchangeRate = Number(toPriceData?.eur);
     }
-    if (fToken?.symbol === 'rub') {
+    if (fToken?.symbol === "rub") {
       exchangeRate = Number(toPriceData?.rub);
     }
-    if (fToken?.symbol === 'cad') {
+    if (fToken?.symbol === "cad") {
       exchangeRate = Number(toPriceData?.cad);
     }
-    if (fToken?.symbol === 'aed') {
+    if (fToken?.symbol === "aed") {
       exchangeRate = Number(toPriceData?.aed);
     }
-    if (fToken?.symbol === 'jpy') {
+    if (fToken?.symbol === "jpy") {
       exchangeRate = Number(toPriceData?.jpy);
     }
-    if (fToken?.symbol === 'ngn') {
+    if (fToken?.symbol === "ngn") {
       exchangeRate = Number(toPriceData?.ngn);
     }
-    if (fToken?.symbol === 'php') {
+    if (fToken?.symbol === "php") {
       exchangeRate = Number(toPriceData?.php);
     }
-    if (fToken?.symbol === 'chf') {
+    if (fToken?.symbol === "chf") {
       exchangeRate = Number(toPriceData?.chf);
     }
-    if (fToken?.symbol === 'aud') {
+    if (fToken?.symbol === "aud") {
       exchangeRate = Number(toPriceData?.aud);
     }
 
@@ -3315,371 +2689,31 @@ const getTokenExchangeRate1 = asyncHandler(async (req, res) => {
       exchangeRateRaw: exchangeRate,
       exchangeRate: exchangeRate.toFixed(3),
     };
-
+    console.log({ exchangeRateInCheck: response });
     res.status(200).json(response);
   }
-});
-
-const getTokenExchangeRate = asyncHandler(async (req, res) => {
-  const { fToken, tToken, service, subService } = req.body;
-
-  const limiter = new RateLimiter({
-    tokensPerInterval: 4, // we will set backround refetch of 4 calls every minute max of 8 calls
-    interval: 'minute',
-    fireImmediately: true, // if there is sudden call to the api
-  });
-
-  async function fetchRates() {
-    if (service === 'defi' && subService === 'defi') {
-      //=================================================================================================
-      const fromPrice = await geTokenPriceData(fToken?.id);
-      const fromPriceData = fromPrice?.market_data?.current_price;
-      const toPrice = await geTokenPriceData(tToken?.id);
-      const toPriceData = toPrice?.market_data?.current_price;
-      //=================================================================================================
-      const fUSDPrice = Number(fromPriceData?.usd); // usd price
-      const tUSDPrice = Number(toPriceData?.usd); // usd price
-      let exchangeRate = 1 * (fUSDPrice / tUSDPrice); //fToken?.symbol/tToken.symbol
-
-      if (isNaN(exchangeRate)) {
-        exchangeRate = 0;
-      }
-      const response = {
-        exchangeRateRaw: exchangeRate,
-        exchangeRate: exchangeRate.toFixed(3),
-      };
-
-      res.status(200).json(response);
-    }
-    if (service === 'buy' && subService === 'buyCash') {
-      //=================================================================================================
-      const toPrice = await geTokenPriceData(tToken?.id);
-      const toPriceData = toPrice?.market_data?.current_price;
-      //=================================================================================================
-
-      let exchangeRate;
-      if (fToken?.symbol === 'usd') {
-        exchangeRate = Number(toPriceData?.usd);
-      }
-      if (fToken?.symbol === 'gbp') {
-        exchangeRate = Number(toPriceData?.gbp);
-      }
-      if (fToken?.symbol === 'eur') {
-        exchangeRate = Number(toPriceData?.eur);
-      }
-      if (fToken?.symbol === 'rub') {
-        exchangeRate = Number(toPriceData?.rub);
-      }
-      if (fToken?.symbol === 'cad') {
-        exchangeRate = Number(toPriceData?.cad);
-      }
-      if (fToken?.symbol === 'aed') {
-        exchangeRate = Number(toPriceData?.aed);
-      }
-      if (fToken?.symbol === 'jpy') {
-        exchangeRate = Number(toPriceData?.jpy);
-      }
-      if (fToken?.symbol === 'ngn') {
-        exchangeRate = Number(toPriceData?.ngn);
-      }
-      if (fToken?.symbol === 'php') {
-        exchangeRate = Number(toPriceData?.php);
-      }
-      if (fToken?.symbol === 'chf') {
-        exchangeRate = Number(toPriceData?.chf);
-      }
-      if (fToken?.symbol === 'aud') {
-        exchangeRate = Number(toPriceData?.aud);
-      }
-
-      if (isNaN(exchangeRate)) {
-        exchangeRate = 0;
-      }
-
-      const response = {
-        exchangeRateRaw: exchangeRate,
-        exchangeRate: exchangeRate.toFixed(3),
-      };
-
-      res.status(200).json(response);
-    }
-    if (service === 'buy' && subService === 'buyCard') {
-      //=================================================================================================
-      const toPrice = await geTokenPriceData(tToken?.id);
-      const toPriceData = toPrice?.market_data?.current_price;
-      //=================================================================================================
-
-      let exchangeRate;
-      if (fToken?.symbol === 'usd') {
-        exchangeRate = Number(toPriceData?.usd);
-      }
-      if (fToken?.symbol === 'gbp') {
-        exchangeRate = Number(toPriceData?.gbp);
-      }
-      if (fToken?.symbol === 'eur') {
-        exchangeRate = Number(toPriceData?.eur);
-      }
-      if (fToken?.symbol === 'rub') {
-        exchangeRate = Number(toPriceData?.rub);
-      }
-      if (fToken?.symbol === 'cad') {
-        exchangeRate = Number(toPriceData?.cad);
-      }
-      if (fToken?.symbol === 'aed') {
-        exchangeRate = Number(toPriceData?.aed);
-      }
-      if (fToken?.symbol === 'jpy') {
-        exchangeRate = Number(toPriceData?.jpy);
-      }
-      if (fToken?.symbol === 'ngn') {
-        exchangeRate = Number(toPriceData?.ngn);
-      }
-      if (fToken?.symbol === 'php') {
-        exchangeRate = Number(toPriceData?.php);
-      }
-      if (fToken?.symbol === 'chf') {
-        exchangeRate = Number(toPriceData?.chf);
-      }
-      if (fToken?.symbol === 'aud') {
-        exchangeRate = Number(toPriceData?.aud);
-      }
-
-      if (isNaN(exchangeRate)) {
-        exchangeRate = 0;
-      }
-
-      const response = {
-        exchangeRateRaw: exchangeRate,
-        exchangeRate: exchangeRate.toFixed(3),
-      };
-      console.log({ responseExchangeRate: response });
-      res.status(200).json(response);
-    }
-    if (service === 'sell' && subService === 'sellCash') {
-      //=================================================================================================
-      const fromPrice = await geTokenPriceData(fToken?.id);
-      const fromPriceData = fromPrice?.market_data?.current_price;
-      //=================================================================================================
-
-      let exchangeRate;
-      if (tToken?.symbol === 'usd') {
-        exchangeRate = Number(fromPriceData?.usd);
-      }
-      if (tToken?.symbol === 'gbp') {
-        exchangeRate = Number(fromPriceData?.gbp);
-      }
-      if (tToken?.symbol === 'eur') {
-        exchangeRate = Number(fromPriceData?.eur);
-      }
-      if (tToken?.symbol === 'rub') {
-        exchangeRate = Number(fromPriceData?.rub);
-      }
-      if (tToken?.symbol === 'cad') {
-        exchangeRate = Number(fromPriceData?.cad);
-      }
-      if (tToken?.symbol === 'aed') {
-        exchangeRate = Number(fromPriceData?.aed);
-      }
-      if (tToken?.symbol === 'jpy') {
-        exchangeRate = Number(fromPriceData?.jpy);
-      }
-      if (tToken?.symbol === 'ngn') {
-        exchangeRate = Number(fromPriceData?.ngn);
-      }
-      if (tToken?.symbol === 'php') {
-        exchangeRate = Number(fromPriceData?.php);
-      }
-      if (tToken?.symbol === 'chf') {
-        exchangeRate = Number(fromPriceData?.chf);
-      }
-      if (tToken?.symbol === 'aud') {
-        exchangeRate = Number(fromPriceData?.aud);
-      }
-
-      if (isNaN(exchangeRate)) {
-        exchangeRate = 0;
-      }
-      const response = {
-        exchangeRateRaw: exchangeRate,
-        exchangeRate: exchangeRate.toFixed(3),
-      };
-
-      res.status(200).json(response);
-    }
-    if (service === 'sell' && subService === 'sellCard') {
-      //=================================================================================================
-      const fromPrice = await geTokenPriceData(fToken?.id);
-      const fromPriceData = fromPrice?.market_data?.current_price;
-      //=================================================================================================
-
-      let exchangeRate;
-      if (tToken?.symbol === 'usd') {
-        exchangeRate = Number(fromPriceData?.usd);
-      }
-      if (tToken?.symbol === 'gbp') {
-        exchangeRate = Number(fromPriceData?.gbp);
-      }
-      if (tToken?.symbol === 'eur') {
-        exchangeRate = Number(fromPriceData?.eur);
-      }
-      if (tToken?.symbol === 'rub') {
-        exchangeRate = Number(fromPriceData?.rub);
-      }
-      if (tToken?.symbol === 'cad') {
-        exchangeRate = Number(fromPriceData?.cad);
-      }
-      if (tToken?.symbol === 'aed') {
-        exchangeRate = Number(fromPriceData?.aed);
-      }
-      if (tToken?.symbol === 'jpy') {
-        exchangeRate = Number(fromPriceData?.jpy);
-      }
-      if (tToken?.symbol === 'ngn') {
-        exchangeRate = Number(fromPriceData?.ngn);
-      }
-      if (tToken?.symbol === 'php') {
-        exchangeRate = Number(fromPriceData?.php);
-      }
-      if (tToken?.symbol === 'chf') {
-        exchangeRate = Number(fromPriceData?.chf);
-      }
-      if (tToken?.symbol === 'aud') {
-        exchangeRate = Number(fromPriceData?.aud);
-      }
-      if (isNaN(exchangeRate)) {
-        exchangeRate = 0;
-      }
-      const response = {
-        exchangeRateRaw: exchangeRate,
-        exchangeRate: exchangeRate.toFixed(3),
-      };
-
-      res.status(200).json(response);
-    }
-    if (service === 'exchange' && subService === 'exchange') {
-      //=================================================================================================
-      const fromPrice = await geTokenPriceData(fToken?.id);
-      const fromPriceData = fromPrice?.market_data?.current_price;
-      const toPrice = await geTokenPriceData(tToken?.id);
-      const toPriceData = toPrice?.market_data?.current_price;
-      //=================================================================================================
-      const fUSDPrice = Number(fromPriceData?.usd); // usd price
-      const tUSDPrice = Number(toPriceData?.usd); // usd price
-
-      let exchangeRate = 1 * (fUSDPrice / tUSDPrice); //fToken?.symbol/tToken.symbol
-
-      if (isNaN(exchangeRate)) {
-        exchangeRate = 0;
-      }
-
-      const response = {
-        exchangeRateRaw: exchangeRate,
-        exchangeRate: exchangeRate.toFixed(3),
-      };
-      res.status(200).json(response);
-    }
-    if (service === 'store' && subService === 'store') {
-      //=================================================================================================
-      const toPrice = await geTokenPriceData(tToken?.id);
-      const toPriceData = toPrice?.market_data?.current_price;
-      //=================================================================================================
-
-      let exchangeRate;
-      if (fToken?.symbol === 'usd') {
-        exchangeRate = Number(toPriceData?.usd);
-      }
-      if (fToken?.symbol === 'gbp') {
-        exchangeRate = Number(toPriceData?.gbp);
-      }
-      if (fToken?.symbol === 'eur') {
-        exchangeRate = Number(toPriceData?.eur);
-      }
-      if (fToken?.symbol === 'rub') {
-        exchangeRate = Number(toPriceData?.rub);
-      }
-      if (fToken?.symbol === 'cad') {
-        exchangeRate = Number(toPriceData?.cad);
-      }
-      if (fToken?.symbol === 'aed') {
-        exchangeRate = Number(toPriceData?.aed);
-      }
-      if (fToken?.symbol === 'jpy') {
-        exchangeRate = Number(toPriceData?.jpy);
-      }
-      if (fToken?.symbol === 'ngn') {
-        exchangeRate = Number(toPriceData?.ngn);
-      }
-      if (fToken?.symbol === 'php') {
-        exchangeRate = Number(toPriceData?.php);
-      }
-      if (fToken?.symbol === 'chf') {
-        exchangeRate = Number(toPriceData?.chf);
-      }
-      if (fToken?.symbol === 'aud') {
-        exchangeRate = Number(toPriceData?.aud);
-      }
-
-      if (isNaN(exchangeRate)) {
-        exchangeRate = 0;
-      }
-
-      const response = {
-        exchangeRateRaw: exchangeRate,
-        exchangeRate: exchangeRate.toFixed(3),
-      };
-      console.log({ exchangeRateInCheck: response });
-      res.status(200).json(response);
-    }
-  }
-
-  async function requestHandler() {
-    // Immediately send 429 header to client when rate limiting is in effect
-    const remainingRequests = await limiter.removeTokens(1);
-    let errorStatus;
-    if (remainingRequests < 0) {
-      const message = '429 Too Many Requests - your IP is being rate limited';
-      console.log('429 Too Many Requests - your IP is being rate limited');
-      errorStatus = true;
-      res.status(500).json(message);
-
-      // response.writeHead(429, {'Content-Type': 'text/plain;charset=UTF-8'});
-      // response.end('429 Too Many Requests - your IP is being rate limited');
-    } else {
-      errorStatus = false;
-      await fetchRates();
-    }
-  }
-
-  await requestHandler();
-
-  // const checkCoingekoPooling = async () => {
-  //   let intervalId = setInterval(async () => {
-  //     await requestHandler();
-  //   }, 30000); // normal duration
-  //   return () => {
-  //     clearInterval(intervalId);
-  //   };
-  // };
-
-  // checkCoingekoPooling();
 });
 
 const getTransactionRate = asyncHandler(async (req, res) => {
   const { fToken, tToken, exchangeRate, fValue, service, subService } =
     req.body;
 
-  if (service === 'defi' && subService === 'defi') {
-    let tValue = Number(fValue) * exchangeRate;
+  if (service === "defi" && subService === "defi") {
+    let directValue = Number(fValue) * exchangeRate;
 
-    const serviceFee = (0.25 / 100) * Number(fValue); // 0.25%
+    const serviceFee = (0.25 / 100) * Number(directValue); // 0.25%
 
     // const networkFees = await getTxFees(txData) // from the blockchain
-    const networkFee = (0.25 / 100) * Number(fValue); // should be from the blockchain
+    const networkFee = (0.25 / 100) * Number(directValue); // should be from the blockchain
 
     const youSend = Number(fValue);
 
-    const youGet = Number(fValue) - (serviceFee + networkFee);
-    const { amount, estimatedGas } = await getTokenAmount(fToken, fValue);
+    let tValue = Number(directValue) - (serviceFee + networkFee);
+    const youGet = tValue;
+    const { amount, estimatedGas } = await getTokenAmount(
+      fToken,
+      tValue.toString()
+    );
 
     let tValueFormatted = Number(tValue).toFixed(4);
     if (isNaN(tValue)) {
@@ -3690,34 +2724,41 @@ const getTransactionRate = asyncHandler(async (req, res) => {
       tValueFormatted = 0;
     }
 
+    if (isNaN(directValue)) {
+      directValue = 0;
+    }
+
     const response = {
       youSend,
       youGet,
       serviceFeeRaw: serviceFee,
-      serviceFee: serviceFee.toFixed(3),
+      serviceFee: serviceFee.toFixed(8),
       networkFeeRew: networkFee,
-      networkFee: networkFee.toFixed(3),
+      networkFee: networkFee.toFixed(8),
       tValue,
       tValueFormatted,
       amount,
       estimatedGas,
+      directValue,
+      directValueRaw: directValue.toFixed(3),
     };
 
     res.status(200).json(response);
   }
-  if (service === 'buy' && subService === 'buyCash') {
+  if (service === "buy" && subService === "buyCash") {
     //=================================================================================================
 
-    let tValue = Number(fValue) / exchangeRate;
+    let directValue = Number(fValue) / exchangeRate;
 
-    const serviceFee = (0.25 / 100) * Number(fValue); // 0.25%
+    const serviceFee = (0.25 / 100) * Number(directValue); // 0.25%
 
     // const networkFees = await getTxFees(txData) // from the blockchain
-    const networkFee = (0.25 / 100) * Number(fValue); // should be from the blockchain
+    const networkFee = (0.25 / 100) * Number(directValue); // should be from the blockchain
 
     const youSend = Number(fValue);
 
-    const youGet = Number(fValue) - (serviceFee + networkFee);
+    let tValue = Number(directValue) - (serviceFee + networkFee);
+    const youGet = tValue;
     const { amount, estimatedGas } = await getTokenAmount(
       tToken,
       tValue.toString()
@@ -3731,35 +2772,45 @@ const getTransactionRate = asyncHandler(async (req, res) => {
     if (isNaN(tValueFormatted)) {
       tValueFormatted = 0;
     }
+
+    if (isNaN(directValue)) {
+      directValue = 0;
+    }
+
     const response = {
       youSend,
       youGet,
       serviceFeeRaw: serviceFee,
-      serviceFee: serviceFee.toFixed(3),
+      serviceFee: serviceFee.toFixed(8),
       networkFeeRew: networkFee,
-      networkFee: networkFee.toFixed(3),
+      networkFee: networkFee.toFixed(8),
       tValue,
       tValueFormatted,
       amount,
       estimatedGas,
+      directValue,
+      directValueRaw: directValue.toFixed(3),
     };
 
     res.status(200).json(response);
   }
-  if (service === 'buy' && subService === 'buyCard') {
-    let tValue = Number(fValue) / exchangeRate;
+  if (service === "buy" && subService === "buyCard") {
+    let directValue = Number(fValue) / exchangeRate;
+
+    const serviceFee = (0.25 / 100) * Number(directValue); // 0.25%
 
     // const networkFees = await getTxFees(txData) // from the blockchain
-    const processingFee = (1 / 100) * Number(fValue); // (1%) should be from the blockchain
+    const networkFee = (0.25 / 100) * Number(directValue); // should be from the blockchain
 
     const youSend = Number(fValue);
 
-    const youGet = Number(fValue) - processingFee;
-    //============================={TODO}=====================================
+    let tValue = Number(directValue) - (serviceFee + networkFee);
+    const youGet = tValue;
     const { amount, estimatedGas } = await getTokenAmount(
-      tToken,
+      fToken,
       tValue.toString()
     );
+
     let tValueFormatted = Number(tValue).toFixed(4);
     if (isNaN(tValue)) {
       tValue = 0;
@@ -3769,30 +2820,44 @@ const getTransactionRate = asyncHandler(async (req, res) => {
       tValueFormatted = 0;
     }
 
+    if (isNaN(directValue)) {
+      directValue = 0;
+    }
     const response = {
       youSend,
-      youGet,
-      processingFeeRaw: processingFee,
-      processingFee: processingFee.toFixed(3),
+      youGetRaw: youGet,
+      youGet: youGet.toFixed(4),
+      serviceFeeRaw: serviceFee,
+      serviceFee: serviceFee.toFixed(8),
+      networkFeeRew: networkFee,
+      networkFee: networkFee.toFixed(8),
+      processingFeeRaw: serviceFee,
+      processingFee: serviceFee.toFixed(8),
       tValue,
       tValueFormatted,
       amount,
       estimatedGas,
+      directValue,
+      directValueRaw: directValue.toFixed(3),
     };
-    console.log({ response: response });
+
     res.status(200).json(response);
   }
-  if (service === 'sell' && subService === 'sellCash') {
-    let tValue = Number(fValue) * exchangeRate;
 
-    const serviceFee = (0.25 / 100) * Number(fValue); // 0.25%
+  //========{use processing fee for selling}====================
+  if (service === "sell" && subService === "sellCash") {
+    let directValue = Number(fValue) * exchangeRate;
+
+    const serviceFee = (0.25 / 100) * Number(directValue); // 0.25%
 
     // const networkFees = await getTxFees(txData) // from the blockchain
-    const networkFee = (0.25 / 100) * Number(fValue); // should be from the blockchain
+    const networkFee = (0.25 / 100) * Number(directValue); // should be from the blockchain
 
     const youSend = Number(fValue);
 
-    const youGet = Number(fValue) - (serviceFee + networkFee);
+    let tValue = Number(directValue) - (serviceFee + networkFee);
+    const youGet = tValue;
+
     const { amount, estimatedGas } = await getTokenAmount(fToken, fValue);
 
     let tValueFormatted = Number(tValue).toFixed(4);
@@ -3804,37 +2869,43 @@ const getTransactionRate = asyncHandler(async (req, res) => {
       tValueFormatted = 0;
     }
 
+    if (isNaN(directValue)) {
+      directValue = 0;
+    }
+
     const response = {
       youSend,
       youGet,
       serviceFeeRaw: serviceFee,
-      serviceFee: serviceFee.toFixed(3),
+      serviceFee: serviceFee.toFixed(8),
       networkFeeRew: networkFee,
-      networkFee: networkFee.toFixed(3),
+      networkFee: networkFee.toFixed(8),
       tValue,
       tValueFormatted,
       amount,
       estimatedGas,
+      directValue,
+      directValueRaw: directValue.toFixed(3),
     };
 
     res.status(200).json(response);
   }
-  if (service === 'sell' && subService === 'sellCard') {
-    let tValue = Number(fValue) * exchangeRate;
+  if (service === "sell" && subService === "sellCard") {
+    let directValue = Number(fValue) * exchangeRate;
 
-    const serviceFee = (0.25 / 100) * Number(fValue); // 0.25%
+    const serviceFee = (0.25 / 100) * Number(directValue); // 0.25%
 
     // const networkFees = await getTxFees(txData) // from the blockchain
-    const networkFee = (0.25 / 100) * Number(fValue); // should be from the blockchain
-    const processingFee = (1 / 100) * Number(fValue); // (1%) should be from the blockchain
+    const networkFee = (0.25 / 100) * Number(directValue); // should be from the blockchain
 
     const youSend = Number(fValue);
 
-    const youGet = Number(fValue) - (serviceFee + networkFee);
+    let tValue = Number(directValue) - (serviceFee + networkFee);
+    const youGet = tValue;
+
     const { amount, estimatedGas } = await getTokenAmount(fToken, fValue);
 
     let tValueFormatted = Number(tValue).toFixed(4);
-
     if (isNaN(tValue)) {
       tValue = 0;
     }
@@ -3843,37 +2914,48 @@ const getTransactionRate = asyncHandler(async (req, res) => {
       tValueFormatted = 0;
     }
 
+    if (isNaN(directValue)) {
+      directValue = 0;
+    }
+
     const response = {
       youSend,
       youGet,
       serviceFeeRaw: serviceFee,
-      serviceFee: serviceFee.toFixed(3),
+      serviceFee: serviceFee.toFixed(8),
       networkFeeRew: networkFee,
-      networkFee: networkFee.toFixed(3),
-      processingFeeRaw: processingFee,
-      processingFee: processingFee.toFixed(3),
+      networkFee: networkFee.toFixed(8),
+      processingFeeRaw: serviceFee,
+      processingFee: serviceFee.toFixed(8),
       tValue,
       tValueFormatted,
       amount,
       estimatedGas,
+      directValue,
+      directValueRaw: directValue.toFixed(3),
     };
 
     res.status(200).json(response);
   }
-  if (service === 'exchange' && subService === 'exchange') {
-    let tValue = Number(fValue) * exchangeRate;
+  if (service === "exchange" && subService === "exchange") {
+    let directValue = Number(fValue) * exchangeRate;
 
-    const serviceFee = (0.25 / 100) * Number(fValue); // 0.25%
+    const serviceFee = (0.25 / 100) * Number(directValue); // 0.25%
 
     // const networkFees = await getTxFees(txData) // from the blockchain
-    const networkFee = (0.25 / 100) * Number(fValue); // should be from the blockchain
+    const networkFee = (0.25 / 100) * Number(directValue); // should be from the blockchain
 
     const youSend = Number(fValue);
 
-    const youGet = Number(fValue) - (serviceFee + networkFee);
-    const { amount, estimatedGas } = await getTokenAmount(fToken, fValue);
+    let tValue = Number(directValue) - (serviceFee + networkFee);
+    const youGet = tValue;
+    const { amount, estimatedGas } = await getTokenAmount(
+      fToken,
+      tValue.toString()
+    );
+    // const { amount, estimatedGas } = await getTokenAmount(fToken, fValue);
 
-    let tValueFormatted = Number(tValue).toFixed(3);
+    let tValueFormatted = Number(tValue).toFixed(4);
     if (isNaN(tValue)) {
       tValue = 0;
     }
@@ -3882,36 +2964,43 @@ const getTransactionRate = asyncHandler(async (req, res) => {
       tValueFormatted = 0;
     }
 
+    if (isNaN(directValue)) {
+      directValue = 0;
+    }
+
     const response = {
       youSend,
       youGet,
       serviceFeeRaw: serviceFee,
-      serviceFee: serviceFee.toFixed(3),
+      serviceFee: serviceFee.toFixed(8),
       networkFeeRew: networkFee,
-      networkFee: networkFee.toFixed(3),
+      networkFee: networkFee.toFixed(8),
       tValue,
       tValueFormatted,
       amount,
       estimatedGas,
+      directValue,
+      directValueRaw: directValue.toFixed(3),
     };
 
     res.status(200).json(response);
   }
-  if (service === 'store' && subService === 'store') {
+  if (service === "store" && subService === "store") {
     //=================================================================================================
 
-    let tValue = Number(fValue) / exchangeRate;
+    let directValue = Number(fValue) * exchangeRate;
 
-    const serviceFee = (0.25 / 100) * Number(fValue); // 0.25%
+    const serviceFee = (0.25 / 100) * Number(directValue); // 0.25%
 
     // const networkFees = await getTxFees(txData) // from the blockchain
-    const networkFee = (0.25 / 100) * Number(fValue); // should be from the blockchain
+    const networkFee = (0.25 / 100) * Number(directValue); // should be from the blockchain
 
     const youSend = Number(fValue);
 
-    const youGet = Number(fValue) - (serviceFee + networkFee);
+    let tValue = Number(directValue) - (serviceFee + networkFee);
+    const youGet = tValue;
     const { amount, estimatedGas } = await getTokenAmount(
-      tToken,
+      fToken,
       tValue.toString()
     );
 
@@ -3922,6 +3011,10 @@ const getTransactionRate = asyncHandler(async (req, res) => {
 
     if (isNaN(tValueFormatted)) {
       tValueFormatted = 0;
+    }
+
+    if (isNaN(directValue)) {
+      directValue = 0;
     }
     const response = {
       youSend,
@@ -3934,8 +3027,51 @@ const getTransactionRate = asyncHandler(async (req, res) => {
       tValueFormatted,
       amount,
       estimatedGas,
+      directValue,
+      directValueRaw: directValue.toFixed(3),
     };
 
+    res.status(200).json(response);
+  }
+});
+
+const updateTransactionRatesById = asyncHandler(async (req, res) => {
+  const {
+    id, // new transaction mongodb id ==> transaction?._id
+    status,
+    percentageProgress,
+    fValue,
+    youSend,
+    youGet,
+    serviceFee,
+    networkFee,
+    processingFee,
+    exchangeRate,
+    tValue,
+    amount,
+    directValue,
+  } = req.body;
+
+  const transaction = await Transaction.findById(id);
+
+  if (transaction) {
+    transaction.status = status || transaction.status;
+    percentageProgress = percentageProgress || transaction.percentageProgress;
+    transaction.fValue = fValue || transaction.fValue;
+    transaction.youSend = youSend || transaction.youSend;
+    transaction.youGet = youGet || transaction.youGet;
+    transaction.serviceFee = serviceFee || transaction.serviceFee;
+    transaction.networkFee = networkFee || transaction.networkFee;
+    transaction.processingFee = processingFee || transaction.processingFee;
+    transaction.exchangeRate = exchangeRate || transaction.exchangeRate;
+    transaction.tValue = tValue || transaction.tValue;
+    transaction.amount = amount || transaction.amount;
+    // transaction.directValue = directValue || transaction.directValue;
+  }
+  const response = await transaction.save();
+
+  if (response) {
+    console.log({ updatedTransactionRate: response });
     res.status(200).json(response);
   }
 });
@@ -3943,113 +3079,28 @@ const getTransactionRate = asyncHandler(async (req, res) => {
 const getTokenPriceData = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  const url = `https://api.coingecko.com/api/v3/coins/${id}`;
+  //==============={Free API}===================================
+  //   const url = `https://api.coingecko.com/api/v3/coins/${id}`;
 
+  //==============={Demo API}===================================
+  // const url = `https://api.coingecko.com/api/v3/coins/${id}?x_cg_demo_api_key=${process.env.COINGEKO_API_KEY}`;
+
+  //==============={Pro API}===================================
+  const url = `https://pro-api.coingecko.com/api/v3/coins/${id}?x_cg_pro_api_key=${process.env.COINGEKO_API_KEY}`;
   const response = await axios.get(url);
   const updatedResponse = await response.data;
   // return updatedResponse;
   res.status(200).json(updatedResponse);
 });
 
-async function statusUpdateOneBooking(booking) {
-  let timeLeft = new Date(booking?.timeLeft).getTime();
-  let currentTime = new Date(Date.now()).getTime();
-
-  console.log({
-    checkIn: checkIn,
-    currentTime: currentTime,
-  });
-
-  let newStatusx;
-  //==={Is Active}==================
-  if (timeLeft > currentTime) {
-    newStatusx = 'Active';
-  }
-  //==={Is Expired}==================
-  if (timeLeft < currentTime) {
-    newStatusx = 'Expired';
-  }
-
-  const userData = {
-    id: booking._id, // new
-    place: booking?.room?.placeId,
-    room: booking?.room?._id,
-    checkIn: booking.checkIn,
-    checkOut: booking.checkOut,
-    numberOfGuests: booking.numberOfGuests,
-    name: booking.name,
-    phone: booking.phone,
-    price: booking.price,
-    paymentMethod: booking.paymentMethod,
-    owner: booking.owner,
-    status: booking, // new update
-    timeStatus: newStatusx,
-  };
-  console.log('userData:', userData);
-  updateBookingsAutomaticallyInternal(userData);
-}
-// Pool data at intervals of 30 mins
-async function statusUpdate() {
-  const bookings = await Booking.find().populate('room');
-  bookings?.map(async (booking) => {
-    let checkIn = new Date(booking?.checkIn).getTime();
-    let checkOut = new Date(booking?.checkOut).getTime();
-    let currentTime = new Date(Date.now()).getTime();
-
-    console.log({
-      checkIn: checkIn,
-      checkOut: checkOut,
-      currentTime: currentTime,
-    });
-
-    let newStatusx;
-
-    if (
-      checkIn <= currentTime && // checkIn date is today or behind and checkout date has not reached yet
-      checkOut >= currentTime
-    ) {
-      newStatusx = 'Active';
-    }
-
-    if (
-      checkIn > currentTime && // checkIn date is ahead of now
-      checkOut > currentTime
-    ) {
-      newStatusx = 'Inactive';
-    }
-
-    //==={Is Completed}==================
-
-    if (checkOut < currentTime) {
-      newStatusx = 'Completed';
-    }
-
-    const userData = {
-      id: booking._id, // new
-      place: booking?.room?.placeId,
-      room: booking?.room?._id,
-      checkIn: booking.checkIn,
-      checkOut: booking.checkOut,
-      numberOfGuests: booking.numberOfGuests,
-      name: booking.name,
-      phone: booking.phone,
-      price: booking.price,
-      paymentMethod: booking.paymentMethod,
-      owner: booking.owner,
-      status: newStatusx, // new update
-    };
-    console.log('userData:', userData);
-    updateBookingsAutomaticallyInternal(userData);
-  });
-}
 //==========================={STORE}=================================================================================================
 const createStore = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id); // get userId from "protect middleware"
   const { currency, cryptoCurrency, bitcoinAddress, tronAddress } = req.body;
-  console.log({ store: 'active' });
+  console.log({ store: "active" });
   if (!user) {
     res.status(400);
-    throw new Error('User not found, please login');
+    throw new Error("User not found, please login");
   }
 
   const pin = await generatePin(); // storePin
@@ -4112,12 +3163,12 @@ const createTransactionStore = asyncHandler(async (req, res) => {
 
   if (!store) {
     res.status(400);
-    throw new Error('Store not found, please try again');
+    throw new Error("Store not found, please try again");
   }
   const newOrderId = await generateOrderId();
 
   console.log({ userData: req.body });
-  if (service === 'store' && subService === 'store') {
+  if (service === "store" && subService === "store") {
     // const blenderyAddress = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'; // test address
     const { blenderyAddress } = await getTransactionWallet(tToken?.chain); // tToken is crypto
     const savedTransaction = await Store.create({
@@ -4132,7 +3183,7 @@ const createTransactionStore = asyncHandler(async (req, res) => {
       subService, // new to be added to frontend
       percentageProgress,
       chain: tToken?.chain,
-      chainId: tToken?.chainId ? tToken?.chainId : '',
+      chainId: tToken?.chainId ? tToken?.chainId : "",
       orderNo: newOrderId,
       txId: newOrderId,
       blenderyAddress,
@@ -4174,40 +3225,40 @@ const updateTransactionByIdStore = asyncHandler(async (req, res) => {
   // let updatedTimeLeft;
   //==={Is Active}==================
   if (timeLeft > currentTime) {
-    updatedTimeStatus = 'Active';
+    updatedTimeStatus = "Active";
   }
   //==={Is Expired}==================
   if (timeLeft < currentTime) {
-    updatedTimeStatus = 'Expired';
+    updatedTimeStatus = "Expired";
   }
 
-  const blockchainUrlBitcoinMainnet = 'https://blockstream.info/tx';
-  const blockchainUrlBitcoinTest = 'https://blockstream.info/testnet/tx';
+  const blockchainUrlBitcoinMainnet = "https://blockstream.info/tx";
+  const blockchainUrlBitcoinTest = "https://blockstream.info/testnet/tx";
   const blockchainUrlBitcoinEndpoint = blockchainUrlBitcoinTest;
   const blockchainUrlBitcoin = `${blockchainUrlBitcoinEndpoint}/${hashOut}`;
 
-  const tronblockchainUrlMainnet = 'https://tronscan.org/#/transaction'; // goerli test net
-  const tronblockchainUrlNile = 'https://nile.tronscan.org/#/transaction'; // goerli test net
+  const tronblockchainUrlMainnet = "https://tronscan.org/#/transaction"; // goerli test net
+  const tronblockchainUrlNile = "https://nile.tronscan.org/#/transaction"; // goerli test net
   const tronblockchainUrlEndpoint = tronblockchainUrlNile;
   const blockchainUrlTron = `${tronblockchainUrlEndpoint}/${hashOut}`;
 
-  const blockchainUrlEthereumMainnet = 'https://etherscan.io/tx'; // goerli test net
-  const blockchainUrlEthereumGoerli = 'https://goerli.etherscan.io/tx'; // goerli test net
+  const blockchainUrlEthereumMainnet = "https://etherscan.io/tx"; // goerli test net
+  const blockchainUrlEthereumGoerli = "https://goerli.etherscan.io/tx"; // goerli test net
   const blockchainUrlEthereumEndpoint = blockchainUrlEthereumGoerli;
   const blockchainUrlEthereum = `${blockchainUrlEthereumEndpoint}/${hashOut}`;
-  let blockchainUrl = '';
+  let blockchainUrl = "";
   let chain;
 
   if (hashOut) {
-    if (service === 'store' && subService === 'store') {
-      chain = transaction?.tToken?.chain ? transaction?.tToken?.chain : '';
-      if (chain === 'Bitcoin') {
+    if (service === "store" && subService === "store") {
+      chain = transaction?.tToken?.chain ? transaction?.tToken?.chain : "";
+      if (chain === "Bitcoin") {
         blockchainUrl = blockchainUrlBitcoin;
       }
-      if (chain === 'Tron') {
+      if (chain === "Tron") {
         blockchainUrl = blockchainUrlTron;
       }
-      if (chain === 'Ethereum') {
+      if (chain === "Ethereum") {
         blockchainUrl = blockchainUrlEthereum;
       }
       //
@@ -4219,7 +3270,7 @@ const updateTransactionByIdStore = asyncHandler(async (req, res) => {
   // const status = 'Completed';
 
   let percentageProgress;
-  if (status === 'Completed') {
+  if (status === "Completed") {
     percentageProgress = 5;
   } else {
     percentageProgress = progress;
@@ -4255,7 +3306,7 @@ const getUserTransactionsByStore = asyncHandler(async (req, res) => {
   const response = await Store.find({
     user: req.user.id,
     storeId: storeId,
-  }).populate('user');
+  }).populate("user");
 
   if (response) {
     res.status(200).json(response);
@@ -4267,7 +3318,7 @@ const getAllUserTransactionsByStore = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
   const { storeId } = req.params;
 
-  const response = await Store.find({ user: req.user.id }).populate('user');
+  const response = await Store.find({ user: req.user.id }).populate("user");
 
   if (response) {
     res.status(200).json(response);
@@ -4283,7 +3334,7 @@ const getOneUserTransactionStore = asyncHandler(async (req, res) => {
   const transaction = await Store.findOne({
     user: user._id,
     _id: id,
-  }).populate('user');
+  }).populate("user");
   // await updateBlockChainTransactionsAutomaticallyInternal(transaction?._id);
 
   // res.json(
@@ -4299,15 +3350,15 @@ const getTransactionByTxIdStore = asyncHandler(async (req, res) => {
 
   console.log({ txId: txId });
 
-  res.json(await Store.findById(txId).populate('user'));
+  res.json(await Store.findById(txId).populate("user"));
 });
 
 // not required
 const getAllTransactionsByUserStore = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id); // get managers userId from "protect middleware"
   const { userId } = req.params;
-  if (user.role === 'User') {
-    res.json(await Store.find({ user: userId }).populate('user'));
+  if (user.role === "User") {
+    res.json(await Store.find({ user: userId }).populate("user"));
   }
 });
 
@@ -4328,11 +3379,11 @@ const updateTransactionsAutomaticallyStore = asyncHandler(async (req, res) => {
   // let updatedTimeLeft;
   //==={Is Active}==================
   if (timeLeft > currentTime) {
-    updatedTimeStatus = 'Active';
+    updatedTimeStatus = "Active";
   }
   //==={Is Expired}==================
   if (timeLeft < currentTime) {
-    updatedTimeStatus = 'Expired';
+    updatedTimeStatus = "Expired";
   }
   // also, start transaction monitoring on blockchain from here
   //blockchainMonitoring()
@@ -4360,11 +3411,11 @@ const updateBlockChainTransactionStore = asyncHandler(async (req, res) => {
   // let updatedTimeLeft;
   //==={Is Active}==================
   if (timeLeft > currentTime) {
-    updatedTimeStatus = 'Active';
+    updatedTimeStatus = "Active";
   }
   //==={Is Expired}==================
   if (timeLeft < currentTime) {
-    updatedTimeStatus = 'Expired';
+    updatedTimeStatus = "Expired";
   }
 
   if (transactionDoc) {
@@ -4388,8 +3439,17 @@ const updateBlockChainTransactionStore = asyncHandler(async (req, res) => {
  */
 
 const getTokenPriceDataSwap = async (id) => {
-  const url = 'https://api.coingecko.com/api/v3/';
-  const param = `coins/${id}`;
+  //==============={Free API}===================================
+  // const url = 'https://api.coingecko.com/api/v3/';
+  // const param = `coins/${id}`;
+
+  //==============={Demo API}===================================
+  // const url = 'https://api.coingecko.com/api/v3/';
+  // const param = `coins/${id}?x_cg_demo_api_key=${process.env.COINGEKO_API_KEY}`;
+  //==============={Pro API}===================================
+  const url = "https://pro-api.coingecko.com/api/v3/";
+  const param = `coins/${id}?x_cg_pro_api_key=${process.env.COINGEKO_API_KEY}`;
+
   const response = await axios.get(url + param);
   return response.data;
 };
@@ -4460,7 +3520,7 @@ const getPriceOneInch = async (
   fValue
 ) => {
   let validatedValue;
-  if (fAddress != '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee') {
+  if (fAddress != "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee") {
     validatedValue = parseUnits(
       fValue.toString(),
       fDecimals.toString()
@@ -4494,10 +3554,10 @@ const getPriceOneInch = async (
       const toTokenAmount = toAmount;
       console.log({ toTokenAmount: toTokenAmount });
 
-      let toTokenAmountFormatted = '';
+      let toTokenAmountFormatted = "";
       let toTokenAmountFixed;
 
-      if (tAddress != '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee') {
+      if (tAddress != "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee") {
         toTokenAmountFormatted = formatUnits(
           toTokenAmount.toString(),
           tDecimals.toString()
@@ -4537,7 +3597,7 @@ const getTokenExchangeRateSwap = asyncHandler(async (req, res) => {
   const fDecimals = fToken?.decimals;
   const tAddress = tToken?.address;
   const tDecimals = tToken?.decimals;
-  const fValue = '1';
+  const fValue = "1";
   //======{oneInch Rate}
   const { validatedValue, tValue, tValueFormatted } = await getPriceOneInch(
     chainId,
@@ -4580,7 +3640,7 @@ const getSpender = asyncHandler(async (req, res) => {
 
   if (!chainId) {
     res.status(400);
-    throw new Error('chainId not found');
+    throw new Error("chainId not found");
   }
   const url = `https://api.1inch.dev/swap/${version}/${Number(
     chainId
@@ -4614,7 +3674,7 @@ const getSpender = asyncHandler(async (req, res) => {
 const getSpenderTest = asyncHandler(async (chainId) => {
   if (!chainId) {
     res.status(400);
-    throw new Error('chainId not found');
+    throw new Error("chainId not found");
   }
   const url = `https://api.1inch.dev/swap/${version}/${Number(
     chainId
@@ -4651,16 +3711,16 @@ const getSwapApproval = asyncHandler(async (req, res) => {
 
   if (!chainId) {
     res.status(400);
-    throw new Error('chainId not found');
+    throw new Error("chainId not found");
   }
 
   if (!fToken) {
     res.status(400);
-    throw new Error('fromToken not found');
+    throw new Error("fromToken not found");
   }
 
   let validatedValue;
-  if (fToken?.address != '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee') {
+  if (fToken?.address != "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee") {
     validatedValue = parseUnits(
       fValue.toString(),
       fToken?.decimals.toString()
@@ -4706,30 +3766,30 @@ const getSwapApproval = asyncHandler(async (req, res) => {
 });
 const swap = asyncHandler(async (req, res) => {
   const { chainId, fToken, tToken, walletAddress, slippage, fValue } = req.body;
-  console.log('swapping in progress');
+  console.log("swapping in progress");
   // console.log({ swappDtataIn: req.body });
   if (!chainId) {
     res.status(400);
-    throw new Error('chainId not found');
+    throw new Error("chainId not found");
   }
 
   if (!fToken) {
     res.status(400);
-    throw new Error('fromToken not found');
+    throw new Error("fromToken not found");
   }
 
   if (!tToken) {
     res.status(400);
-    throw new Error('tToken not found');
+    throw new Error("tToken not found");
   }
 
   if (!walletAddress) {
     res.status(400);
-    throw new Error('walletAddress not found');
+    throw new Error("walletAddress not found");
   }
 
   let validatedValue;
-  if (fToken.address != '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee') {
+  if (fToken.address != "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee") {
     validatedValue = parseUnits(
       fValue.toString(),
       fToken?.decimals.toString()
@@ -4823,6 +3883,7 @@ module.exports = {
   orderCompleted,
   getTokenExchangeRate,
   getTransactionRate,
+  updateTransactionRatesById,
   //============{transactions by services and subservices}============
   getUserExchange,
   getUserDefi,

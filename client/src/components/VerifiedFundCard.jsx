@@ -74,6 +74,7 @@ export const VerifiedFundCard = (props) => {
     localStorage.removeItem('percentageProgress');
     localStorage.removeItem('blockchainNetworkE');
     localStorage.removeItem('provider');
+    localStorage.removeItem('isReceivedByCard');
     dispatch(getTransactionByTxIdInternal(null));
     navigate('/');
   }

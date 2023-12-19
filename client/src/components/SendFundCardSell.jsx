@@ -59,7 +59,7 @@ export const Providers = (props) => {
 };
 
 export const SendFundCardSell = (props) => {
-  const { txData, setRefetchTxData } = props;
+  const { txData, setRefetchTxData, transactionRates } = props;
   const [blockChainData, setBlockChainData] = useState();
 
   //========{begin to monitor transaction after this click}=========================
@@ -68,6 +68,15 @@ export const SendFundCardSell = (props) => {
       id: txData?._id,
       status: 'Paid',
       percentageProgress: 4,
+      youSend: transactionRates?.youSend,
+      youGet: transactionRates?.youGet,
+      serviceFee: transactionRates?.serviceFee,
+      networkFee: transactionRates?.networkFee,
+      processingFee: transactionRates?.processingFee,
+      exchangeRate: transactionRates?.exchangeRate,
+      tValue: transactionRates?.tValue,
+      amount: transactionRates?.amount,
+      directValue: transactionRates?.directValue,
     };
     const response = await updateTransactionsAutomatically(userData);
     if (response?.status === 'Paid') {

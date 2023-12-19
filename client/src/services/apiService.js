@@ -1,5 +1,5 @@
-import axios from "axios";
-import { toast } from "react-toastify";
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 //updated with defi functions
@@ -20,9 +20,9 @@ export const registerUser = async (userData) => {
       userData,
       { withCredentials: true }
     );
-    if (response.statusText === "OK") {
-      toast.success("User Registered successfully");
-      localStorage.setItem("user", JSON.stringify(response.data));
+    if (response.statusText === 'OK') {
+      toast.success('User Registered successfully');
+      localStorage.setItem('user', JSON.stringify(response.data));
     }
     return response.data;
   } catch (error) {
@@ -43,8 +43,8 @@ export const registerSocial = async (userData) => {
       { withCredentials: true }
     );
     if (response.data) {
-      toast.success("Signup Successful...");
-      localStorage.setItem("user", JSON.stringify(response.data));
+      toast.success('Signup Successful...');
+      localStorage.setItem('user', JSON.stringify(response.data));
     }
     return response.data;
   } catch (error) {
@@ -64,7 +64,7 @@ export const loginSocial = async (userData) => {
       { withCredentials: true }
     );
     if (response.data) {
-      toast.success("Login Successful...");
+      toast.success('Login Successful...');
       return response.data;
     }
   } catch (error) {
@@ -81,8 +81,8 @@ export const loginUser = async (userData) => {
   try {
     const response = await axios.post(`${BACKEND_URL}/users/login`, userData);
     if (response.data) {
-      toast.success("Login Successful...");
-      localStorage.setItem("user", JSON.stringify(response.data));
+      toast.success('Login Successful...');
+      localStorage.setItem('user', JSON.stringify(response.data));
       return response.data;
     }
   } catch (error) {
@@ -134,7 +134,7 @@ export const errorUserFacebook = async () => {
   try {
     const response = await axios.get(`${BACKEND_URL}/auth/facebook/error`);
     if (response.data) {
-      toast.success("Error authentication via Facebook...");
+      toast.success('Error authentication via Facebook...');
       return response.data;
     }
   } catch (error) {
@@ -188,7 +188,7 @@ export const errorUserGoogle = async () => {
   try {
     const response = await axios.get(`${BACKEND_URL}/auth/google/error`);
     if (response.data) {
-      toast.success("Error authentication via Google...");
+      toast.success('Error authentication via Google...');
       return response.data;
     }
   } catch (error) {
@@ -206,7 +206,7 @@ export const errorUserGoogle = async () => {
 export const logoutUser = async () => {
   try {
     await axios.get(`${BACKEND_URL}/users/logout`);
-    localStorage.removeItem("user");
+    localStorage.removeItem('user');
   } catch (error) {
     const message =
       (error.response && error.response.data && error.response.data.message) ||
@@ -362,8 +362,8 @@ export const stripeCheckOut = async (userData) => {
       `${BACKEND_URL}/payment/stripCheckout`,
       userData
     );
-    if (response.statusText === "OK") {
-      toast.success("Payment successful");
+    if (response.statusText === 'OK') {
+      toast.success('Payment successful');
     }
     // return response.data;
     // return response;
@@ -384,8 +384,8 @@ export const stripeCheckOutSession = async (userData) => {
       `${BACKEND_URL}/payment/create-checkout-session`,
       userData
     );
-    if (response.statusText === "OK") {
-      toast.success("Payment successful");
+    if (response.statusText === 'OK') {
+      toast.success('Payment successful');
     }
     // return response.data;
     // return response;
@@ -407,7 +407,7 @@ export const createYandexPayBuy = async (userData) => {
       userData
     );
     if (response.data) {
-      toast.success("invoice created");
+      toast.success('invoice created');
     }
     return response.data;
   } catch (error) {
@@ -426,7 +426,7 @@ export const createYandexPaySell = async (userData) => {
       userData
     );
     if (response.data) {
-      toast.success("invoice created");
+      toast.success('invoice created');
     }
     return response.data;
   } catch (error) {
@@ -443,8 +443,8 @@ export const paymentConfirmation = async (userData) => {
       `${BACKEND_URL}/payment/paymentConfirmation`,
       userData
     );
-    if (response.statusText === "OK") {
-      toast.success("payment successful");
+    if (response.statusText === 'OK') {
+      toast.success('payment successful');
     }
 
     return response.data;
@@ -463,8 +463,8 @@ export const registrationConfirmation = async (userData) => {
       `${BACKEND_URL}/users/registrationConfirmation`,
       userData
     );
-    if (response.statusText === "OK") {
-      toast.success("registration confirmation");
+    if (response.statusText === 'OK') {
+      toast.success('registration confirmation');
     }
 
     return response.data;
@@ -529,17 +529,33 @@ export const updateTransactionsAutomatically = async (userData) => {
   }
 };
 
+export const updateTransactionRatesByIdService = async (userData) => {
+  try {
+    const response = await axios.patch(
+      `${BACKEND_URL}/transaction/updateTransactionRatesById`,
+      userData
+    );
+    return response.data;
+  } catch (error) {
+    const message =
+      (error.response && error.response.data && error.response.data.message) ||
+      error.message ||
+      error.toString();
+    toast.error(message);
+  }
+};
+
 export const updateOneBlockchainTransactionByIdService1 = async (userData) => {
-  // console.log({ updateinBlockChain: 'client input' });
-  // console.log({ input: userData });
+  console.log({ updateinBlockChain: 'client input' });
+  console.log({ input: userData });
 
   try {
     const response = await axios.patch(
       `${BACKEND_URL}/transaction/updateOneBlockchainTransactionById`,
       userData
     );
-    // console.log({ updateinBlockChain: "client output" });
-    // console.log({ output: response.data });
+    console.log({ updateinBlockChain: 'client output' });
+    console.log({ output: response.data });
 
     return response.data;
   } catch (error) {
@@ -552,16 +568,39 @@ export const updateOneBlockchainTransactionByIdService1 = async (userData) => {
 };
 
 export const updateOneBlockchainTransactionByIdService = async (userData) => {
-  // console.log({ updateinBlockChain: "client input" });
-  // console.log({ input: userData });
+  console.log({ updateinBlockChain: 'client input' });
+  console.log({ input: userData });
 
   try {
     const response = await axios.patch(
       `${BACKEND_URL}/transaction/updateOneBlockchainTransactionById`,
       userData
     );
-    // console.log({ updateinBlockChain: "client output" });
-    // console.log({ output: response.data });
+    console.log({ updateinBlockChain: 'client output' });
+    console.log({ output: response.data });
+
+    return response.data;
+  } catch (error) {
+    const message =
+      (error.response && error.response.data && error.response.data.message) ||
+      error.message ||
+      error.toString();
+    toast.error(message);
+  }
+};
+
+
+export const updateOnePaidTransactionByIdService = async (userData) => {
+  console.log({ updateinPaidTransaction: 'client input' });
+  console.log({ input: userData });
+
+  try {
+    const response = await axios.patch(
+      `${BACKEND_URL}/transaction/updateOnePaidTransactionById`,
+      userData
+    );
+    console.log({ updateinPaidTransaction: 'client output' });
+    console.log({ output: response.data });
 
     return response.data;
   } catch (error) {
@@ -617,7 +656,7 @@ export const getAllTransactionsByUser = async () => {
 export const updateOneBlockchainTransactionById = async (userData) => {
   if (!userData) return;
 
-  if (userData?.status !== "Pending" || userData?.status !== "Paid") {
+  if (userData?.status !== 'Pending' || userData?.status !== 'Paid') {
     return;
   }
   const response = await axios.patch(
@@ -807,7 +846,7 @@ export const getTokensDefiByIdService = async (chainId) => {
  */
 
 export const getTransactionSwapRateService = async (userData) => {
-  // console.log({ transactData: userData });
+  console.log({ transactData: userData });
   try {
     const response = await axios.post(
       `${BACKEND_URL}/transaction/getTransactionRateSwap`,
@@ -829,7 +868,7 @@ export const getTokenExchangeRateSwapService = async (userData) => {
       `${BACKEND_URL}/transaction/getTokenExchangeRateSwap`,
       userData
     );
-    // console.log({ swappingDataClient: response.data });
+    console.log({ swappingDataClient: response.data });
 
     return response.data;
   } catch (error) {
@@ -847,7 +886,7 @@ export const getChainRateSwapService = async (userData) => {
       `${BACKEND_URL}/transaction/getChainRateSwap`,
       userData
     );
-    // console.log({ exchangeData: response.data });
+    console.log({ exchangeData: response.data });
 
     return response.data;
   } catch (error) {
@@ -931,6 +970,38 @@ export const createTransactionService = async (userData) => {
     const response = await axios.post(
       `${BACKEND_URL}/transaction/createTransaction`,
       userData
+    );
+    return response.data;
+  } catch (error) {
+    const message =
+      (error.response && error.response.data && error.response.data.message) ||
+      error.message ||
+      error.toString();
+    toast.error(message);
+  }
+};
+
+//======={Master wallet balances}=========================
+
+export const getMasterWalletsService = async () => {
+  try {
+    const response = await axios.get(
+      `${BACKEND_URL}/transaction/getMasterWallets`
+    );
+    return response.data;
+  } catch (error) {
+    const message =
+      (error.response && error.response.data && error.response.data.message) ||
+      error.message ||
+      error.toString();
+    toast.error(message);
+  }
+};
+
+export const getMasterWalletsAdminService = async () => {
+  try {
+    const response = await axios.get(
+      `${BACKEND_URL}/transaction/getMasterWalletsAdmin`
     );
     return response.data;
   } catch (error) {

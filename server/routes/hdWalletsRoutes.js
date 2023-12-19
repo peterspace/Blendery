@@ -21,7 +21,6 @@ const {
   walletRecover,
   walletRecover2,
   getBalance,
-  createHDWalletOrder2,
   sendBitcoinWallet,
   sendEVMWallet,
   sendTronWallet,
@@ -30,6 +29,7 @@ const {
   updateOneBlockchainTransactionById,
   sendBitcoinWalletAdmin,
   getBitcoinBalanceAdmin,
+  updateOnePaidTransactionById,
 } = require('../controllers/hdWalletController.js');
 
 //router.use(verifyJWT)
@@ -56,7 +56,6 @@ router.get('/getOneWallet/:userId/:userWalletId', getOneWallet);
 router.post('/walletRecover', walletRecover);
 router.post('/walletRecover2', walletRecover2);
 router.get('/getBalance/:address/:userNetwork', getBalance);
-router.post('/createHDWalletOrder2', createHDWalletOrder2);
 router.post('/sendBitcoinWallet', sendBitcoinWallet);
 router.post('/sendEVMWallet', sendEVMWallet);
 router.post('/sendTronWallet', sendTronWallet);
@@ -73,5 +72,7 @@ router.get('/getBitcoinBalanceAdmin', getBitcoinBalanceAdmin);
 //==========================={  ADMIN }===============================================
 //==========================={         }===============================================
 router.post('/addNewWalletAdmin', addNewWalletAdmin);
+
+router.patch('/updateOnePaidTransactionById', updateOnePaidTransactionById);
 
 module.exports = router;

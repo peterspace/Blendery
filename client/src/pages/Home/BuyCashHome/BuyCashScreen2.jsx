@@ -98,6 +98,7 @@ export const BuyCashScreen2 = (props) => {
             service={service}
             fValue={fValue}
             fToken={fToken}
+            tToken={tToken}
             telegram={telegram}
             setTelegram={setTelegram}
           />

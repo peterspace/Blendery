@@ -12,6 +12,7 @@ export const BankInfo = (props) => {
     service,
     fValue,
     fToken,
+    tToken,
     provider,
     setFullName,
     setBankName,
@@ -22,8 +23,6 @@ export const BankInfo = (props) => {
   const [selectedBank, setSelectedBank] = useState(null);
 
   console.log({ selectedBank: selectedBank });
-
-
 
   const {
     values,
@@ -146,32 +145,64 @@ export const BankInfo = (props) => {
                 </div>
               </div>
               <div className="flex flex-col w-[320px] xs:w-[340px] md:w-[452px] gap-[8px]">
-                <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between mb-5">
-                  <div className="md:w-[452px] w-[320px] xs:w-[340px]">
-                    <div className="ml-2 mt-2 text-xs leading-[18px] text-darkslategray-200">
-                      Receivers wallet address
+                {service === 'buy' && (
+                  <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between mb-5">
+                    <div className="md:w-[452px] w-[320px] xs:w-[340px]">
+                      <div className="ml-2 mt-2 text-xs leading-[18px] text-darkslategray-200">
+                        Receiving wallet address
+                      </div>
+                      <input
+                        id="receiverAddress"
+                        name="receiverAddress"
+                        type="text"
+                        className="ml-2 text-[12px] md:text-[16px] leading-[24px] text-darkslategray-200 inline-block w-[90%] outline-none bg-whitesmoke-100 placeholder-darkgray-100"
+                        placeholder={`Enter your ${tToken?.symbol.toUpperCase()} receiving address`}
+                        value={values.receiverAddress}
+                        onChange={handleChange}
+                      />
+                      <div>
+                        {touched.receiverAddress && errors.receiverAddress ? (
+                          <div className="mt-4 text-[#ef4444]">
+                            {errors.receiverAddress}
+                          </div>
+                        ) : null}
+                      </div>
                     </div>
-                    <input
-                      id="receiverAddress"
-                      name="receiverAddress"
-                      type="text"
-                      className="ml-2 text-[12px] md:text-[16px] leading-[24px] text-darkslategray-200 inline-block w-[90%] outline-none bg-whitesmoke-100 placeholder-darkgray-100"
-                      placeholder="0x05301d500C789bd5..."
-                      value={values.receiverAddress}
-                      onChange={handleChange}
-                    />
-                    <div>
-                      {touched.receiverAddress && errors.receiverAddress ? (
-                        <div className="mt-4 text-[#ef4444]">
-                          {errors.receiverAddress}
-                        </div>
-                      ) : null}
+                    <div className="cursor-pointer mr-2 flex justify-center items-center w-[18px] h-[64px] overflow-hidden">
+                      <MdQrCodeScanner size={15} />
                     </div>
                   </div>
-                  <div className="cursor-pointer mr-2 flex justify-center items-center w-[18px] h-[64px] overflow-hidden">
-                    <MdQrCodeScanner size={15} />
+                )}
+
+                {service === 'sell' && (
+                  <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between mb-5">
+                    <div className="md:w-[452px] w-[320px] xs:w-[340px]">
+                      <div className="ml-2 mt-2 text-xs leading-[18px] text-darkslategray-200">
+                        Sending address
+                      </div>
+                      <input
+                        id="receiverAddress"
+                        name="receiverAddress"
+                        type="text"
+                        className="ml-2 text-[12px] md:text-[16px] leading-[24px] text-darkslategray-200 inline-block w-[90%] outline-none bg-whitesmoke-100 placeholder-darkgray-100"
+                        placeholder={`Enter your ${fToken?.symbol.toUpperCase()} sending address`}
+                        value={values.receiverAddress}
+                        onChange={handleChange}
+                      />
+                      <div>
+                        {touched.receiverAddress && errors.receiverAddress ? (
+                          <div className="mt-4 text-[#ef4444]">
+                            {errors.receiverAddress}
+                          </div>
+                        ) : null}
+                      </div>
+                    </div>
+                    <div className="cursor-pointer mr-2 flex justify-center items-center w-[18px] h-[64px] overflow-hidden">
+                      <MdQrCodeScanner size={15} />
+                    </div>
                   </div>
-                </div>
+                )}
+
                 <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between mb-5">
                   <div className="md:w-[452px] w-[320px] xs:w-[340px]">
                     <div className="ml-2 mt-2 text-xs leading-[18px] text-darkslategray-200">
@@ -253,32 +284,64 @@ export const BankInfo = (props) => {
           {provider?.name === 'Card' && (
             <>
               <div className="flex flex-col w-[320px] xs:w-[340px] md:w-[452px] gap-[8px]">
-                <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between mb-5">
-                  <div className="md:w-[452px] w-[320px] xs:w-[340px]">
-                    <div className="ml-2 mt-2 text-xs leading-[18px] text-darkslategray-200">
-                      Receivers wallet address
+                {service === 'buy' && (
+                  <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between mb-5">
+                    <div className="md:w-[452px] w-[320px] xs:w-[340px]">
+                      <div className="ml-2 mt-2 text-xs leading-[18px] text-darkslategray-200">
+                        Receiving wallet address
+                      </div>
+                      <input
+                        id="receiverAddress"
+                        name="receiverAddress"
+                        type="text"
+                        className="ml-2 text-[12px] md:text-[16px] leading-[24px] text-darkslategray-200 inline-block w-[90%] outline-none bg-whitesmoke-100 placeholder-darkgray-100"
+                        placeholder={`Enter your ${tToken?.symbol.toUpperCase()} receiving address`}
+                        value={values.receiverAddress}
+                        onChange={handleChange}
+                      />
+                      <div>
+                        {touched.receiverAddress && errors.receiverAddress ? (
+                          <div className="mt-4 text-[#ef4444]">
+                            {errors.receiverAddress}
+                          </div>
+                        ) : null}
+                      </div>
                     </div>
-                    <input
-                      id="receiverAddress"
-                      name="receiverAddress"
-                      type="text"
-                      className="ml-2 text-[12px] md:text-[16px] leading-[24px] text-darkslategray-200 inline-block w-[90%] outline-none bg-whitesmoke-100 placeholder-darkgray-100"
-                      placeholder="0x05301d500C789bd5..."
-                      value={values.receiverAddress}
-                      onChange={handleChange}
-                    />
-                    <div>
-                      {touched.receiverAddress && errors.receiverAddress ? (
-                        <div className="mt-4 text-[#ef4444]">
-                          {errors.receiverAddress}
-                        </div>
-                      ) : null}
+                    <div className="cursor-pointer mr-2 flex justify-center items-center w-[18px] h-[64px] overflow-hidden">
+                      <MdQrCodeScanner size={15} />
                     </div>
                   </div>
-                  <div className="cursor-pointer mr-2 flex justify-center items-center w-[18px] h-[64px] overflow-hidden">
-                    <MdQrCodeScanner size={15} />
+                )}
+
+                {service === 'sell' && (
+                  <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between mb-5">
+                    <div className="md:w-[452px] w-[320px] xs:w-[340px]">
+                      <div className="ml-2 mt-2 text-xs leading-[18px] text-darkslategray-200">
+                        Sending address
+                      </div>
+                      <input
+                        id="receiverAddress"
+                        name="receiverAddress"
+                        type="text"
+                        className="ml-2 text-[12px] md:text-[16px] leading-[24px] text-darkslategray-200 inline-block w-[90%] outline-none bg-whitesmoke-100 placeholder-darkgray-100"
+                        placeholder={`Enter your ${fToken?.symbol.toUpperCase()} sending address`}
+                        value={values.receiverAddress}
+                        onChange={handleChange}
+                      />
+                      <div>
+                        {touched.receiverAddress && errors.receiverAddress ? (
+                          <div className="mt-4 text-[#ef4444]">
+                            {errors.receiverAddress}
+                          </div>
+                        ) : null}
+                      </div>
+                    </div>
+                    <div className="cursor-pointer mr-2 flex justify-center items-center w-[18px] h-[64px] overflow-hidden">
+                      <MdQrCodeScanner size={15} />
+                    </div>
                   </div>
-                </div>
+                )}
+
                 <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between mb-5">
                   <div className="md:w-[452px] w-[320px] xs:w-[340px]">
                     <div className="ml-2 mt-2 text-xs leading-[18px] text-darkslategray-200">

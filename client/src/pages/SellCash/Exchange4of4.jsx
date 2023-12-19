@@ -51,7 +51,7 @@ export const Exchange4of4 = (props) => {
               <Timer txData={txData} />
             </div>
 
-            <DetailsCash fTitle={fTitle} tTitle={tTitle} txData={txData} />
+            <DetailsCash fTitle={fTitle} tTitle={tTitle} txData={txData} transactionRates={null}/>
           </div>
         </div>
       ) : null}

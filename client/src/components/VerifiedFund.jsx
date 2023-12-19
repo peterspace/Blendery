@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { RiFileWarningFill } from 'react-icons/ri';
-import { SiHiveBlockchain } from 'react-icons/si';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { RiFileWarningFill } from "react-icons/ri";
+import { SiHiveBlockchain } from "react-icons/si";
+import { useDispatch, useSelector } from "react-redux";
 import {
   updateTransactionsAutomatically,
   getTransactionByTxIdInternal,
-} from '../redux/features/transaction/transactionSlice';
+} from "../redux/features/transaction/transactionSlice";
 
 export const VerifiedFund = (props) => {
   const { txData, setRefetchTxData } = props;
@@ -19,7 +19,7 @@ export const VerifiedFund = (props) => {
   const updateTransaction = async () => {
     const userData = {
       id: txData?._id,
-      status: 'Completed', // payment recived
+      status: "Completed", // payment recived
       percentageProgress: 5,
     };
 
@@ -57,31 +57,32 @@ export const VerifiedFund = (props) => {
   //   return <Navigate to="/" />;
   // }
   async function newFunc() {
-     //================{new updates}===============================
-     localStorage.removeItem('fTokenExchange');
-     localStorage.removeItem('tTokenExchange');
-     localStorage.removeItem('fValueExchange');
-     localStorage.removeItem('transactionRatesExchange');
-     //================{new updates}===============================
- 
-     localStorage.removeItem('telegram');
-     localStorage.removeItem('userAddress');
-     localStorage.removeItem('benderyAddress');
-     localStorage.removeItem('country');
-     localStorage.removeItem('cityData');
-     localStorage.removeItem('city');
-     localStorage.removeItem('paymentMethod');
-     localStorage.removeItem('txInfo');
-     localStorage.removeItem('percentageProgress');
-     localStorage.removeItem('blockchainNetworkE');
-     localStorage.removeItem('provider');
+    //================{new updates}===============================
+    localStorage.removeItem("fTokenExchange");
+    localStorage.removeItem("tTokenExchange");
+    localStorage.removeItem("fValueExchange");
+    localStorage.removeItem("transactionRatesExchange");
+    //================{new updates}===============================
+
+    localStorage.removeItem("telegram");
+    localStorage.removeItem("userAddress");
+    localStorage.removeItem("benderyAddress");
+    localStorage.removeItem("country");
+    localStorage.removeItem("cityData");
+    localStorage.removeItem("city");
+    localStorage.removeItem("paymentMethod");
+    localStorage.removeItem("txInfo");
+    localStorage.removeItem("percentageProgress");
+    localStorage.removeItem("blockchainNetworkE");
+    localStorage.removeItem("provider");
+    localStorage.removeItem("isReceivedExchange");
     dispatch(getTransactionByTxIdInternal(null));
-    navigate('/');
+    navigate("/");
   }
 
   const sendFund = (
     <>
-      {txData?.status === 'Completed' ? (
+      {txData?.status === "Completed" ? (
         <div className="flex justify-center rounded-lg bg-white shadow-[0px_2px_4px_rgba(26,_47,_79,_0.2)] w-[320px] xs:w-[340px] md:w-[500px] p-4">
           <div className="flex flex-col gap-[24px]">
             <div className="flex flex-col gap-[8px] md:gap-[12px]">
@@ -164,8 +165,8 @@ export const VerifiedFund = (props) => {
 
             <div className="flex flex-row bg-orangeLight rounded p-1 md:w-[452px] w-[300px]">
               <div className="ml-1 flex justify-center items-center w-[24px] flex-shrink-0">
-                {' '}
-                <RiFileWarningFill color="#FFB000" size={15} />{' '}
+                {" "}
+                <RiFileWarningFill color="#FFB000" size={15} />{" "}
               </div>
               <div className="text-xs leading-[14.4px] text-darkslategray-200 inline-block w-[424px]">
                 Your funds has been sent to the address
@@ -268,8 +269,8 @@ export const VerifiedFund = (props) => {
 
             <div className="flex flex-row bg-orangeLight rounded p-1 md:w-[452px] w-[300px]">
               <div className="ml-1 flex justify-center items-center w-[24px] flex-shrink-0">
-                {' '}
-                <RiFileWarningFill color="#FFB000" size={15} />{' '}
+                {" "}
+                <RiFileWarningFill color="#FFB000" size={15} />{" "}
               </div>
               <div className="text-xs leading-[14.4px] text-darkslategray-200 inline-block w-[424px]">
                 Please note that this process could last up to 30 minutes.

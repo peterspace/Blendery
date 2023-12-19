@@ -77,7 +77,7 @@ export default {
         limegreen: "#4f46e5", // tailwind bg-indigo-600
         slategray: "#557f96",
         darkslateblue: "#3c5a9f",
-        overlayBlack: "rgba(0, 0, 0, 0.5)",
+        overlayBlack: "rgba(82, 82, 122, 0.20)",
         hoverLight: "#2f2f45",
         bgLight: "#2f2f45",
         hoverDark: "#2f2f45",
@@ -102,18 +102,6 @@ export default {
       },
       borderRadius: {
         "21xl": "40px",
-      },
-      boxShadow: {
-        headerShadow: "0px 6px 16px 0px rgba(0, 0, 0, 0.04)",
-      },
-      keyframes: {
-        popoverOpen: {
-          "0%": { scale: "0" },
-          "100%": { scale: "1" },
-        },
-      },
-      animation: {
-        popoverOpen: "popoverOpen .2s ease-in-out",
       },
     },
     fontSize: {

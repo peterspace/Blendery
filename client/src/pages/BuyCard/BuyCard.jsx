@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation, Navigate } from 'react-router-dom';
-import { Exchange3of4 } from './Exchange3of4';
-import { Exchange4of4 } from './Exchange4of4';
-import { Exchange5of5 } from './Exchange5of5';
-import { Footer } from '../../components/Footer';
-import { useDispatch, useSelector } from 'react-redux';
-import { getTransactionByTxIdInternal } from '../../redux/features/transaction/transactionSlice';
-import { getTransactionByTxIdService } from '../../services/apiService';
+import React, { useState, useEffect } from "react";
+import { useLocation, Navigate } from "react-router-dom";
+import { Exchange3of4 } from "./Exchange3of4";
+import { Exchange4of4 } from "./Exchange4of4";
+import { Exchange5of5 } from "./Exchange5of5";
+import { Footer } from "../../components/Footer";
+import { useDispatch, useSelector } from "react-redux";
+import { getTransactionByTxIdInternal } from "../../redux/features/transaction/transactionSlice";
+import {
+  getTransactionByTxIdService,
+  updateOnePaidTransactionByIdService,
+} from "../../services/apiService";
 
 export const BuyCard = (props) => {
   const { mode, user, service, subService, setTxInfo, txInfo } = props;
@@ -26,12 +29,30 @@ export const BuyCard = (props) => {
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
   const [refetchTxData, setRefetchTxData] = useState(false);
-  const [fTitle, setFTitle] = useState('You send');
-  const [tTitle, setTTitle] = useState('You get');
+  const [fTitle, setFTitle] = useState("You send");
+  const [tTitle, setTTitle] = useState("You get");
+
+  const isReceivedL = localStorage.getItem("isReceivedByCard")
+    ? JSON.parse(localStorage.getItem("isReceivedByCard"))
+    : true;
+
+  const [isReceived, setIsReceived] = useState(isReceivedL);
+  console.log({ isReceived: isReceived });
+
+  const [paymentResult, setPaymentResult] = useState();
+  console.log({ paymentResult: paymentResult });
+
+  useEffect(() => {
+    if (isReceived) {
+      localStorage.setItem("isReceivedByCard", JSON.stringify(isReceived));
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isReceived]);
   //====================================================================================================
 
   useEffect(() => {
-    localStorage.setItem('prevLocation', JSON.stringify(location?.pathname));
+    localStorage.setItem("prevLocation", JSON.stringify(location?.pathname));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -39,7 +60,6 @@ export const BuyCard = (props) => {
   useEffect(() => {
     if (refetchTxData) {
       fetchTxData();
-      setRefetchTxData(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refetchTxData]);
@@ -51,6 +71,25 @@ export const BuyCard = (props) => {
       setTxInfo(response);
     }
   };
+
+  //====================={Pay user automatically}====================================
+  useEffect(() => {
+    if (txData?.status === "Received" && isReceived) {
+      updatePaidTransaction();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [txData, isReceived]);
+
+  async function updatePaidTransaction() {
+    const userData = {
+      id: txData?._id,
+    };
+    const response = await updateOnePaidTransactionByIdService(userData);
+    if (response) {
+      setPaymentResult(response);
+      setIsReceived(false);
+    }
+  }
 
   if (!user?.token) {
     return <Navigate to="/auth" />;

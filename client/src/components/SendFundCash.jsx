@@ -4,7 +4,7 @@ import { RiFileWarningFill } from 'react-icons/ri';
 import { updateTransactionsAutomatically } from '../services/apiService';
 
 export const SendFundCash = (props) => {
-  const { txData } = props;
+  const { txData, transactionRates } = props;
 
   const [showpin, setshowPin] = useState(false);
 
@@ -14,6 +14,15 @@ export const SendFundCash = (props) => {
       id: txData?._id,
       status: 'Paid',
       percentageProgress: 4,
+      youSend: transactionRates?.youSend,
+      youGet: transactionRates?.youGet,
+      serviceFee: transactionRates?.serviceFee,
+      networkFee: transactionRates?.networkFee,
+      processingFee: transactionRates?.processingFee,
+      exchangeRate: transactionRates?.exchangeRate,
+      tValue: transactionRates?.tValue,
+      amount: transactionRates?.amount,
+      directValue: transactionRates?.directValue,
     };
     await updateTransactionsAutomatically(userData);
   };

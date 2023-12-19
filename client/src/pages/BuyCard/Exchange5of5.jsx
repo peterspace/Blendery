@@ -23,7 +23,12 @@ export const Exchange5of5 = (props) => {
           </div>
 
           <div className="flex-col xl:flex-row h-[374px]">
-            <DetailsCard fTitle={fTitle} tTitle={tTitle} txData={txData} />
+            <DetailsCard
+              fTitle={fTitle}
+              tTitle={tTitle}
+              txData={txData}
+              transactionRates={null}
+            />
           </div>
         </div>
       ) : null}

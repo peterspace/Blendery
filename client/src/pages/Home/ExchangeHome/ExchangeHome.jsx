@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { ExchangeScreen1 } from "./ExchangeScreen1";
-import { ExchangeScreen2 } from "./ExchangeScreen2";
-import { ExchangeScreen3 } from "./ExchangeScreen3";
-import { useDispatch, useSelector } from "react-redux";
-import { getTransactionRate } from "../../../redux/features/transaction/transactionSlice";
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { ExchangeScreen1 } from './ExchangeScreen1';
+import { ExchangeScreen2 } from './ExchangeScreen2';
+import { ExchangeScreen3 } from './ExchangeScreen3';
+import { useDispatch, useSelector } from 'react-redux';
+import { getTransactionRate } from '../../../redux/features/transaction/transactionSlice';
 
 import {
   getTokenExchangeRate,
   getTransactionRateInfo,
-} from "../../../services/apiService";
+} from '../../../services/apiService';
 
-import { getTokenListExchange } from "../../../redux/features/token/tokenSlice";
+import { getTokenListExchange } from '../../../redux/features/token/tokenSlice';
 
 //w-[370px] ===w-[300px]
 //w-[375px] === w-[320px] xs:w-[340px]
@@ -47,15 +47,15 @@ export const ExchangeHome = (props) => {
   const [loading, setLoading] = useState(false);
   const [loadingExchangeRate, setLoadingExchangeRate] = useState(false);
 
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [retryMessage, setRetryMessage] = useState();
-  const [exchangeRateInfo, setExchangeRateInfo] = useState("0");
-  // console.log({ exchangeRateInfo: exchangeRateInfo });
-  const transactionRatesL = localStorage.getItem("transactionRatesExchange")
-    ? JSON.parse(localStorage.getItem("transactionRatesExchange"))
+  const [exchangeRateInfo, setExchangeRateInfo] = useState('0');
+  console.log({ exchangeRateInfo: exchangeRateInfo });
+  const transactionRatesL = localStorage.getItem('transactionRatesExchange')
+    ? JSON.parse(localStorage.getItem('transactionRatesExchange'))
     : 0;
   const [transactionRates, setTransactionRates] = useState(transactionRatesL);
-  // console.log({ transactionRates: transactionRates });
+  console.log({ transactionRates: transactionRates });
   const tValue = transactionRates ? transactionRates?.tValueFormatted : 0;
   const exchangeRate = transactionRates ? transactionRates?.exchangeRate : 0;
 
@@ -69,8 +69,8 @@ export const ExchangeHome = (props) => {
   /********************************************************************************************************************** */
   /********************************************************************************************************************** */
 
-  const percentageProgressL = localStorage.getItem("percentageProgressExchange")
-    ? JSON.parse(localStorage.getItem("percentageProgressExchange"))
+  const percentageProgressL = localStorage.getItem('percentageProgressExchange')
+    ? JSON.parse(localStorage.getItem('percentageProgressExchange'))
     : 1;
 
   const [percentageProgress, setPercentageProgress] =
@@ -78,38 +78,39 @@ export const ExchangeHome = (props) => {
 
   //==============={Primary Data}=========================
 
-  const fTokenL = localStorage.getItem("fTokenExchange")
-    ? JSON.parse(localStorage.getItem("fTokenExchange"))
+  const fTokenL = localStorage.getItem('fTokenExchange')
+    ? JSON.parse(localStorage.getItem('fTokenExchange'))
     : null;
 
   const [fToken, setFromToken] = useState(fTokenL);
-  const tTokenL = localStorage.getItem("tTokenExchange")
-    ? JSON.parse(localStorage.getItem("tTokenExchange"))
+  const tTokenL = localStorage.getItem('tTokenExchange')
+    ? JSON.parse(localStorage.getItem('tTokenExchange'))
     : null;
   const [tToken, setToToken] = useState(tTokenL);
-  const fValueL = localStorage.getItem("fValueExchange")
-    ? JSON.parse(localStorage.getItem("fValueExchange"))
+  const fValueL = localStorage.getItem('fValueExchange')
+    ? JSON.parse(localStorage.getItem('fValueExchange'))
     : 1;
   const [fValue, setFromValue] = useState(fValueL);
 
-  const [fTitle, setFTitle] = useState("You send");
-  const [tTitle, setTTitle] = useState("You get");
+  const [fTitle, setFTitle] = useState('You send');
+  const [tTitle, setTTitle] = useState('You get');
 
-  const userAddressL = localStorage.getItem("userAddress")
-    ? JSON.parse(localStorage.getItem("userAddress"))
+  const userAddressL = localStorage.getItem('userAddress')
+    ? JSON.parse(localStorage.getItem('userAddress'))
     : null;
 
   const [userAddress, setUserAddress] = useState(userAddressL);
 
   //==================={ON: On delay Timer}===========================
   const [activeInterval, setActiveInterval] = useState(0);
-  const [initailInterval, setInitailInterval] = useState(30000); // fixed
+  const [initailInterval, setinitailInterval] = useState(15000); // fixed// every 15 seconds
+  // const [initailInterval, setinitailInterval] = useState(30000); // fixed
   const [delay, setDelay] = useState(60000); // fixed 1 minute 0r 60 secs
   const [nextInterval, setNextInterval] = useState(initailInterval);
 
-  // console.log({ activeInterval: activeInterval });
+  console.log({ activeInterval: activeInterval });
   // const [nextInterval, setNextInterval] = useState(30000);
-  // console.log({ nextInterval: nextInterval });
+  console.log({ nextInterval: nextInterval });
 
   useEffect(() => {
     dispatch(getTokenListExchange());
@@ -118,7 +119,7 @@ export const ExchangeHome = (props) => {
   useEffect(() => {
     if (percentageProgress) {
       localStorage.setItem(
-        "percentageProgressExchange",
+        'percentageProgressExchange',
         JSON.stringify(percentageProgress)
       );
       setPercentageProgressHome(percentageProgress);
@@ -158,7 +159,7 @@ export const ExchangeHome = (props) => {
   }, [allTokensToL]);
 
   useEffect(() => {
-    localStorage.setItem("prevLocation", JSON.stringify(location?.pathname));
+    localStorage.setItem('prevLocation', JSON.stringify(location?.pathname));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   //======================================================================================================
@@ -166,7 +167,7 @@ export const ExchangeHome = (props) => {
   useEffect(() => {
     if (transactionRates) {
       localStorage.setItem(
-        "transactionRatesExchange",
+        'transactionRatesExchange',
         JSON.stringify(transactionRates)
       );
     }
@@ -176,7 +177,7 @@ export const ExchangeHome = (props) => {
 
   useEffect(() => {
     if (fToken) {
-      localStorage.setItem("fTokenExchange", JSON.stringify(fToken));
+      localStorage.setItem('fTokenExchange', JSON.stringify(fToken));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -184,7 +185,7 @@ export const ExchangeHome = (props) => {
 
   useEffect(() => {
     if (tToken) {
-      localStorage.setItem("tTokenExchange", JSON.stringify(tToken));
+      localStorage.setItem('tTokenExchange', JSON.stringify(tToken));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -192,7 +193,7 @@ export const ExchangeHome = (props) => {
 
   useEffect(() => {
     if (fValue) {
-      localStorage.setItem("fValueExchange", JSON.stringify(fValue));
+      localStorage.setItem('fValueExchange', JSON.stringify(fValue));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -200,7 +201,7 @@ export const ExchangeHome = (props) => {
 
   useEffect(() => {
     if (userAddress) {
-      localStorage.setItem("userAddress", JSON.stringify(userAddress));
+      localStorage.setItem('userAddress', JSON.stringify(userAddress));
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -217,7 +218,7 @@ export const ExchangeHome = (props) => {
   }, [activeInterval]);
 
   useEffect(() => {
-    if (exchangeRateInfo === "0.000") {
+    if (exchangeRateInfo === '0.000') {
       setActiveInterval(initailInterval + delay);
 
       setTimeout(() => {
@@ -265,10 +266,10 @@ export const ExchangeHome = (props) => {
   }, [fToken, tToken]);
 
   useEffect(() => {
-    if (exchangeRateInfo === "0.000") {
+    if (exchangeRateInfo === '0.000') {
       setLoadingExchangeRate(true);
       setLoading(true);
-      // console.log({ loading: 'loading prices please hold' });
+      console.log({ loading: 'loading prices please hold' });
     } else {
       setLoadingExchangeRate(false);
       setLoading(false);
@@ -290,11 +291,11 @@ export const ExchangeHome = (props) => {
       setLoadingExchangeRate(true);
 
       const response = await getTokenExchangeRate(userData);
-      // console.log({ exchangeData: response });
+      console.log({ exchangeData: response });
 
       // setExchangeRateInfo(response?.exchangeRate);
 
-      if (response.exchangeRate === "undefined") {
+      if (response.exchangeRate === 'undefined') {
         // set is loading as true
         //too many requests
         return;
@@ -302,7 +303,7 @@ export const ExchangeHome = (props) => {
       if (response.exchangeRate) {
         // set is loading as true
         setExchangeRateInfo(response?.exchangeRate);
-        setRetryMessage("");
+        setRetryMessage('');
       }
       if (response.message) {
         setRetryMessage(response?.message);
@@ -320,7 +321,7 @@ export const ExchangeHome = (props) => {
   const priceDataException = async () => {
     if (
       fValue === 0 ||
-      fValue === "0" ||
+      fValue === '0' ||
       fValue === null ||
       fValue === undefined
     ) {
@@ -329,7 +330,7 @@ export const ExchangeHome = (props) => {
 
     if (
       Number(exchangeRateInfo) === 0 ||
-      exchangeRateInfo === "0.000" ||
+      exchangeRateInfo === '0.000' ||
       exchangeRateInfo === null ||
       exchangeRateInfo === undefined
     ) {

@@ -1,10 +1,13 @@
-import { useState, useEffect, useCallback, useLayoutEffect } from "react";
+import { useState, useEffect, useCallback, useContext } from "react";
 import AdminDataTable from "./tables/AdminDataTable";
 import MemoizedAdminTransactionsTable from "./tables/AdminTransactionsTable";
 import NoTransactionFound from "../../components/NoTransactionFound";
+import { TransActionUpdateModalContext } from "../Dashboard/AdminDashboard";
 
 const AdminRecord = (props) => {
   const { columns, data, mode, setMode } = props;
+  const { refetchTxData } = useContext(TransActionUpdateModalContext);
+
   const themeL = localStorage.getItem("theme")
     ? JSON.parse(localStorage.getItem("theme"))
     : false;

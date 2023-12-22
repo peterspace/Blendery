@@ -1,29 +1,35 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
-function Popover({ children, content, trigger = "click" }) {
-  const [show, setShow] = useState(false);
+function Popover({
+  children,
+  content,
+  trigger = "click",
+  isPopoverOpen,
+  setIsPopoverOpen,
+  handleOpenPopover,
+}) {
   const wrapperRef = useRef(null);
 
   const handleMouseOver = () => {
     if (trigger === "hover") {
-      setShow(true);
+      setIsPopoverOpen(true);
     }
   };
 
   const handleMouseLeft = () => {
     if (trigger === "hover") {
-      setShow(false);
+      setIsPopoverOpen(false);
     }
   };
 
   useEffect(() => {
     function handleClickOutside(event) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-        setShow(false);
+        setIsPopoverOpen(false);
       }
     }
 
-    if (show) {
+    if (isPopoverOpen) {
       // Bind the event listener
       document.addEventListener("mousedown", handleClickOutside);
       return () => {
@@ -31,7 +37,7 @@ function Popover({ children, content, trigger = "click" }) {
         document.removeEventListener("mousedown", handleClickOutside);
       };
     }
-  }, [show, wrapperRef]);
+  }, [isPopoverOpen, wrapperRef]);
 
   return (
     <div
@@ -40,13 +46,13 @@ function Popover({ children, content, trigger = "click" }) {
       onMouseLeave={handleMouseLeft}
       className="w-fit h-fit relative flex justify-center"
     >
-      <div className="cursor-pointer" onClick={() => setShow(!show)}>
+      <div className="cursor-pointer" onClick={handleOpenPopover}>
         {children}
       </div>
       <div
-        hidden={!show}
+        hidden={!isPopoverOpen}
         className={`min-w-fit w-[200px] h-fit absolute bottom-[50%] right-[0%] z-50 transition-all animate-popoverClose
-            ${show ? "animate-popoverOpen" : null}
+            ${isPopoverOpen ? "animate-popoverOpen" : null}
         `}
       >
         <div className="rounded bg-white shadow-lg mb-[10px]">{content}</div>

@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { useState, useEffect, createContext } from "react";
+import { useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
 
 import { DashboardMenuAdmin } from "../../components/DashboardMenuAdmin";
 
 import { useDispatch, useSelector } from "react-redux";
 import {
   getTransactionByTxIdService,
-  updateOneBlockchainTransactionByIdService,
   //=============================================
   getAllTransactions,
   //======{Admin}==============
@@ -22,6 +22,7 @@ import AdminRecord from "../Tanstack/AdminRecord";
 import { ColumnsAdminRecords } from "../Tanstack/ColumnsAdminRecords";
 import { CardUpdateInfo } from "../../components/CardUpdateInfo";
 import CircularProgress from "../../components/CircularProgress";
+import TransactionUpdateModal from "../../components/TransactionUpdateModal";
 
 const menu = [
   {
@@ -57,6 +58,8 @@ const menu = [
   },
 ];
 
+export const TransActionUpdateModalContext = createContext(null);
+
 export const AdminDashboard = (props) => {
   const { mode, user, setTxInfo, setMode } = props;
 
@@ -64,6 +67,24 @@ export const AdminDashboard = (props) => {
 
   const dispatch = useDispatch();
   const [idx, setIdx] = useState(menu[0]?.id);
+  const [isTransactionUpdateModalOpen, setIsTransactionUpdateModalOpen] =
+    useState(false);
+  // formatted data of selected transaction
+  const [selectedRowData, setSelectedRowData] = useState();
+  // unformatted data of selected transaction
+  const [selectedRowFullData, setSelectedRowFullData] = useState();
+  const [isExchangeLoading, setIsExchangeLoading] = useState(false);
+  const [isBuyCardLoading, setIsBuyCardLoading] = useState(false);
+  const [isBuyCashLoading, setIsBuyCashLoading] = useState(false);
+  const [isSellCardLoading, setIsSellCardLoading] = useState(false);
+  const [isSellCashLoading, setIsSellCashLoading] = useState(false);
+  const [isDefiLoading, setIsDefiLoading] = useState(false);
+  const [revalidateExchange, setRevalidateExchange] = useState(true);
+  const [revalidateBuyCash, setRevalidateBuyCash] = useState(true);
+  const [revalidateBuyCard, setRevalidateBuyCard] = useState(true);
+  const [revalidateSellCash, setRevalidateSellCash] = useState(true);
+  const [revalidateSellCard, setRevalidateSellCard] = useState(true);
+  const [revalidateDefi, setRevalidateDefi] = useState(true);
 
   const txData = useSelector(
     (state) => state.transaction?.transactionByTxIdInternal
@@ -82,14 +103,8 @@ export const AdminDashboard = (props) => {
   //   (state) => state.transaction?.transactionByTxIdInternal
   // );
   const [refetchTxData, setRefetchTxData] = useState(false);
-  const [refetchAdminData, setRefetchAdminData] = useState(false);
-
-  const transactions = localStorage.getItem("transactions")
-    ? JSON.parse(localStorage.getItem("transactions"))
-    : null;
 
   //=========================={Admin}=======================================================
-  const [allTransactions, setAllTransactions] = useState();
   const [allExchangeTransactionsAdmin, setAllExchangeTransactionsAdmin] =
     useState();
   const [allDefiTransactionsAdmin, setAllDefiTransactionsAdmin] = useState();
@@ -130,103 +145,148 @@ export const AdminDashboard = (props) => {
 
   //=============================={Admin Data Calls}===============================================
 
-  async function fetchAllTransactionAdmin() {
-    //====={Admin}===========================
-
-    const response = await getAllTransactions();
-    if (response) {
-      setAllTransactions(response);
-    }
-  }
-
   async function fetchAllTransactionAdminExchange() {
     //====={Admin}===========================
-
-    const response = await getAdminExchange();
-    if (response) {
-      setAllExchangeTransactionsAdmin(response);
+    try {
+      setIsExchangeLoading(true);
+      const response = await getAdminExchange();
+      if (response) {
+        setAllExchangeTransactionsAdmin(response);
+      }
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setIsExchangeLoading(false);
+      setRevalidateExchange(false);
     }
   }
 
   async function fetchAllTransactionAdminDefi() {
     //====={Admin}===========================
-
-    const response = await getAdminDefi();
-    if (response) {
-      setAllDefiTransactionsAdmin(response);
+    try {
+      setIsDefiLoading(true);
+      const response = await getAdminDefi();
+      if (response) {
+        setAllDefiTransactionsAdmin(response);
+      }
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setIsDefiLoading(false);
+      setRevalidateDefi(false);
     }
   }
 
   async function fetchAllTransactionAdminBuyCash() {
     //====={Admin}===========================
-
-    const response = await getAdminBuyCash();
-    if (response) {
-      setAllBuyCashTransactionsAdmin(response);
+    try {
+      setIsBuyCashLoading(true);
+      const response = await getAdminBuyCash();
+      if (response) {
+        setAllBuyCashTransactionsAdmin(response);
+      }
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setIsBuyCashLoading(false);
+      setRevalidateBuyCash(false);
     }
   }
 
   async function fetchAllTransactionAdminBuyCard() {
     //====={Admin}===========================
-
-    const response = await getAdminBuyCard();
-    if (response) {
-      setAllBuyCardTransactionsAdmin(response);
+    try {
+      setIsBuyCardLoading(true);
+      const response = await getAdminBuyCard();
+      if (response) {
+        setAllBuyCardTransactionsAdmin(response);
+      }
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setIsBuyCardLoading(false);
+      setRevalidateBuyCard(false);
     }
   }
 
   async function fetchAllTransactionAdmiSellCash() {
     //====={Admin}===========================
-
-    const response = await getAdminSellCash();
-    if (response) {
-      setAllSellCashTransactionsAdmin(response);
+    try {
+      setIsSellCashLoading(true);
+      const response = await getAdminSellCash();
+      if (response) {
+        setAllSellCashTransactionsAdmin(response);
+      }
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setIsSellCashLoading(false);
+      setRevalidateSellCash(false);
     }
   }
 
   async function fetchAllTransactionAdmiSellCard() {
-    const response = await getAdminSellCard();
-    if (response) {
-      setAllSellCardTransactionsAdmin(response);
+    try {
+      setIsSellCardLoading(true);
+      const response = await getAdminSellCard();
+      if (response) {
+        setAllSellCardTransactionsAdmin(response);
+      }
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setIsSellCardLoading(false);
+      setRevalidateSellCard(false);
     }
   }
 
   useEffect(() => {
-    fetchAllTransactionAdmin();
+    if (revalidateExchange) {
+      fetchAllTransactionAdminExchange();
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allTransactions]);
+  }, [revalidateExchange]);
 
   useEffect(() => {
-    fetchAllTransactionAdminExchange();
+    if (revalidateDefi) {
+      fetchAllTransactionAdminDefi();
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allExchangeTransactionsAdmin]);
+  }, [revalidateDefi]);
+
   useEffect(() => {
-    fetchAllTransactionAdminDefi();
+    if (revalidateBuyCash) {
+      fetchAllTransactionAdminBuyCash();
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allDefiTransactionsAdmin]);
+  }, [revalidateBuyCash]);
+
   useEffect(() => {
-    fetchAllTransactionAdminBuyCash();
+    if (revalidateBuyCard) {
+      fetchAllTransactionAdminBuyCard();
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allBuyCashTransactionsAdmin]);
+  }, [revalidateBuyCard]);
+
   useEffect(() => {
-    fetchAllTransactionAdminBuyCard();
+    if (revalidateSellCash) {
+      fetchAllTransactionAdmiSellCash();
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allBuyCardTransactionsAdmin]);
+  }, [revalidateSellCash]);
+
   useEffect(() => {
-    fetchAllTransactionAdmiSellCash();
+    if (revalidateSellCard) {
+      fetchAllTransactionAdmiSellCard();
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allSellCashTransactionsAdmin]);
-  useEffect(() => {
-    fetchAllTransactionAdmiSellCard();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allSellCardTransactionsAdmin]);
+  }, [revalidateSellCard]);
 
   //==================================={TX DATA}=================================================================
 
@@ -252,101 +312,121 @@ export const AdminDashboard = (props) => {
   //====================================================================================================
 
   return (
-    <div className="flex gap-5 bg-[#F3F3F3]">
-      <DashboardMenuAdmin
-        setPage={setPage}
-        mode={mode}
-        user={user}
-        page={page}
-      />
-      {!isUpdating && (
-        <div className="w-[78%]">
-          {page === "Exchange" &&
-            (allExchangeTransactionsAdmin ? (
-              <AdminRecord
-                columns={ColumnsAdminRecords}
-                data={allExchangeTransactionsAdmin}
-                mode={mode}
-                setMode={setMode}
-              />
-            ) : (
-              <div className="w-full h-full flex justify-center items-center">
-                <CircularProgress />
-              </div>
-            ))}
-          {page === "Defi" &&
-            (allDefiTransactionsAdmin ? (
-              <AdminRecord
-                columns={ColumnsAdminRecords}
-                data={allDefiTransactionsAdmin}
-                mode={mode}
-                setMode={setMode}
-              />
-            ) : (
-              <div className="w-full h-full flex justify-center items-center">
-                <CircularProgress />
-              </div>
-            ))}
-          {page === "Buy (Cash)" &&
-            (allBuyCashTransactionsAdmin ? (
-              <AdminRecord
-                columns={ColumnsAdminRecords}
-                data={allBuyCashTransactionsAdmin}
-                mode={mode}
-                setMode={setMode}
-              />
-            ) : (
-              <div className="w-full h-full flex justify-center items-center">
-                <CircularProgress />
-              </div>
-            ))}
-          {page === "Buy (Card)" &&
-            (allBuyCardTransactionsAdmin ? (
-              <AdminRecord
-                columns={ColumnsAdminRecords}
-                data={allBuyCardTransactionsAdmin}
-                mode={mode}
-                setMode={setMode}
-              />
-            ) : (
-              <div className="w-full h-full flex justify-center items-center">
-                <CircularProgress />
-              </div>
-            ))}
-          {page === "Sell (Cash)" &&
-            (allSellCashTransactionsAdmin ? (
-              <AdminRecord
-                columns={ColumnsAdminRecords}
-                data={allSellCashTransactionsAdmin}
-                mode={mode}
-                setMode={setMode}
-              />
-            ) : (
-              <div className="w-full h-full flex justify-center items-center">
-                <CircularProgress />
-              </div>
-            ))}
-          {page === "Sell (Card)" &&
-            (allSellCardTransactionsAdmin ? (
-              <AdminRecord
-                columns={ColumnsAdminRecords}
-                data={allSellCardTransactionsAdmin}
-                mode={mode}
-                setMode={setMode}
-              />
-            ) : (
-              <div className="w-full h-full flex justify-center items-center">
-                <CircularProgress />
-              </div>
-            ))}
-        </div>
-      )}
+    <TransActionUpdateModalContext.Provider
+      value={{
+        isTransactionUpdateModalOpen,
+        setIsTransactionUpdateModalOpen,
+        selectedRowData,
+        setSelectedRowData,
+        selectedRowFullData,
+        setSelectedRowFullData,
+        setRevalidateExchange,
+        setRevalidateBuyCard,
+        setRevalidateBuyCash,
+        setRevalidateSellCard,
+        setRevalidateSellCash,
+        setRevalidateDefi,
+        setRefetchTxData,
+      }}
+    >
+      <div className="flex gap-5 bg-[#F3F3F3]">
+        <DashboardMenuAdmin
+          setPage={setPage}
+          mode={mode}
+          user={user}
+          page={page}
+        />
+        {!isUpdating && (
+          <div className="w-[78%]">
+            {page === "Exchange" &&
+              (!isExchangeLoading && allExchangeTransactionsAdmin ? (
+                <AdminRecord
+                  columns={ColumnsAdminRecords}
+                  data={allExchangeTransactionsAdmin}
+                  mode={mode}
+                  setMode={setMode}
+                />
+              ) : (
+                <div className="w-full h-full flex justify-center items-center">
+                  <CircularProgress />
+                </div>
+              ))}
+            {page === "Defi" &&
+              (!isDefiLoading && allDefiTransactionsAdmin ? (
+                <AdminRecord
+                  columns={ColumnsAdminRecords}
+                  data={allDefiTransactionsAdmin}
+                  mode={mode}
+                  setMode={setMode}
+                />
+              ) : (
+                <div className="w-full h-full flex justify-center items-center">
+                  <CircularProgress />
+                </div>
+              ))}
+            {page === "Buy (Cash)" &&
+              (!isBuyCashLoading && allBuyCashTransactionsAdmin ? (
+                <AdminRecord
+                  columns={ColumnsAdminRecords}
+                  data={allBuyCashTransactionsAdmin}
+                  mode={mode}
+                  setMode={setMode}
+                />
+              ) : (
+                <div className="w-full h-full flex justify-center items-center">
+                  <CircularProgress />
+                </div>
+              ))}
+            {page === "Buy (Card)" &&
+              (!isBuyCardLoading && allBuyCardTransactionsAdmin ? (
+                <AdminRecord
+                  columns={ColumnsAdminRecords}
+                  data={allBuyCardTransactionsAdmin}
+                  mode={mode}
+                  setMode={setMode}
+                />
+              ) : (
+                <div className="w-full h-full flex justify-center items-center">
+                  <CircularProgress />
+                </div>
+              ))}
+            {page === "Sell (Cash)" &&
+              (!isSellCashLoading && allSellCashTransactionsAdmin ? (
+                <AdminRecord
+                  columns={ColumnsAdminRecords}
+                  data={allSellCashTransactionsAdmin}
+                  mode={mode}
+                  setMode={setMode}
+                />
+              ) : (
+                <div className="w-full h-full flex justify-center items-center">
+                  <CircularProgress />
+                </div>
+              ))}
+            {page === "Sell (Card)" &&
+              (!isSellCardLoading && allSellCardTransactionsAdmin ? (
+                <AdminRecord
+                  columns={ColumnsAdminRecords}
+                  data={allSellCardTransactionsAdmin}
+                  mode={mode}
+                  setMode={setMode}
+                />
+              ) : (
+                <div className="w-full h-full flex justify-center items-center">
+                  <CircularProgress />
+                </div>
+              ))}
+          </div>
+        )}
 
-      {isUpdating && txData && (
-        <section className={`container p-2`}>
-          <CardUpdateInfo mode={mode} setRefetchTxData={setRefetchTxData} />
-        </section>
-      )}
-    </div>
+        {isUpdating && txData && (
+          <section className={`container p-2`}>
+            <CardUpdateInfo mode={mode} setRefetchTxData={setRefetchTxData} />
+          </section>
+        )}
+
+        <TransactionUpdateModal page={page} />
+      </div>
+    </TransActionUpdateModalContext.Provider>
   );
 };

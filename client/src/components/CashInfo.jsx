@@ -1,6 +1,6 @@
-import { useFormik } from 'formik';
+import { useFormik } from "formik";
 
-import { MdQrCodeScanner } from 'react-icons/md';
+import { MdQrCodeScanner } from "react-icons/md";
 
 export const CashInfo = (props) => {
   const {
@@ -17,24 +17,24 @@ export const CashInfo = (props) => {
 
   const { values, handleChange, handleSubmit, touched, errors } = useFormik({
     initialValues: {
-      recipientAddress: '',
-      telegram: '',
+      recipientAddress: "",
+      telegram: "",
       isTermsChecked: false,
     },
     validate: (values) => {
       const errors = {};
 
       if (!values.recipientAddress) {
-        errors.recipientAddress = 'Recipient address is required!';
+        errors.recipientAddress = "Recipient address is required!";
       }
 
       if (!values.telegram) {
-        errors.telegram = 'Telegram address is required!';
+        errors.telegram = "Telegram address is required!";
       }
 
       if (!values.isTermsChecked) {
         errors.isTermsChecked =
-          'Please indicate that you have read and agree to the Terms and Conditions and Privacy Policy';
+          "Please indicate that you have read and agree to the Terms and Conditions and Privacy Policy";
       }
 
       return errors;
@@ -64,8 +64,7 @@ export const CashInfo = (props) => {
           </div>
 
           <div className="flex flex-col w-[320px] xs:w-[340px] md:w-[452px] gap-3">
-
-            {service === 'buy' && (
+            {service === "buy" && (
               <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between mb-5">
                 <div className="md:w-[452px] w-[320px] xs:w-[340px]">
                   <div className="ml-2 mt-2 text-xs leading-[18px] text-darkslategray-200">
@@ -94,7 +93,7 @@ export const CashInfo = (props) => {
               </div>
             )}
 
-            {service === 'sell' && (
+            {service === "sell" && (
               <div className="flex flex-row bg-whitesmoke-100 rounded h-[62px] justify-between mb-5">
                 <div className="md:w-[452px] w-[320px] xs:w-[340px]">
                   <div className="ml-2 mt-2 text-xs leading-[18px] text-darkslategray-200">
